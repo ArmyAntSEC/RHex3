@@ -1,0 +1,62 @@
+#ifndef _SERIALSTREAM_H_
+#define _SERIALSTREAM_H_
+
+#include <Arduino.h>
+
+enum _EndlCode { endl };
+
+class SerialStream
+{
+
+public:
+  LogStorage& operator<< ( char const * str )
+  {
+    Serial.print ( str );
+    return *this;
+  }
+  
+  LogStorage& operator<< ( String str )
+  {
+    Serial.print ( str );
+    return *this;
+  }
+  
+  LogStorage& operator<< ( long int num )
+  {
+    Serial.print ( num );
+    return *this;
+  }
+  
+  LogStorage& operator<< ( long unsigned int num )
+  {
+    Serial.print ( num );
+    return *this;
+  }
+  
+  LogStorage& operator<< ( int num )
+  {
+    Serial.print ( num );
+    return *this;
+  }
+  
+  LogStorage& operator<< ( unsigned int num )
+  {
+    Serial.print ( num );
+    return *this;
+  }
+  
+  LogStorage& operator<< ( double num )
+  {
+    Serial.print ( num );
+    return *this;
+  }
+  
+  LogStorage& operator<< (  _EndlCode );
+  {
+    Serial.prinln ();
+    return *this;
+  }
+  
+}
+
+#endif

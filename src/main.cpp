@@ -9,8 +9,15 @@
 #define MOTOR_PWM 6
 
 #include <HomingEncoder.h>
+#include <TaskScheduler.h>
+#include <SerialStream.h>
+#include "MotorDriver.h"
 
 HomingEncoder encoder1;
+
+TaskScheduler sched;
+
+MotorDriver driver;
 
 void setup()
 {
@@ -23,35 +30,56 @@ void setup()
   
   digitalWrite ( MOTOR_EN1, 1 );
   digitalWrite ( MOTOR_EN2, 0 );
+
+  Log << "Hello World!" << endl;
+
+  driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );
+
+
+  Log << "Start pos: " << encoder1.readCompensated() << ", " << encoder1.isHomed() << endl;
+  driver.setMotorPWM( 64 );
+  delay(1000);
+  Log << "Mid pos: " << encoder1.readCompensated() << ", " << encoder1.isHomed() << endl;
+  driver.setMotorPWM( -64 );
+  delay(1000);
+  Log << "End pos: " << encoder1.readCompensated() << ", " << encoder1.isHomed() << endl;
+  driver.setMotorPWM( 0 );
 }
 
-int counter = 0;
+  
+void loop()
+{
+  sched.run();
+  
+  
+} 
 
+
+//*********************************
+// ** A function to test the leg dynamics. Should be called once every 10ms
+//***********************************
+int counter = 0;
 const int logLen = 160;
 long int posLog[logLen];
 
-unsigned long int nextCall = 0;
-
-void loop()
+void testLegDynamics ( void )
 {
-  if ( millis() > nextCall ) {
-    if ( counter == 0 )
-      analogWrite ( MOTOR_PWM, 255 );
-    if ( counter == logLen/2 )
-      analogWrite ( MOTOR_PWM, 0 );
-    if ( counter == logLen ) {
-      Serial.println ( millis() );
-      for ( int i = 0; i < logLen; i++ ) {
-        Serial.print ( i );
-        Serial.print ( '\t' );
-        Serial.println ( posLog[i] );
-      }
+  if ( counter == 0 )
+    analogWrite ( MOTOR_PWM, 255 );
+  if ( counter == logLen/2 )
+    analogWrite ( MOTOR_PWM, 0 );
+  if ( counter == logLen ) {
+    Serial.println ( millis() );
+    for ( int i = 0; i < logLen; i++ ) {
+      Serial.print ( i );
+      Serial.print ( '\t' );
+      Serial.println ( posLog[i] );
     }
-    if ( counter < logLen ) {
-      posLog[counter] = encoder1.readCompensated();
-    }
-
-    counter++;
-    nextCall += 10;
   }
-} 
+  if ( counter < logLen ) {
+    posLog[counter] = encoder1.readCompensated();
+  }
+  
+  counter++;
+}
+
