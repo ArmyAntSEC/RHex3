@@ -3,8 +3,8 @@
 #define MOTOR_EN1 4
 #define MOTOR_EN2 5
 #define MOTOR_CS A0
-#define ENCODER_1 2
-#define ENCODER_2 3
+#define ENCODER_2 2
+#define ENCODER_1 3
 #define OPTO 7
 #define MOTOR_PWM 6
 
@@ -12,12 +12,27 @@
 #include <TaskScheduler.h>
 #include <SerialStream.h>
 #include "MotorDriver.h"
+#include "MotorSpeedController.h"
 
 HomingEncoder encoder1;
 
 TaskScheduler sched;
 
 MotorDriver driver;
+
+MotorSpeedController controller ( 10 );
+
+class PositionBeacon: public RecurringTask
+{
+  public:
+    PositionBeacon( unsigned int _rate): RecurringTask( _rate ) {}
+
+    virtual void run( unsigned long int now )
+    {
+      Log << "Position: " << encoder1.readCompensated() << endl;
+    }
+};
+PositionBeacon beacon(100);
 
 void setup()
 {
@@ -27,7 +42,7 @@ void setup()
   pinMode ( MOTOR_EN1, OUTPUT );
   pinMode ( MOTOR_EN2, OUTPUT );
   pinMode ( MOTOR_PWM, OUTPUT );
-  
+
   digitalWrite ( MOTOR_EN1, 1 );
   digitalWrite ( MOTOR_EN2, 0 );
 
@@ -44,15 +59,21 @@ void setup()
   delay(1000);
   Log << "End pos: " << encoder1.readCompensated() << ", " << encoder1.isHomed() << endl;
   driver.setMotorPWM( 0 );
+
+  controller.init( millis(), &driver, &encoder1 );
+  controller.setDestinationPositionAndSpeed( 1500, 64 );
+
+  sched.add( &controller );
+
+  beacon.init(  millis() );
+  sched.add( &beacon );
 }
 
-  
+
 void loop()
 {
   sched.run();
-  
-  
-} 
+}
 
 
 //*********************************
