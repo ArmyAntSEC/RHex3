@@ -16,6 +16,7 @@ private:
   int driverPinTwo;	
   int currentPin;
   int driverPinPWM;
+  int lastMotorPWM = 0;
   
 public:	
   void init( int _driverPinOne, int _driverPinTwo, int _driverPinPWM, 
@@ -33,15 +34,20 @@ public:
   }
   
   void setMotorPWM( int motorPWM ) {			  
-    if ( motorPWM <= 0 ) {
+    if ( motorPWM < 0 || 
+      (motorPWM == 0 && lastMotorPWM > 0) ) //Actively break when setting the speed to 0
+    {
       digitalWrite ( this->driverPinTwo, LOW);
       digitalWrite ( this->driverPinOne, HIGH);			
-    } else {
+    } else if ( motorPWM > 0 || 
+      (motorPWM == 0 && lastMotorPWM < 0) ) //Actively break when setting the speed to 0
+    {        
       digitalWrite ( this->driverPinTwo, HIGH);
       digitalWrite ( this->driverPinOne, LOW);		
     }
     
     analogWrite ( this->driverPinPWM, abs(motorPWM) );
+    this->lastMotorPWM = motorPWM;
   }
   
   float getCurrentInMilliVolt() {
