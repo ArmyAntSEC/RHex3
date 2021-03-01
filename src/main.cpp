@@ -14,6 +14,7 @@
 #include <SerialStream.h>
 #include "MotorDriver.h"
 #include "MotorSpeedController.h"
+#include "miniTests.h"
 
 HomingEncoder encoder;
 
@@ -23,25 +24,6 @@ MotorDriver driver;
 
 MotorSpeedController controller ( 10 );
 
-void testEncoderReliability()
-{
-  for ( int i = 0; i < 5; i++ ) {    
-    encoder.unHome();
-
-    int speed = -64;    
-    driver.setMotorPWM(speed);      
-    int randNum = random(100);
-    delay ( 200 + randNum  );
-    while ( !encoder.isHomed() ) {    
-      encoder.isr_homing<0>(); 
-      delay(10);   
-    }
-    driver.setMotorPWM(0);
-    delay(1000);  
-    Log << "Stop position: " << encoder.readCompensated() << endl;
-    Log << "Position at homing: " << encoder.getPosAtLastHome() << endl;    
-  }
-}
 
 void setup()
 {
@@ -61,7 +43,7 @@ void setup()
 
   driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );
 
-  testEncoderReliability();
+  testEncoderReliability(&encoder, &driver);
 
   driver.setMotorPWM(0);
   
