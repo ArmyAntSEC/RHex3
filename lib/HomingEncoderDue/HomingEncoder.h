@@ -56,12 +56,14 @@ struct HomingEncoderState {
 
   bool moving_forward;
   
-  int position;
-  int rotations;
+  long int position;
+  int laps;
   
   bool is_homed;
   
-  int pos_at_last_home;
+  long int pos_at_last_home;
+  int last_lap_length;
+  int average_lap_length;
   
   int offset;
 
@@ -98,13 +100,15 @@ public:
     state.encoderPin2 = encoderPin2;
     state.breakerPin = breakerPin;
     state.position = 0;
-    state.rotations = 0;
+    state.laps = 0;
     state.moving_forward = true;
     state.is_homed = false;
     state.pos_at_last_home = 0;
     state.last_position = 0;
     state.last_position_timestamp_micros = 0;
-    state.speed_cps = 0;        
+    state.speed_cps = 0;     
+    state.last_lap_length = 0;
+    state.average_lap_length = 0;   
     
     state.encoderPin1_register = PIN_TO_BASEREG(encoderPin1);
     state.encoderPin2_register = PIN_TO_BASEREG(encoderPin2);
@@ -182,14 +186,32 @@ public:
     return speedCPMS;
   }
 
-  int getPosComp()
-    {             
-      int r;                        
-      noInterrupts();
-      r = state.position + state.offset;
-      interrupts();
-      return r;
-    }
+  int isMovingForward()
+  {
+    int dir = 0;
+    noInterrupts();
+    dir = state.moving_forward;
+    interrupts();
+    return dir;
+  }
+
+  long int getPosComp()
+  {             
+    long int r;                        
+    noInterrupts();
+    r = state.position + state.offset;
+    interrupts();
+    return r;
+  }
+
+  long int getPosSinceLastHoming()
+  {             
+    long int r;                        
+    noInterrupts();
+    r = state.position - state.pos_at_last_home;
+    interrupts();
+    return r;
+  }
   
   void unHome()
     {
@@ -208,24 +230,42 @@ public:
       return is_homed;
     }
   
-  int getRotations()
-    {
-      int rotations;
-      noInterrupts();
-      rotations = state.rotations;
-      interrupts();
-      return rotations;
-    }
+  int getLaps()
+  {
+    int laps;
+    noInterrupts();
+    laps = state.laps;
+    interrupts();
+    return laps;
+  }
   
   int getPosAtLastHome()
-    {
-      int rValue = 0;
-      noInterrupts();
-      rValue = state.pos_at_last_home;
-      interrupts();
-      return rValue;
-    }
+  {
+    int rValue = 0;
+    noInterrupts();
+    rValue = state.pos_at_last_home;
+    interrupts();
+    return rValue;
+  }
   
+  int getLastLapLength()
+  {
+    int rValue = 0;
+    noInterrupts();
+    rValue = state.last_lap_length;
+    interrupts();
+    return rValue;
+  }
+
+  int getAverageLapLength()
+  {
+    int rValue = 0;
+    noInterrupts();
+    rValue = state.average_lap_length;
+    interrupts();
+    return rValue;
+  }
+
   unsigned int getBreakerVal()
   {
     return DIRECT_PIN_READ(state.breakerPin_register, 
@@ -234,66 +274,77 @@ public:
   
 public:
   template<int N> static void isr_encoder(void) 
-    {
-      HomingEncoderState * state = stateList[N];
-      
-      uint8_t p1val = DIRECT_PIN_READ(state->encoderPin1_register, 
-				      state->encoderPin1_bitmask );
-      uint8_t p2val = DIRECT_PIN_READ(state->encoderPin2_register,
-				      state->encoderPin2_bitmask );
-      
-      uint8_t encoder_state = state->encoder_state & 3;
-      if (p1val) encoder_state |= 4;
-      if (p2val) encoder_state |= 8;
-      state->encoder_state = (encoder_state >> 2);
-      
-      switch (encoder_state) {
-      case 1: case 7: case 8: case 14:
-	state->position--;
-	state->moving_forward = false;
-	break;
-      case 2: case 4: case 11: case 13:
-	state->position++;
-	state->moving_forward = true;
-	break;
-      case 3: case 12:
-	state->position -= 2;
-	state->moving_forward = false;
-	break;
-      case 6: case 9:
-	state->position += 2;
-	state->moving_forward = true;
-	break;
-      }                                    
-    }
+  {
+    HomingEncoderState * state = stateList[N];
+    
+    uint8_t p1val = DIRECT_PIN_READ(state->encoderPin1_register, 
+      state->encoderPin1_bitmask );
+    uint8_t p2val = DIRECT_PIN_READ(state->encoderPin2_register,
+            state->encoderPin2_bitmask );
+    
+    uint8_t encoder_state = state->encoder_state & 3;
+    if (p1val) encoder_state |= 4;
+    if (p2val) encoder_state |= 8;
+    state->encoder_state = (encoder_state >> 2);
+    
+    switch (encoder_state) {
+    case 1: case 7: case 8: case 14:
+	    state->position--;
+	    state->moving_forward = false;
+      break;
+    case 2: case 4: case 11: case 13:
+      state->position++;
+      state->moving_forward = true;
+      break;
+    case 3: case 12:
+      state->position -= 2;
+      state->moving_forward = false;
+      break;
+    case 6: case 9:
+      state->position += 2;
+    	state->moving_forward = true;
+	  break;
+    }                                    
+  }
   
   template<int N> static void isr_homing(void) 
     { 
       HomingEncoderState * state = stateList[N];
       
       uint8_t breaker_val = DIRECT_PIN_READ(state->breakerPin_register, 
-					    state->breakerPin_bitmask );                           
-#if defined (ARDUINO_AVR_UNO)
-      //A bit of an ugly hack, but it allows u to call this function as often as we want on the Uno, but it only
-      //does anything if the breaker has actually toggled
+        state->breakerPin_bitmask );                           
+      #if defined (ARDUINO_AVR_UNO)
+        //A bit of an ugly hack, but it allows u to call this function as often as we want on the Uno, but it only
+        //does anything if the breaker has actually toggled
 
-      if ( breaker_val == state->homing_pin_last_value )
-	return;
-      else
-	state->homing_pin_last_value = breaker_val;
-#endif
+        if ( breaker_val == state->homing_pin_last_value )
+	        return;
+        else
+	        state->homing_pin_last_value = breaker_val; 
+      #endif
       
       //Depending on direction, we will trigger either on rising or falling. 
       //We want to make sure we allways trigger on the same edge regardless of direction
-      if ( abs(state->position) > 2500 && state->moving_forward ^ breaker_val ) {                                
-	state->is_homed = true;
-	state->pos_at_last_home = state->position;
-	state->position = 0;
-	if ( state->moving_forward )
-	  state->rotations++;
-	else
-	  state->rotations--;
-      }            
+      if ( abs(state->position - state->pos_at_last_home) > 2500 && state->moving_forward ^ breaker_val ) {                                
+        if ( !state->is_homed ) {
+          //We reset the positon on the first home
+          state->position = 0;                 
+        } else {
+          //We compute lap statistics for subsequent homings
+          state->last_lap_length = state->position - state->pos_at_last_home;
+          state->pos_at_last_home = state->position;
+          
+          if ( state->moving_forward ) {
+            state->laps++;
+          } else {
+            state->laps--;
+          }
+          
+          state->average_lap_length = state->position / state->laps; 
+        }
+        
+        state->is_homed = true;                
+      }
     }
 };
 

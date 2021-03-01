@@ -43,10 +43,7 @@ void setup()
 
   driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );
 
-  
-  driver.setMotorPWM(-64); 
-  delay(500);
-  testHomingPrecision(&encoder, &driver);
+  testEncoderReliability(&encoder, &driver);
   driver.setMotorPWM(0);
   
 }
