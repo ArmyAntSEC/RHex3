@@ -1,3 +1,0 @@
-[submodule "lib/HomingEncoderDue"]
-	path = lib/HomingEncoderDue
-	url = git@github.com:ArmyAntSEC/HomingEncoderDue.git

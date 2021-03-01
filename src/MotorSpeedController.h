@@ -34,7 +34,7 @@ class MotorSpeedController: public RecurringTask
     {
       this->dest = _dest;
 
-      int currPos = -encoder->readCompensated();
+      int currPos = -encoder->readCompensatedPos();
       while ( currPos > this->dest )
         this->dest += encoder->clicksPerRevolution();
 
@@ -47,7 +47,7 @@ class MotorSpeedController: public RecurringTask
 
     virtual void run ( unsigned long int now )
     {
-      int currPos = -encoder->readCompensated();
+      int currPos = -encoder->readCompensatedPos();
       if ( currPos > this->dest )
       {
         this->driver->setMotorPWM( 0 );
