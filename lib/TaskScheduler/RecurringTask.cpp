@@ -8,14 +8,15 @@
 #include "RecurringTask.h"
 #include <Arduino.h>
 
-RecurringTask::RecurringTask(unsigned int _rate)
-: runTime(0), rate(_rate), isRunning(false)
+RecurringTask::RecurringTask()
+: runTime(0), rate(1000), isRunning(true)
 {
 }
 
 //Sets the runTime to now so that the task starts running.
-void RecurringTask::init( unsigned long int now = 0 ) {
-	this->runTime = now;
+void RecurringTask::init( unsigned int _rate, unsigned long int _now = 0 ) {
+	this->rate = _rate;
+	this->runTime = _now;
 	this->start();
 }
 

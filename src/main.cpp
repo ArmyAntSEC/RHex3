@@ -22,7 +22,7 @@ TaskScheduler sched;
 
 MotorDriver driver;
 
-MotorSpeedController controller ( 10 );
+MotorSpeedController controller;
 
 
 void setup()
@@ -43,8 +43,10 @@ void setup()
 
   driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );
 
-  testEncoderReliability(&encoder, &driver);
-
+  
+  driver.setMotorPWM(-64); 
+  delay(500);
+  testHomingPrecision(&encoder, &driver);
   driver.setMotorPWM(0);
   
 }

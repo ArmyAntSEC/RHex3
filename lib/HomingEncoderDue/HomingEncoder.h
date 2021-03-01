@@ -24,6 +24,8 @@
 #define _HOMINGENCODER_H_
 
 #include <Arduino.h>
+#include <RecurringTask.h>
+#include <FixedPointsCommon.h>
 
 #if defined(ARDUINO_SAM_DUE)
   #define IO_REG_TYPE			uint32_t
@@ -63,16 +65,16 @@ struct HomingEncoderState {
   
   int offset;
 
-  int last_position;
+  long int last_position;
   unsigned long int last_position_timestamp_micros;
-  int speed_cps;
+  SQ15x16 speed_cps;
 
 #if defined (ARDUINO_AVR_UNO)
   uint8_t homing_pin_last_value; //Only used for Uno to software emulate the homing pin interrupt
 #endif
 };
 
-class HomingEncoder
+class HomingEncoder: public RecurringTask
 {
 private:
   HomingEncoderState state;        
@@ -139,31 +141,48 @@ public:
 #endif      
     }
   }
-
-  virtual void run( unsigned long int now_micro )
+  
+  //Should be called once every 10ms to compute the speed.
+  virtual void run( unsigned long int )
   {    
-    int thisPos = this->readCompensatedPos();
-    int posDelta = thisPos - state.last_position;
+    
+    //Max rpm: 3
+    //Max clicks per second: 3*3500 = 10000
+    //Max clicks per 0.01 s = 100
+    //Max clicks per 0.001 s = 10
+
+    //Min clicks per second 4700
+    //Min clicks per 0.01s = 47
+    //Min clicks per 0.001s = 4.7
+
+
+    unsigned long int nowU = micros();
+
+    int thisPos = this->getPosComp();
+    SQ15x16 posDelta = thisPos - state.last_position;
     state.last_position = thisPos;
 
-    int timeDelta = now_micro - state.last_position_timestamp_micros;
+    SQ15x16 timeDelta = nowU - state.last_position_timestamp_micros;
+    state.last_position_timestamp_micros = nowU;
 
-    if ( timeDelta == 0 )
+    if ( timeDelta == 0 ) {
       state.speed_cps = 0;
-    else
-      state.speed_cps = (1e6*posDelta)/timeDelta;
+    } else {            
+      //First pre-scale by 100, then divide, then scale by 10k for a total of 1e6.
+      state.speed_cps = 10000*((100*posDelta)/timeDelta);
+    }    
   }
 
-  int readSpeed()
+  long int getSpeedCPMS()
   {
-    int speedCPS = 0;
+    int speedCPMS = 0;
     noInterrupts();
-    speedCPS = state.speed_cps;
+    speedCPMS = state.speed_cps.getInteger();
     interrupts();  
-    return speedCPS;
+    return speedCPMS;
   }
 
-  int readCompensatedPos()
+  int getPosComp()
     {             
       int r;                        
       noInterrupts();
@@ -206,6 +225,12 @@ public:
       interrupts();
       return rValue;
     }
+  
+  unsigned int getBreakerVal()
+  {
+    return DIRECT_PIN_READ(state.breakerPin_register, 
+      state.breakerPin_bitmask );                           
+  }
   
 public:
   template<int N> static void isr_encoder(void) 

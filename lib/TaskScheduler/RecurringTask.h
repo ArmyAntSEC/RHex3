@@ -12,11 +12,11 @@
 
 class RecurringTask: public Task { // @suppress("Class has a virtual method and non-virtual destructor")
 public:
-	RecurringTask( unsigned int _rate );
+	RecurringTask( );
     virtual bool canRun(unsigned long int now);
     inline void setRate(unsigned long int _rate) { runTime += _rate; }
     virtual void run(unsigned long int now);
-    void init( unsigned long int now );
+    void init( unsigned int _rate, unsigned long int _now );
     inline void start() { this->isRunning = true; }
     inline void stop() { this->isRunning = false; }
     inline unsigned long int getRate() { return rate; }    

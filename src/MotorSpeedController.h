@@ -18,14 +18,14 @@ class MotorSpeedController: public RecurringTask
     bool running;
 
   public:
-    MotorSpeedController( int _rate ): RecurringTask( _rate )
+    MotorSpeedController( )
     {
       //Anything to init here?
     }
 
-    void init ( unsigned long int _now, MotorDriver* _driver, HomingEncoder* _encoder )
+    void init ( unsigned int _rate, unsigned long int _now, MotorDriver* _driver, HomingEncoder* _encoder )
     {
-      RecurringTask::init( _now );
+      RecurringTask::init( _rate, _now );
       this->driver = _driver;
       this->encoder = _encoder;
     }
@@ -34,7 +34,7 @@ class MotorSpeedController: public RecurringTask
     {
       this->dest = _dest;
 
-      int currPos = -encoder->readCompensatedPos();
+      int currPos = -encoder->getPosComp();
       while ( currPos > this->dest )
         this->dest += encoder->clicksPerRevolution();
 
@@ -47,7 +47,7 @@ class MotorSpeedController: public RecurringTask
 
     virtual void run ( unsigned long int now )
     {
-      int currPos = -encoder->readCompensatedPos();
+      int currPos = -encoder->getPosComp();
       if ( currPos > this->dest )
       {
         this->driver->setMotorPWM( 0 );
