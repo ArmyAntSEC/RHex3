@@ -5,6 +5,8 @@
 #include <SerialStream.h>
 #include "MotorDriver.h"
 
+#define sgn(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
+
 void testDrift( HomingEncoder* encoder, MotorDriver *driver )
 {
   for ( int i = 0; i < 10; i++ ) {    
@@ -94,8 +96,45 @@ void testEncoderReliability( HomingEncoder* encoder, MotorDriver *driver )
     Log << "Pos since last homing: " << encoder->getLastLapLength() << 
     " Average Lap length: " << encoder->getAverageLapLength() << endl;
   }
+}
 
+void testGoToPosition( HomingEncoder* encoder, MotorDriver *driver )
+{  
+  int targetSpeed = 7500;  
 
+  int power = -64;    
+  driver->setMotorPWM(power);   
+  int randNum = random(100);
+  delay ( 200 + randNum  );
+  
+  boolean done = false;
+  unsigned long int nextRound = millis() + 10;  
+  unsigned long int nextRound2 = millis() + 1000;  
+  unsigned long int startTime = millis();
+  while ( !done && millis() - startTime < 5000 ) {
+    encoder->isr_homing<0>(); //Make sure homing code is run regularly        
+    if ( millis() > nextRound ) {
+      encoder->run(0);
+      nextRound += 10;
+
+    if ( millis() > nextRound2 ) {
+      nextRound2 += 1000;
+      if ( encoder->isHomed() && encoder->getSpeedCPMS() > 0 ) {
+          long int speed = encoder->getSpeedCPMS();        
+          int newPower = power * (float)targetSpeed / (float)speed;
+          if ( abs(newPower) > 255 ) {
+            newPower = 255*sgn(newPower);
+          }
+
+          driver->setMotorPWM(power);   
+          Log << "Speed: " << speed <<
+            " New Power: " << newPower << 
+            " Old Power: " << power << endl;
+          power = newPower;
+        }      
+      }
+    }
+  }    
 }
 
 #endif

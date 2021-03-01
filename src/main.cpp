@@ -43,7 +43,7 @@ void setup()
 
   driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );
 
-  testEncoderReliability(&encoder, &driver);
+  testGoToPosition(&encoder, &driver);
   driver.setMotorPWM(0);
   
 }
