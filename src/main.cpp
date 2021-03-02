@@ -39,7 +39,7 @@ void setup()
   digitalWrite ( MOTOR_EN2, 1 );
 
   randomSeed(analogRead(UNCONNECTED_ANALOG));
-  Log << "Hello World: " << random(100) << endl;
+  //Log << "Hello World: " << random(100) << endl;
 
   driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );
 

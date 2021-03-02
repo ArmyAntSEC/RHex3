@@ -100,8 +100,8 @@ void testEncoderReliability( HomingEncoder* encoder, MotorDriver *driver )
 
 void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver )
 {  
-  //int speedLog[500];
-  //int powerLog[500];
+  int speedLog[100];
+  int powerLog[100];
   int loopCount = 0;
 
   float P = 10;
@@ -116,7 +116,7 @@ void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver )
 
   unsigned long int startTime = millis();
   unsigned long int nextTime = millis() + 10;  
-  while ( millis() - startTime < 3000 )
+  while ( millis() - startTime < 1000 )
   {
     encoder->isr_homing<0>(); //Make sure homing code is run regularly      
     if ( millis() > nextTime ) {
@@ -136,20 +136,20 @@ void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver )
 
       ErrorVariance += (long int)Error*(long int)Error;
 
-      //speedLog[loopCount] = Input;
-      //powerLog[loopCount] = Output;
+      speedLog[loopCount] = Input;
+      powerLog[loopCount] = Output;
 
       loopCount++;
     }
   }
   Log << "Last speed: " << Input << endl;    
   Log << "Error Std: " << sqrt( ErrorVariance )/loopCount << endl;
-  Log << "Loop count: " << loopCount;
-    
-  /*for ( int i = 0; i < 1; i++ ) {
+  Log << "Loop count: " << loopCount << endl;
+  
+  Log << "Speed, Power" << endl;
+  for ( int i = 0; i < loopCount-1; i++ ) {
     Log << speedLog[i] << ", " << powerLog[i] << endl;
-    delay(10);
-  } */ 
+  }
 }
 
 #endif
