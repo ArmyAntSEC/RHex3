@@ -3,8 +3,8 @@
 #define MOTOR_EN1 4
 #define MOTOR_EN2 5
 #define MOTOR_CS A0
-#define ENCODER_2 3
-#define ENCODER_1 2
+#define ENCODER_2 2
+#define ENCODER_1 3
 #define OPTO 7
 #define MOTOR_PWM 6
 #define UNCONNECTED_ANALOG A2
@@ -43,7 +43,7 @@ void setup()
 
   driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );
 
-  testGoToPosition(&encoder, &driver);
+  testSpeedPDController(&encoder, &driver);
   driver.setMotorPWM(0);
   
 }

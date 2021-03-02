@@ -40,8 +40,8 @@ void testDrift( HomingEncoder* encoder, MotorDriver *driver )
 
 void testSpeedMesaurement( HomingEncoder* encoder, MotorDriver *driver )
 {
-    //int speed = -64;    
-    int speed = -255;    
+    int speed = -64;    
+    //int speed = -255;    
     driver->setMotorPWM(speed);      
     for ( int j = 1; j < 10; j++ ) {    
       for ( int i = 0; i < 50; i++ ) {
@@ -98,43 +98,58 @@ void testEncoderReliability( HomingEncoder* encoder, MotorDriver *driver )
   }
 }
 
-void testGoToPosition( HomingEncoder* encoder, MotorDriver *driver )
+void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver )
 {  
-  int targetSpeed = 7500;  
+  //int speedLog[500];
+  //int powerLog[500];
+  int loopCount = 0;
 
-  int power = -64;    
-  driver->setMotorPWM(power);   
-  int randNum = random(100);
-  delay ( 200 + randNum  );
-  
-  boolean done = false;
-  unsigned long int nextRound = millis() + 10;  
-  unsigned long int nextRound2 = millis() + 1000;  
+  float P = 10;
+  float D = 0.0;
+  int Input = 0;
+  long int Output = 0;
+  int SetPoint = 5000;
+  int lastInput = 0;
+    
+
+  long int ErrorVariance = 0;
+
   unsigned long int startTime = millis();
-  while ( !done && millis() - startTime < 5000 ) {
-    encoder->isr_homing<0>(); //Make sure homing code is run regularly        
-    if ( millis() > nextRound ) {
+  unsigned long int nextTime = millis() + 10;  
+  while ( millis() - startTime < 3000 )
+  {
+    encoder->isr_homing<0>(); //Make sure homing code is run regularly      
+    if ( millis() > nextTime ) {
       encoder->run(0);
-      nextRound += 10;
+      nextTime += 10;
+      
+      Input = encoder->getSpeedCPMS();
+      int Error = SetPoint - Input;
+      int dInput = Input - lastInput;
+      lastInput = Input;
 
-    if ( millis() > nextRound2 ) {
-      nextRound2 += 1000;
-      if ( encoder->isHomed() && encoder->getSpeedCPMS() > 0 ) {
-          long int speed = encoder->getSpeedCPMS();        
-          int newPower = power * (float)targetSpeed / (float)speed;
-          if ( abs(newPower) > 255 ) {
-            newPower = 255*sgn(newPower);
-          }
+      Output = P*Error + D*dInput;
+      if ( Output > 255  ) Output = 255;
+      if ( Output < 0 ) Output = 1;      
+            
+      driver->setMotorPWM(Output);   
 
-          driver->setMotorPWM(power);   
-          Log << "Speed: " << speed <<
-            " New Power: " << newPower << 
-            " Old Power: " << power << endl;
-          power = newPower;
-        }      
-      }
+      ErrorVariance += (long int)Error*(long int)Error;
+
+      //speedLog[loopCount] = Input;
+      //powerLog[loopCount] = Output;
+
+      loopCount++;
     }
-  }    
+  }
+  Log << "Last speed: " << Input << endl;    
+  Log << "Error Std: " << sqrt( ErrorVariance )/loopCount << endl;
+  Log << "Loop count: " << loopCount;
+    
+  /*for ( int i = 0; i < 1; i++ ) {
+    Log << speedLog[i] << ", " << powerLog[i] << endl;
+    delay(10);
+  } */ 
 }
 
 #endif
