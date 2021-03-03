@@ -43,8 +43,17 @@ void setup()
 
   driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );
 
-  testSpeedPDController(&encoder, &driver);
-  driver.setMotorPWM(0);
+  while ( true ) {
+    while ( Serial.available() == 0 ) {}
+    int incomingByte = Serial.read();
+    testSpeedPDController(&encoder, &driver, incomingByte);
+    driver.setMotorPWM(0);
+  }
+  
+
+
+  
+  
   
 }
 

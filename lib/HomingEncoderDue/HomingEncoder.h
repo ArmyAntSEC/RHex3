@@ -163,18 +163,32 @@ public:
     unsigned long int nowU = micros();
 
     int thisPos = this->getPosComp();
-    SQ15x16 posDelta = thisPos - state.last_position;
+    noInterrupts();
+    int lastPos = state.last_position;
+    unsigned long int lastTimeU = state.last_position_timestamp_micros;
+    interrupts();
+
+    SQ15x16 posDelta = thisPos - lastPos;
     state.last_position = thisPos;
 
-    SQ15x16 timeDelta = nowU - state.last_position_timestamp_micros;
+    SQ15x16 timeDelta = nowU - lastTimeU;
     state.last_position_timestamp_micros = nowU;
 
+    SQ15x16 speedCPS;
     if ( timeDelta == 0 ) {
-      state.speed_cps = 0;
+      speedCPS = 0;
     } else {            
       //First pre-scale by 100, then divide, then scale by 10k for a total of 1e6.
-      state.speed_cps = 10000*((100*posDelta)/timeDelta);
+      speedCPS = 10000*((100*posDelta)/timeDelta);
     }    
+    
+    noInterrupts();
+    state.last_position = thisPos;
+    state.last_position_timestamp_micros = nowU;
+    state.speed_cps = speedCPS;
+    interrupts();
+
+
   }
 
   long int getSpeedCPMS()

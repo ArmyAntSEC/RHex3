@@ -98,16 +98,17 @@ void testEncoderReliability( HomingEncoder* encoder, MotorDriver *driver )
   }
 }
 
-void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver )
+void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver, int _P )
 {  
   int speedLog[100];
   int powerLog[100];
   int loopCount = 0;
 
-  float P = 10;
-  float D = 0.0;
+  float P = 1; 
+  float D = ((float)_P)/10;
   int Input = 0;
   long int Output = 0;
+  long int OutputFiltered = 0;
   int SetPoint = 5000;
   int lastInput = 0;
     
@@ -132,19 +133,20 @@ void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver )
       if ( Output > 255  ) Output = 255;
       if ( Output < 0 ) Output = 1;      
             
-      driver->setMotorPWM(Output);   
+      OutputFiltered = (Output + OutputFiltered*4)/5;
+      driver->setMotorPWM(OutputFiltered);   
 
       ErrorVariance += (long int)Error*(long int)Error;
 
       speedLog[loopCount] = Input;
-      powerLog[loopCount] = Output;
+      powerLog[loopCount] = OutputFiltered;
 
       loopCount++;
     }
   }
-  Log << "Last speed: " << Input << endl;    
-  Log << "Error Std: " << sqrt( ErrorVariance )/loopCount << endl;
-  Log << "Loop count: " << loopCount << endl;
+  //Log << "Last speed: " << Input << endl;    
+  //Log << "Error Std: " << sqrt( ErrorVariance )/loopCount << endl;
+  //Log << "Loop count: " << loopCount << endl;
   
   Log << "Speed, Power" << endl;
   for ( int i = 0; i < loopCount-1; i++ ) {
