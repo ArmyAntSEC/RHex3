@@ -98,26 +98,29 @@ void testEncoderReliability( HomingEncoder* encoder, MotorDriver *driver )
   }
 }
 
-void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver, int _P )
+void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver, float parameters[4] )
 {  
-  int speedLog[100];
-  int powerLog[100];
+  int speedLog[200];
+  int powerLog[200];
   int loopCount = 0;
 
-  float P = 1; 
-  float D = ((float)_P)/10;
+  float P = parameters[0]; 
+  float D = parameters[1];
+  float filter = parameters[2];
+
   int Input = 0;
   long int Output = 0;
   long int OutputFiltered = 0;
-  int SetPoint = 5000;
+  int SetPoint = parameters[3];
   int lastInput = 0;
     
+  //Make sure that we are homed before we start.
+  encoder->forceHomed();
 
   long int ErrorVariance = 0;
-
   unsigned long int startTime = millis();
   unsigned long int nextTime = millis() + 10;  
-  while ( millis() - startTime < 1000 )
+  while ( millis() - startTime < 2000 )
   {
     encoder->isr_homing<0>(); //Make sure homing code is run regularly      
     if ( millis() > nextTime ) {
@@ -133,7 +136,7 @@ void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver, int _P 
       if ( Output > 255  ) Output = 255;
       if ( Output < 0 ) Output = 1;      
             
-      OutputFiltered = (Output + OutputFiltered*4)/5;
+      OutputFiltered = (Output + OutputFiltered*(filter-1))/filter;
       driver->setMotorPWM(OutputFiltered);   
 
       ErrorVariance += (long int)Error*(long int)Error;

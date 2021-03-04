@@ -27,6 +27,8 @@
 #include <RecurringTask.h>
 #include <FixedPointsCommon.h>
 
+#include <SerialStream.h>
+
 #if defined(ARDUINO_SAM_DUE)
   #define IO_REG_TYPE			uint32_t
 #elif defined(ARDUINO_AVR_UNO)
@@ -188,6 +190,14 @@ public:
     state.speed_cps = speedCPS;
     interrupts();
 
+    /*if ( speedCPS < -100 ) {
+      Log << "Very negative speed" << endl;
+      Log << "speedCPS:" << speedCPS.getInteger() << endl;
+      Log << "Pos delta: " << posDelta.getInteger() << endl;
+      Log << "Time delta: " << timeDelta.getInteger() << endl;
+      Log << "This pos: " << thisPos << endl;
+      Log << "Last pos:" << lastPos << endl;
+    }*/
 
   }
 
@@ -228,22 +238,30 @@ public:
   }
   
   void unHome()
-    {
-      noInterrupts();
-      state.is_homed = false;
-      state.pos_at_last_home = 0;
-      interrupts();
-    }
+  {
+    noInterrupts();
+    state.is_homed = false;
+    state.pos_at_last_home = 0;
+    interrupts();
+  }
   
+  void forceHomed()
+  {
+    noInterrupts();
+    state.is_homed = true;
+    state.pos_at_last_home = state.position;
+    interrupts();
+  }
+
   bool isHomed() 
-    {
-      bool is_homed;
-      noInterrupts();
-      is_homed = state.is_homed;
-      interrupts();
-      return is_homed;
-    }
-  
+  {
+    bool is_homed;
+    noInterrupts();
+    is_homed = state.is_homed;
+    interrupts();
+    return is_homed;
+  }
+
   int getLaps()
   {
     int laps;

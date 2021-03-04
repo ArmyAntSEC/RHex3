@@ -43,18 +43,24 @@ void setup()
 
   driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );
 
-  while ( true ) {
-    while ( Serial.available() == 0 ) {}
-    int incomingByte = Serial.read();
-    testSpeedPDController(&encoder, &driver, incomingByte);
-    driver.setMotorPWM(0);
+  const int numParams = 4;
+  float parameters[numParams];
+  byte* paramsRaw = (byte*)parameters;
+
+  int byteCount = numParams*sizeof(float);
+  for ( int i = 0; i < byteCount; i++ ) {
+    while ( Serial.available() == 0 ) {
+      delay(1);
+    }
+    paramsRaw[i] = Serial.read();
   }
   
+  //Log << "Params: " << parameters[0] << ", " << parameters[1] << ", " <<
+  //  parameters[2] << ", " << parameters[3] << endl;
 
+  testSpeedPDController(&encoder, &driver, parameters);
 
-  
-  
-  
+  driver.setMotorPWM(0);   
 }
 
 
