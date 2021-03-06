@@ -145,6 +145,11 @@ void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver, float p
       powerLog[loopCount] = OutputFiltered;
 
       loopCount++;
+
+      if ( millis() - startTime > 1000 ) { 
+        //After 1 second, set the speed to half.
+        SetPoint = parameters[3]/2;
+      }      
     }
   }
   //Log << "Last speed: " << Input << endl;    
