@@ -13,7 +13,6 @@
 #include <TaskScheduler.h>
 #include <SerialStream.h>
 #include "MotorDriver.h"
-#include "MotorSpeedController.h"
 #include "miniTests.h"
 
 HomingEncoder encoder;
@@ -21,9 +20,6 @@ HomingEncoder encoder;
 TaskScheduler sched;
 
 MotorDriver driver;
-
-MotorSpeedController controller;
-
 
 void setup()
 {
@@ -58,7 +54,7 @@ void setup()
   //Log << "Params: " << parameters[0] << ", " << parameters[1] << ", " <<
   //  parameters[2] << ", " << parameters[3] << endl;
 
-  testSpeedPDController(&encoder, &driver, parameters);
+  testSpeedPDControllerClass(&encoder, &driver, parameters);
 
   driver.setMotorPWM(0);   
 }

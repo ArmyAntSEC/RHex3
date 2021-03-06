@@ -4,6 +4,7 @@
 #include "HomingEncoder.h"
 #include <SerialStream.h>
 #include "MotorDriver.h"
+#include "MotorSpeedRegulator.h"
 
 #define sgn(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
 
@@ -162,4 +163,45 @@ void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver, float p
   }
 }
 
+void testSpeedPDControllerClass( HomingEncoder* encoder, MotorDriver *driver, float parameters[4] )
+{  
+  int speedLog[200];
+  int powerLog[200];
+  int loopCount = 0;
+  
+  MotorSpeedRegulator regulator;
+  regulator.init( encoder, driver, parameters[0], parameters[1], parameters[2] );
+  regulator.setSetPoint( parameters[3] );
+
+  //Make sure that we are homed before we start.
+  encoder->forceHomed();
+
+  unsigned long int startTime = millis();
+  unsigned long int nextTime = millis() + 10;  
+  while ( millis() - startTime < 2000 )
+  {
+    encoder->isr_homing<0>(); //Make sure homing code is run regularly      
+    if ( millis() > nextTime ) {
+      encoder->run(0);
+      nextTime += 10;
+      
+      regulator.run();
+
+      speedLog[loopCount] = regulator.getInput();
+      powerLog[loopCount] = regulator.getFilteredOutput();
+
+      loopCount++;
+
+      if ( millis() - startTime > 1000 ) { 
+        //After 1 second, set the speed to half.
+        regulator.setSetPoint( parameters[3]/2 );
+      }      
+    }
+  }
+
+  Log << "Speed, Power" << endl;
+  for ( int i = 0; i < loopCount-1; i++ ) {
+    Log << speedLog[i] << ", " << powerLog[i] << endl;
+  }
+}
 #endif
