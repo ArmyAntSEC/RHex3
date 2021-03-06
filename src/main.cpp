@@ -54,11 +54,10 @@ void setup()
   //Log << "Params: " << parameters[0] << ", " << parameters[1] << ", " <<
   //  parameters[2] << ", " << parameters[3] << endl;
 
-  testSpeedPDControllerClass(&encoder, &driver, parameters);
+  testGoToPosition(&encoder, &driver, parameters);
 
   driver.setMotorPWM(0);   
 }
-
 
 void loop()
 {
