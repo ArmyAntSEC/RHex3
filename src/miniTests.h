@@ -167,6 +167,7 @@ void testSpeedPDControllerClass( HomingEncoder* encoder, MotorDriver *driver, fl
 {  
   int speedLog[200];
   int powerLog[200];
+  int posLog[200];
   int loopCount = 0;
   
   MotorSpeedRegulator regulator;
@@ -174,16 +175,16 @@ void testSpeedPDControllerClass( HomingEncoder* encoder, MotorDriver *driver, fl
   regulator.setSetPoint( parameters[3] );
   
   //Home the encoder
-  driver->setMotorPWM( 64 );
+  driver->setMotorPWM( 92 );
   while ( !encoder->isHomed() ) {    
     encoder->isr_homing<0>(); //Make sure homing code is run regularly      
   }
   driver->setMotorPWM( 0 );
-  delay(500); //Make sure the motor has stopped.  
-  driver->setMotorPWM( 64 ); //Ugly hack: But then give it a kick to avoid it stopping.   
+  delay(500); //Make sure the motor has stopped.    
   
   unsigned long int startTime = millis();
   unsigned long int nextTime = millis() + 10;  
+  encoder->run(0); //Init the speed measurement
   while ( millis() - startTime < 2000 )
   {
     encoder->isr_homing<0>(); //Make sure homing code is run regularly      
@@ -195,6 +196,7 @@ void testSpeedPDControllerClass( HomingEncoder* encoder, MotorDriver *driver, fl
 
       speedLog[loopCount] = regulator.getInput();
       powerLog[loopCount] = regulator.getFilteredOutput();
+      posLog[loopCount] = encoder->getPosComp();        
 
       loopCount++;
 
@@ -205,9 +207,9 @@ void testSpeedPDControllerClass( HomingEncoder* encoder, MotorDriver *driver, fl
     }
   }
 
-  Log << "Speed, Power" << endl;
+  Log << "Speed, Power, Position" << endl;
   for ( int i = 0; i < loopCount-1; i++ ) {
-    Log << speedLog[i] << ", " << powerLog[i] << endl;
+    Log << speedLog[i] << ", " << powerLog[i] << ", " << posLog[i] << endl;
   }
 }
 
@@ -215,24 +217,26 @@ void testGoToPosition( HomingEncoder* encoder, MotorDriver *driver, float parame
 {  
   int speedLog[200];
   int powerLog[200];
+  int posLog[200];
   int loopCount = 0;
+  bool done = false;
   
   MotorSpeedRegulator regulator;
   regulator.init( encoder, driver, parameters[0], parameters[1], parameters[2] );
   regulator.setSetPoint( parameters[3] );
   
   //Home the encoder
-  driver->setMotorPWM( 64 );
+  driver->setMotorPWM( 96 );
   while ( !encoder->isHomed() ) {    
     encoder->isr_homing<0>(); //Make sure homing code is run regularly      
   }
   driver->setMotorPWM( 0 );
   
   delay(500); //Make sure the motor has stopped.  
-  driver->setMotorPWM( 64 ); //Ugly hack: But then give it a kick to avoid it stopping.
-
+  
   unsigned long int startTime = millis();
   unsigned long int nextTime = millis() + 10;    
+  encoder->run(0); //Init the speed measurement
   while ( millis() - startTime < 2000 )
   {
     encoder->isr_homing<0>(); //Make sure homing code is run regularly      
@@ -240,16 +244,19 @@ void testGoToPosition( HomingEncoder* encoder, MotorDriver *driver, float parame
       encoder->run(0);
       nextTime += 10;
       
-      if ( millis() - startTime > 1000 ) { 
-        //After 1 second, stop the motor
-        driver->setMotorPWM( 0 );
-        speedLog[loopCount] = encoder->getSpeedCPMS();
-        powerLog[loopCount] = 0;
-
-      } else {
+      if ( encoder->getPosComp() > 3000 ) {
+        done = true;
+      }
+      if ( !done ) {         
         regulator.run();
         speedLog[loopCount] = regulator.getInput();
         powerLog[loopCount] = regulator.getFilteredOutput();
+        posLog[loopCount] = encoder->getPosComp();        
+      } else {
+        driver->setMotorPWM( 0 );
+        speedLog[loopCount] = encoder->getSpeedCPMS();
+        powerLog[loopCount] = 0;
+        posLog[loopCount] = encoder->getPosComp();        
       }
 
       loopCount++;
@@ -257,9 +264,9 @@ void testGoToPosition( HomingEncoder* encoder, MotorDriver *driver, float parame
     }
   }
 
-  Log << "Speed, Power" << endl;
+  Log << "Speed, Power, Position" << endl;
   for ( int i = 0; i < loopCount-1; i++ ) {
-    Log << speedLog[i] << ", " << powerLog[i] << endl;
+    Log << speedLog[i] << ", " << powerLog[i] << ", " << posLog[i] << endl;
   }
 }
 #endif

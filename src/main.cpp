@@ -51,10 +51,8 @@ void setup()
     paramsRaw[i] = Serial.read();
   }
   
-  //Log << "Params: " << parameters[0] << ", " << parameters[1] << ", " <<
-  //  parameters[2] << ", " << parameters[3] << endl;
-
-  testGoToPosition(&encoder, &driver, parameters);
+  //testGoToPosition(&encoder, &driver, parameters);
+  testSpeedPDControllerClass(&encoder, &driver, parameters);
 
   driver.setMotorPWM(0);   
 }
