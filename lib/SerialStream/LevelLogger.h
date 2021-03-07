@@ -3,10 +3,10 @@
 
 #include "SerialStream.h"
 
-#ifdef LOG_DEBUG
+#ifdef DEBUG_LOG
     #define DEBUG(x) Log << x << endl;
 #else
-    #define DEBUG(x) 
+    #define DEBUG(x)
 #endif
 
 #define ERROR(x) Log << x << endl;

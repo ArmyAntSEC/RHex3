@@ -24,7 +24,8 @@ class SimpleMoveTest: public RemoteRoutine
                 driver->setMotorPWM(0);                
                 //Remote Routines should stop when done to 
                 //allow new commands to be sent.
-                this->stop();                 
+                this->stop();
+                DEBUG( F("Motor stopped") );                 
             }
         }
         
@@ -32,7 +33,10 @@ class SimpleMoveTest: public RemoteRoutine
         {
             RemoteRoutine::init (_now );
             driver->setMotorPWM(64);
-            stopTime = _now + this->timeToMoveSec;
+            this->stopTime = _now + this->timeToMoveSec;
+            DEBUG(F("SimpleMoveTest initialized at time ") << _now );
+            DEBUG(F("Will stop at ") << this->stopTime );
+            this->start(_now);
         }
 
         virtual void storeArgument( int argumentNumber, float argumentValue )
@@ -40,8 +44,11 @@ class SimpleMoveTest: public RemoteRoutine
             switch ( argumentNumber )
             {
                 case 0:
-                    timeToMoveSec = argumentValue;
+                    this->timeToMoveSec = argumentValue;
+                    DEBUG( F("Time to move: ") << this->timeToMoveSec );
                     break;                
+                default:
+                    DEBUG( F("Unsupported arg number:") << argumentNumber );
             }
         }
 

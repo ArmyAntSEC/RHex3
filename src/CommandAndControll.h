@@ -57,7 +57,7 @@ class CommandAndControll: public RecurringTask10ms
                 }
                 
                 int commandInt = (int)command;
-                DEBUG ( F("Received command") << commandInt );
+                DEBUG ( F("Received command: ") << commandInt );
                 if ( commandInt < this->MaxRoutines ) {
                     RemoteRoutine* thisCommand = this->routines[commandInt];
                     if ( thisCommand != 0 ){                        

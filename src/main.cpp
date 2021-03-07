@@ -26,8 +26,9 @@ CommandAndControll ctr ( &sched );
 
 void setup()
 {
-  Serial.begin( 115200 );  
-
+  Serial.begin( 115200 );    
+  DEBUG( F("Setup started") );  
+  
   pinMode ( MOTOR_EN1, OUTPUT );
   pinMode ( MOTOR_EN2, OUTPUT );
   pinMode ( MOTOR_PWM, OUTPUT );
@@ -42,7 +43,8 @@ void setup()
 
   sched.add( &ctr );
 
-  ctr.registerRemoteRoutine(&simpleMoveTest,1);
+  ctr.registerRemoteRoutine(&simpleMoveTest,0);  
+
   DEBUG( F("Setup done") );
 }
 

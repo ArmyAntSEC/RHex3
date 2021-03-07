@@ -41,7 +41,7 @@ class RemoteRoutine: public RecurringTask10ms
                     }
                     rawParam[i] = Serial.read();
                 }
-                DEBUG( F("Parsed argument ") << i << F(" with value ") << paramvalue );
+                DEBUG( F("Parsed argument ") << i << F(" with value ") << paramValue );
                 this->storeArgument( i, paramValue );
             }            
             DEBUG( F("All aruments parsed") );
