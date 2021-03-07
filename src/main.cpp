@@ -13,52 +13,40 @@
 #include <TaskScheduler.h>
 #include <SerialStream.h>
 #include "MotorDriver.h"
-#include "miniTests.h"
+#include "miniTests/SimpleMoveTest.h"
+#include "CommandAndControll.h"
 
 HomingEncoder encoder;
+MotorDriver driver;
+
+SimpleMoveTest simpleMoveTest( &encoder, &driver );
 
 TaskScheduler sched;
-
-MotorDriver driver;
+CommandAndControll ctr ( &sched );
 
 void setup()
 {
   Serial.begin( 115200 );  
 
-  encoder.init<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );
   pinMode ( MOTOR_EN1, OUTPUT );
   pinMode ( MOTOR_EN2, OUTPUT );
   pinMode ( MOTOR_PWM, OUTPUT );
-  pinMode ( UNCONNECTED_ANALOG, INPUT );
-
-  digitalWrite ( MOTOR_EN1, 0 );
-  digitalWrite ( MOTOR_EN2, 1 );
+  pinMode ( UNCONNECTED_ANALOG, INPUT );  
 
   randomSeed(analogRead(UNCONNECTED_ANALOG));
-  //Log << "Hello World: " << random(100) << endl;
 
+  encoder.init<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );
   driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );
-
-  const int numParams = 4;
-  float parameters[numParams];
-  byte* paramsRaw = (byte*)parameters;
-
-  int byteCount = numParams*sizeof(float);
-  for ( int i = 0; i < byteCount; i++ ) {
-    while ( Serial.available() == 0 ) {
-      delay(1);
-    }
-    paramsRaw[i] = Serial.read();
-  }
   
-  //testGoToPosition(&encoder, &driver, parameters);
-  testSpeedPDControllerClass(&encoder, &driver, parameters);
-
   driver.setMotorPWM(0);   
+
+  ctr.registerRemoteRoutine(&simpleMoveTest,1);
 }
 
 void loop()
 {
+  unsigned long int now = millis();
+  ctr.run(now);
   sched.run();
 }
 
