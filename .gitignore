@@ -34,3 +34,6 @@
 # Temporary project file
 .pio/
 /.vscode
+
+# Save files
+*~
