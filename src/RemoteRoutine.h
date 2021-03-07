@@ -30,7 +30,8 @@ class RemoteRoutine: public RecurringTask10ms
 
         void parseArgumentsAndInit( unsigned long int _now )
         {
-            for ( int i = 0; i < numArguments; i++ )
+            DEBUG(F("Waiting for arguments: ") << this->numArguments );
+            for ( int i = 0; i < this->numArguments; i++ )
             {
                 float paramValue = 0;
                 byte* rawParam = (byte*)&paramValue;
@@ -40,9 +41,11 @@ class RemoteRoutine: public RecurringTask10ms
                     }
                     rawParam[i] = Serial.read();
                 }
+                DEBUG( F("Parsed argument ") << i << F(" with value ") << paramvalue );
                 this->storeArgument( i, paramValue );
-            }
-            this->init(_now);
+            }            
+            DEBUG( F("All aruments parsed") );
+            this->init(_now);            
         }        
 };
 

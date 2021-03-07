@@ -5,8 +5,9 @@
 
 #include <RemoteRoutine.h>
 #include <TaskScheduler.h>
+#include <RecurringTask10ms.h>
 
-class CommandAndControll
+class CommandAndControll: public RecurringTask10ms
 {
     private:
         static const int MaxRoutines = 16;
@@ -24,6 +25,9 @@ class CommandAndControll
             if ( _command < MaxRoutines && routines[_command] == 0 ) {                
                 this->routines[_command] = _routine;
                 this->scheduler->add( _routine );                
+                DEBUG( F("Registerd command ") << _command );
+            } else {
+                ERROR( F("Could not register command at pos ") << _command );
             }
         }
 
@@ -41,6 +45,7 @@ class CommandAndControll
             //Wait for a command to arrive. This blocks the main loop until a command is successfully parsed.
             //In order to support background tasks, this function should be converted to non-blocking.
             if ( readyToAcceptCommand ) {
+                DEBUG ( F("Waiting for command") );
                 float command = 0;
                 byte* rawCommand = (byte*)&command;
 
@@ -52,9 +57,10 @@ class CommandAndControll
                 }
                 
                 int commandInt = (int)command;
+                DEBUG ( F("Received command") << commandInt );
                 if ( commandInt < this->MaxRoutines ) {
                     RemoteRoutine* thisCommand = this->routines[commandInt];
-                    if ( thisCommand != 0 ){
+                    if ( thisCommand != 0 ){                        
                         thisCommand->parseArgumentsAndInit(_now);                        
                     }
                 }

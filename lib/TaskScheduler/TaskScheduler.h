@@ -16,7 +16,8 @@ public:
     void add ( Task* task );
     void run();
 private:
-    Task *tasks[10];
+    const static int MaxTasks = 16;
+    Task *tasks[MaxTasks];
     int numTasks;
     int loopsSinceLastRun;
 };

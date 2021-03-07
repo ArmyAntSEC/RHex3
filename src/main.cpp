@@ -11,7 +11,7 @@
 
 #include "HomingEncoder.h"
 #include <TaskScheduler.h>
-#include <SerialStream.h>
+#include <LevelLogger.h>
 #include "MotorDriver.h"
 #include "miniTests/SimpleMoveTest.h"
 #include "CommandAndControll.h"
@@ -40,13 +40,14 @@ void setup()
   
   driver.setMotorPWM(0);   
 
+  sched.add( &ctr );
+
   ctr.registerRemoteRoutine(&simpleMoveTest,1);
+  DEBUG( F("Setup done") );
 }
 
 void loop()
-{
-  unsigned long int now = millis();
-  ctr.run(now);
+{  
   sched.run();
 }
 

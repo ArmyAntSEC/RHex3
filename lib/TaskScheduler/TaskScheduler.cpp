@@ -7,20 +7,21 @@
 
 #include "TaskScheduler.h"
 
-#include "Arduino.h"
+#include <LevelLogger.h>
 
 TaskScheduler::TaskScheduler() :
   numTasks(0), loopsSinceLastRun(0)
 {
-	memset( &tasks, 0, sizeof(Task)*10);
+	memset( &tasks, 0, sizeof(Task)*TaskScheduler::MaxTasks);
 }
 
 void TaskScheduler::add(Task* task) {
-	if ( numTasks < 10 ) {
+	if ( numTasks < TaskScheduler::MaxTasks ) {
 		tasks[numTasks] = task;
 		numTasks++;
 	} else {
-		Serial.println ( "TaskScheduler: More than 10 tasks cannot be allocated.");
+		ERROR( "TaskScheduler: More than " << TaskScheduler::MaxTasks << 
+			" tasks cannot be allocated." );
 	}
 }
 
