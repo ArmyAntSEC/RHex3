@@ -44,6 +44,9 @@ public:
     {        
       digitalWrite ( this->driverPinTwo, HIGH);
       digitalWrite ( this->driverPinOne, LOW);		
+    } else {
+      digitalWrite ( this->driverPinTwo, LOW);
+      digitalWrite ( this->driverPinOne, LOW);		
     }
     
     analogWrite ( this->driverPinPWM, abs(motorPWM) );
