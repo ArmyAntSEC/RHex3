@@ -26,7 +26,12 @@ void TaskScheduler::add(Task* task) {
 }
 
 void TaskScheduler::run() {	
-	unsigned long int now = millis();		
+	if ( millis() > 1100 )  {
+		return;
+	}
+	
+	unsigned long int nowU = micros();		
+	unsigned long int now = millis();	
 	for (int i = 0; i < numTasks; i++) {
 		DEBUG(F("Checking task ") << i << " of " << numTasks << F(" at time ") << now );
 		Task* thisTask = this->tasks[i];		
@@ -36,4 +41,16 @@ void TaskScheduler::run() {
 		DEBUG(F("Done with task ") << i << " of " << numTasks << F(" at time ") << now );				
 	}
 	DEBUG(F("----- Done with run") );
+	unsigned long totalTime = micros() - nowU;
+	if ( this->averageLoopTime == 0 ) {
+		this->averageLoopTime = totalTime;
+	} else {
+		this->averageLoopTime = 
+			(this->averageLoopTime*(TaskScheduler::filterFactor-1) +
+			totalTime) / TaskScheduler::filterFactor;
+	}
+	if ( now > this->nextRunTime ) {
+		ERROR(F("Loop time: ") << this->averageLoopTime << "\u03BCs." );
+		this->nextRunTime += 1000;
+	}
 }

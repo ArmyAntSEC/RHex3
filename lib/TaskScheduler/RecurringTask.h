@@ -12,18 +12,21 @@
 #include <LevelLogger.h>
 
 class RecurringTask: public Task { // @suppress("Class has a virtual method and non-virtual destructor")
-private:
+protected:
     unsigned long int runTime;
     unsigned int rate;
     bool running;
     static const char* getNameImpl() { static const char name[] = "RecTask"; return name; }    
 public:
-	RecurringTask( ): runTime(0), rate(1000), running(true)
+	RecurringTask( ): RecurringTask(1000)
+    {}
+    
+    RecurringTask( unsigned long int _rate ): runTime(0), rate(_rate), running(true)
     {}
 
     virtual bool canRun(unsigned long int now) 
     {
-        DEBUG(F("Test: Running: ") << this->running << " Now: " << now << " Next run:" << this->runTime << " Rate:" << this->rate );
+        //ERROR(F("Test: Running: ") << this->running << " Now: " << now << " Next run:" << this->runTime << " Rate:" << this->rate );
         return this->running && now > this->runTime;
     }   
 
