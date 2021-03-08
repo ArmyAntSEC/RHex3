@@ -24,10 +24,7 @@
 #define _HOMINGENCODER_H_
 
 #include <Arduino.h>
-#include <RecurringTask.h>
 #include <FixedPointsCommon.h>
-
-#include <SerialStream.h>
 
 #if defined(ARDUINO_SAM_DUE)
   #define IO_REG_TYPE			uint32_t
@@ -78,7 +75,7 @@ struct HomingEncoderState {
 #endif
 };
 
-class HomingEncoder: public RecurringTask
+class HomingEncoder
 {
 private:
   HomingEncoderState state;        
@@ -149,7 +146,7 @@ public:
   }
   
   //Should be called once every 10ms to compute the speed.
-  virtual void run( unsigned long int )
+  virtual void run( )
   {    
     
     //Max rpm: 3

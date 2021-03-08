@@ -15,8 +15,11 @@
 #include "MotorDriver.h"
 #include "miniTests/SimpleMoveTest.h"
 #include "CommandAndControll.h"
+#include "RecurringEncoderWrapper.h"
 
 HomingEncoder encoder;
+RecurringEncoderWrapper encoderWrapper ( &encoder );
+
 MotorDriver driver;
 
 SimpleMoveTest simpleMoveTest( &encoder, &driver );
@@ -38,8 +41,9 @@ void setup()
   randomSeed(analogRead(UNCONNECTED_ANALOG));
 
   encoder.init<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );
-  driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );
-  
+  sched.add( &encoderWrapper );  
+
+  driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );  
   driver.setMotorPWM(0);   
 
   ctr.init(millis());

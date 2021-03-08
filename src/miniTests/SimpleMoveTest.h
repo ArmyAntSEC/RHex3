@@ -11,8 +11,8 @@ class SimpleMoveTest: public RemoteRoutine
     private:
         unsigned long int timeToMoveSec; 
         unsigned long int stopTime;
-        static const char* getNameImpl() { static const char name[] = "SimpMvTest"; return name; }            
-        
+        static const char* getNameImpl() { static const char name[] = "SimpMvTest"; return name; }                    
+
     public:
         SimpleMoveTest(HomingEncoder* _encoder, MotorDriver* _driver ): 
             RemoteRoutine ( 1, _encoder, _driver ) 
@@ -22,13 +22,15 @@ class SimpleMoveTest: public RemoteRoutine
         {
             DEBUG( F("Motor running") );                 
             RemoteRoutine::run(_now);
-            
+            if ( _now > stopTime - 10 ) {
+                DEBUG( F("Speed: ") << encoder->getSpeedCPMS() );
+            }
             if ( _now > stopTime ){
                 driver->setMotorPWM(0);                
                 //Remote Routines should stop when done to 
                 //allow new commands to be sent.
                 this->stop();
-                ERROR( F("Motor stopped") );                 
+                DEBUG( F("Motor stopped") );                 
             }
         }
         

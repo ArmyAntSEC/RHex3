@@ -21,7 +21,7 @@ void testDrift( HomingEncoder* encoder, MotorDriver *driver )
     
     //Measure the speed
     for ( int i = 0; i < 2; i++ ) {
-      encoder->run(0);
+      encoder->run();
       delay(10);
     }
     Log << "Speed: " << encoder->getSpeedCPMS() << endl;
@@ -46,7 +46,7 @@ void testSpeedMesaurement( HomingEncoder* encoder, MotorDriver *driver )
     driver->setMotorPWM(speed);      
     for ( int j = 1; j < 10; j++ ) {    
       for ( int i = 0; i < 50; i++ ) {
-        encoder->run(0);
+        encoder->run();
         delay(10);
       }
       Log << "Speed: " << encoder->getSpeedCPMS() << endl;
@@ -125,7 +125,7 @@ void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver, float p
   {
     encoder->isr_homing<0>(); //Make sure homing code is run regularly      
     if ( millis() > nextTime ) {
-      encoder->run(0);
+      encoder->run();
       nextTime += 10;
       
       Input = encoder->getSpeedCPMS();
@@ -184,12 +184,12 @@ void testSpeedPDControllerClass( HomingEncoder* encoder, MotorDriver *driver, fl
   
   unsigned long int startTime = millis();
   unsigned long int nextTime = millis() + 10;  
-  encoder->run(0); //Init the speed measurement
+  encoder->run(); //Init the speed measurement
   while ( millis() - startTime < 2000 )
   {
     encoder->isr_homing<0>(); //Make sure homing code is run regularly      
     if ( millis() > nextTime ) {
-      encoder->run(0);
+      encoder->run();
       nextTime += 10;
       
       regulator.run();
@@ -236,12 +236,12 @@ void testGoToPosition( HomingEncoder* encoder, MotorDriver *driver, float parame
   
   unsigned long int startTime = millis();
   unsigned long int nextTime = millis() + 10;    
-  encoder->run(0); //Init the speed measurement
+  encoder->run(); //Init the speed measurement
   while ( millis() - startTime < 2000 )
   {
     encoder->isr_homing<0>(); //Make sure homing code is run regularly      
     if ( millis() > nextTime ) {
-      encoder->run(0);
+      encoder->run();
       nextTime += 10;
       
       if ( encoder->getPosComp() > 3000 ) {
