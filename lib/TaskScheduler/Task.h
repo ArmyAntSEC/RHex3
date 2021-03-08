@@ -8,11 +8,16 @@
 #ifndef TASK_H_
 #define TASK_H_
 
+#include <LevelLogger.h>
+
 class Task { // @suppress("Class has a virtual method and non-virtual destructor")
+private:
+    static const char* getNameImpl() { static const char name[] = "Task"; return name; }    
 public:
     virtual bool canRun(unsigned long int now) = 0;
     virtual void run(unsigned long int now) = 0;
+    
+    virtual const char* getName() { return Task::getNameImpl(); }
 };
-
 
 #endif /* TASK_H_ */

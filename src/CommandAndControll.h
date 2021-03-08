@@ -13,6 +13,7 @@ class CommandAndControll: public RecurringTask10ms
         static const int MaxRoutines = 16;
         RemoteRoutine* routines[MaxRoutines];
         TaskScheduler* scheduler;        
+        static const char* getNameImpl() { static const char name[] = "Command&Ctrl"; return name; }    
     public:
         CommandAndControll( TaskScheduler* _scheduler )
         {
@@ -33,6 +34,9 @@ class CommandAndControll: public RecurringTask10ms
 
         void run ( unsigned long int _now )
         {
+            DEBUG(F("Running"));
+            RecurringTask10ms::run(_now);        
+
             //Check if any commands are still running.
             //For now, we do not support background tasks. Will add that later.
             bool readyToAcceptCommand = true;
@@ -45,7 +49,7 @@ class CommandAndControll: public RecurringTask10ms
             //Wait for a command to arrive. This blocks the main loop until a command is successfully parsed.
             //In order to support background tasks, this function should be converted to non-blocking.
             if ( readyToAcceptCommand ) {
-                DEBUG ( F("Waiting for command") );
+                ERROR ( F("Waiting for command") );
                 float command = 0;
                 byte* rawCommand = (byte*)&command;
 
@@ -60,11 +64,24 @@ class CommandAndControll: public RecurringTask10ms
                 DEBUG ( F("Received command: ") << commandInt );
                 if ( commandInt < this->MaxRoutines ) {
                     RemoteRoutine* thisCommand = this->routines[commandInt];
-                    if ( thisCommand != 0 ){                        
+                    if ( thisCommand != 0 ){                                                
                         thisCommand->parseArgumentsAndInit(_now);                        
+                    } else {
+                        ERROR( F("Selected a null command" ) );
                     }
+                } else {
+                    ERROR( F("Selected a non-registered command" ) );
                 }
+                this->init(millis()); //Reset the clock in this one
+            } else {
+                DEBUG( F("Tasks running. Not doing anything." ) );
             }
+            
+        }
+        
+        virtual const char* getName()
+        {  
+            return CommandAndControll::getNameImpl();            
         }
 };
 

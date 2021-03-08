@@ -9,6 +9,8 @@
 
 class RemoteRoutine: public RecurringTask10ms
 {           
+    private:
+        static const char* getNameImpl() { static const char name[] = "RemoteRoutine"; return name; }    
     protected:
         const int numArguments;                            
         HomingEncoder* encoder;
@@ -22,15 +24,10 @@ class RemoteRoutine: public RecurringTask10ms
         }
         
         virtual void storeArgument( int argumentNumber, float argumentValue ) = 0;
-        
-        virtual void init( unsigned long int _now )
-        {
-            RecurringTask10ms::init( _now );            
-        }
-
+            
         void parseArgumentsAndInit( unsigned long int _now )
         {
-            DEBUG(F("Waiting for arguments: ") << this->numArguments );
+            DEBUG(F("RR: Waiting for arguments: ") << this->numArguments );
             for ( int i = 0; i < this->numArguments; i++ )
             {
                 float paramValue = 0;
@@ -41,11 +38,18 @@ class RemoteRoutine: public RecurringTask10ms
                     }
                     rawParam[i] = Serial.read();
                 }
-                DEBUG( F("Parsed argument ") << i << F(" with value ") << paramValue );
+                paramValue = 1000; //Force override
+                DEBUG( F("RR: Parsed argument ") << i << F(" with value ") << paramValue );
                 this->storeArgument( i, paramValue );
             }            
-            DEBUG( F("All aruments parsed") );
-            this->init(_now);            
+            DEBUG( F("RR: All aruments parsed") );
+            //The above can have taken a lot of time, so we get a fresh timestamp here.
+            this->init(millis());            
+        }
+     
+        virtual const char* getName()
+        {
+            return RemoteRoutine::getNameImpl();
         }        
 };
 

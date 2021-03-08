@@ -24,6 +24,7 @@ SimpleMoveTest simpleMoveTest( &encoder, &driver );
 TaskScheduler sched;
 CommandAndControll ctr ( &sched );
 
+
 void setup()
 {
   Serial.begin( 115200 );    
@@ -41,11 +42,12 @@ void setup()
   
   driver.setMotorPWM(0);   
 
+  ctr.init(millis());
   sched.add( &ctr );
 
   ctr.registerRemoteRoutine(&simpleMoveTest,0);  
 
-  DEBUG( F("Setup done") );
+  ERROR( F("Setup done") );
 }
 
 void loop()

@@ -11,7 +11,8 @@ class SimpleMoveTest: public RemoteRoutine
     private:
         unsigned long int timeToMoveSec; 
         unsigned long int stopTime;
-                       
+        static const char* getNameImpl() { static const char name[] = "SimpMvTest"; return name; }            
+        
     public:
         SimpleMoveTest(HomingEncoder* _encoder, MotorDriver* _driver ): 
             RemoteRoutine ( 1, _encoder, _driver ) 
@@ -19,23 +20,25 @@ class SimpleMoveTest: public RemoteRoutine
 
         virtual void run( unsigned long int _now )
         {
+            DEBUG( F("Motor running") );                 
             RemoteRoutine::run(_now);
+            
             if ( _now > stopTime ){
                 driver->setMotorPWM(0);                
                 //Remote Routines should stop when done to 
                 //allow new commands to be sent.
                 this->stop();
-                DEBUG( F("Motor stopped") );                 
+                ERROR( F("Motor stopped") );                 
             }
         }
         
         virtual void init( unsigned long int _now )
         {
+            ERROR(F("SimpleMoveTest initialized at time ") << _now );
             RemoteRoutine::init (_now );
             driver->setMotorPWM(64);
-            this->stopTime = _now + this->timeToMoveSec;
-            DEBUG(F("SimpleMoveTest initialized at time ") << _now );
-            DEBUG(F("Will stop at ") << this->stopTime );
+            this->stopTime = _now + this->timeToMoveSec;            
+            ERROR(F("Will stop at ") << this->stopTime );
             this->start(_now);
         }
 
@@ -50,6 +53,11 @@ class SimpleMoveTest: public RemoteRoutine
                 default:
                     DEBUG( F("Unsupported arg number:") << argumentNumber );
             }
+        }
+
+        virtual const char* getName()
+        {
+            return SimpleMoveTest::getNameImpl();
         }
 
 };

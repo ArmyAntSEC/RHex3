@@ -10,7 +10,7 @@
 #include <LevelLogger.h>
 
 TaskScheduler::TaskScheduler() :
-  numTasks(0), loopsSinceLastRun(0)
+  numTasks(0)
 {
 	memset( &tasks, 0, sizeof(Task)*TaskScheduler::MaxTasks);
 }
@@ -20,39 +20,20 @@ void TaskScheduler::add(Task* task) {
 		tasks[numTasks] = task;
 		numTasks++;
 	} else {
-		ERROR( "TaskScheduler: More than " << TaskScheduler::MaxTasks << 
-			" tasks cannot be allocated." );
+		ERROR( F("More than ") << TaskScheduler::MaxTasks << 
+			F(" tasks cannot be allocated.") );
 	}
 }
 
-void TaskScheduler::run() {
-	//Serial.println ( "Running task scheduler" );
-	unsigned long int now = millis();
-	//unsigned long int nowMicro = micros();
-	Task **tpp = tasks;
-	int runCount = 0;
-	//int maxTaskRan = 0;
-	for (int t = 0; t < numTasks; t++) {
-		Task *tp = *tpp;				
-		if (tp->canRun(now)) {			
-			runCount++;
-			//maxTaskRan = t;
-			tp->run(now);
-			break;
-		}
-		tpp++;
+void TaskScheduler::run() {	
+	unsigned long int now = millis();		
+	for (int i = 0; i < numTasks; i++) {
+		DEBUG(F("Checking task ") << i << " of " << numTasks << F(" at time ") << now );
+		Task* thisTask = this->tasks[i];		
+		if (thisTask->canRun(now)) {							
+			thisTask->run(now);											
+		} 
+		DEBUG(F("Done with task ") << i << " of " << numTasks << F(" at time ") << now );				
 	}
-	if ( runCount ) 
-	{
-		/*
-		unsigned long int endTime = micros();
-		log(now) << "Scheduler: Task time [us]: " << endTime - nowMicro <<
-		" Loops since last run: " << loopsSinceLastRun <<
-		" Max task in this run: " << maxTaskRan << 
-		" Total tasks: " << numTasks << endl;
-		*/
-		loopsSinceLastRun = 0;
-	} else  {
-		this->loopsSinceLastRun++;
-	}
+	DEBUG(F("----- Done with run") );
 }

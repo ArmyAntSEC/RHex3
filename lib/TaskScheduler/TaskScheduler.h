@@ -15,11 +15,13 @@ public:
     TaskScheduler();
     void add ( Task* task );
     void run();
+    static const char* getNameImpl() { static const char name[] = "TaskSched"; return name; }    
+    virtual const char* getName() {  return TaskScheduler::getNameImpl(); }
 private:
     const static int MaxTasks = 16;
     Task *tasks[MaxTasks];
     int numTasks;
-    int loopsSinceLastRun;
+    
 };
 
 #endif /* TASKSCHEDULER_H_ */
