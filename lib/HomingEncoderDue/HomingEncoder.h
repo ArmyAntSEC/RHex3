@@ -25,6 +25,7 @@
 
 #include <Arduino.h>
 #include <FixedPointsCommon.h>
+#include <LevelLogger.h>
 
 #if defined(ARDUINO_SAM_DUE)
   #define IO_REG_TYPE			uint32_t
@@ -146,18 +147,16 @@ public:
   }
   
   //Should be called once every 10ms to compute the speed.
-  virtual void run( )
+  virtual void run()
   {    
     
     //Max rpm: 3
     //Max clicks per second: 3*3500 = 10000
     //Max clicks per 0.01 s = 100
-    //Max clicks per 0.001 s = 10
 
     //Min clicks per second 4700
     //Min clicks per 0.01s = 47
-    //Min clicks per 0.001s = 4.7
-
+ 
 
     unsigned long int nowU = micros();
 
@@ -187,14 +186,16 @@ public:
     state.speed_cps = speedCPS;
     interrupts();
 
-    /*if ( speedCPS < -100 ) {
-      Log << "Very negative speed" << endl;
-      Log << "speedCPS:" << speedCPS.getInteger() << endl;
-      Log << "Pos delta: " << posDelta.getInteger() << endl;
-      Log << "Time delta: " << timeDelta.getInteger() << endl;
-      Log << "This pos: " << thisPos << endl;
-      Log << "Last pos:" << lastPos << endl;
-    }*/
+    /*
+    if ( speedCPS == 0 ) {
+      //ERROR( F("Unexpected speed") );
+      //ERROR( F("speedCPS:") << speedCPS.getInteger() );
+      //ERROR( F("Pos delta: ") << posDelta.getInteger() );
+      //ERROR( F("Time delta: ") << timeDelta.getInteger() );
+      //DEBUG( F("This pos: ") << thisPos );
+      //DEBUG ( F("Last pos:") << lastPos );
+    }
+    */
 
   }
 

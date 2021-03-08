@@ -21,6 +21,6 @@ public:
     else
       return false;
   }
-}
+};
 
 #endif
