@@ -25,28 +25,27 @@ class RemoteRoutine: public RecurringTask10ms
         
         virtual void storeArgument( int argumentNumber, float argumentValue ) = 0;
             
-        void parseArgumentsAndInit( unsigned long int _now )
+        void parseArgumentsAndInit( byte* argumentBytes, unsigned int argumentBytesLen, unsigned long int _now )
         {
-            DEBUG(F("RR: Waiting for arguments: ") << this->numArguments );
-            for ( int i = 0; i < this->numArguments; i++ )
-            {
-                float paramValue = 0;
-                byte* rawParam = (byte*)&paramValue;
-                for ( unsigned int i = 0; i < sizeof(float); i++ ) {
-                    while ( Serial.available() == 0 ) {
-                        delay(1);
-                    }
-                    rawParam[i] = Serial.read();
+            if ( argumentBytesLen >= this->numArguments*sizeof(float) ) {
+                float * argumentFloats = (float *)argumentBytes;
+                for ( int i = 0; i < this->numArguments; i++ ) {
+                    this->storeArgument( i, argumentFloats[i] );
                 }
-                paramValue = 1000; //Force override
-                DEBUG( F("RR: Parsed argument ") << i << F(" with value ") << paramValue );
-                this->storeArgument( i, paramValue );
-            }            
-            DEBUG( F("RR: All aruments parsed") );
-            //The above can have taken a lot of time, so we get a fresh timestamp here.
+            } else {
+                ERROR ( F("Not enough bytes sent to initialize this routine.") );
+            }
+
+            ERROR ( F("Initializing routine: ") << this->getName() );
+
             this->init(millis());            
         }
      
+        int getNumberOfArguments()
+        {
+            return this->numArguments;
+        }
+
         virtual const char* getName()
         {
             return RemoteRoutine::getNameImpl();

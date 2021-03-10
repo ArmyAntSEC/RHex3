@@ -13,7 +13,12 @@ class CommandAndControll: public RecurringTask10ms
         static const int MaxRoutines = 16;
         RemoteRoutine* routines[MaxRoutines];
         TaskScheduler* scheduler;        
-        static const char* getNameImpl() { static const char name[] = "Command&Ctrl"; return name; }    
+        static const char* getNameImpl() { static const char name[] = "Comnd&Ctrl"; return name; }    
+        byte argumentBuffer[16];
+        unsigned int argumentBufferWritePos = 0;
+        unsigned int numberOfArgumentBytes = 0;
+        int commandInt = -1;
+
     public:
         CommandAndControll( TaskScheduler* _scheduler )
         {
@@ -28,55 +33,47 @@ class CommandAndControll: public RecurringTask10ms
                 this->scheduler->add( _routine );                
                 DEBUG( F("Registerd command ") << _command );
             } else {
-                ERROR( F("Could not register command at pos ") << _command );
+                DEBUG( F("Could not register command at pos ") << _command );
             }
         }
 
         void run ( unsigned long int _now )
-        {
-            DEBUG(F("Running"));
+        {            
             RecurringTask10ms::run(_now);        
-
-            //Check if any commands are still running.
-            //For now, we do not support background tasks. Will add that later.
-            bool readyToAcceptCommand = true;
-            for ( int i = 0; i < this->MaxRoutines; i++ ) {
-                if ( this->routines[i] != 0 && this->routines[i]->isRunning() ) {
-                    readyToAcceptCommand = false;
-                }            
-            }
-
-            //Wait for a command to arrive. This blocks the main loop until a command is successfully parsed.
-            //In order to support background tasks, this function should be converted to non-blocking.
-            if ( readyToAcceptCommand ) {
-                ERROR ( F("Waiting for command") );
-                float command = 0;
-                byte* rawCommand = (byte*)&command;
-
-                for ( unsigned int i = 0; i < sizeof(float); i++ ) {
-                    while ( Serial.available() == 0 ) {
-                        delay(1);
-                    }
-                    rawCommand[i] = Serial.read();
-                }
-                
-                int commandInt = (int)command;
-                DEBUG ( F("Received command: ") << commandInt );
-                if ( commandInt < this->MaxRoutines ) {
-                    RemoteRoutine* thisCommand = this->routines[commandInt];
-                    if ( thisCommand != 0 ){                                                
-                        thisCommand->parseArgumentsAndInit(_now);                        
-                    } else {
-                        ERROR( F("Selected a null command" ) );
-                    }
-                } else {
-                    ERROR( F("Selected a non-registered command" ) );
-                }
-                this->init(millis()); //Reset the clock in this one
-            } else {
-                DEBUG( F("Tasks running. Not doing anything." ) );
-            }
             
+            if ( Serial.available() ) {                
+                if ( this->commandInt < 0 ) {
+                    this->commandInt = Serial.read();
+                    
+                    this->commandInt = 0; //Hard-code for now
+                    
+                    RemoteRoutine* thisCommand = this->routines[commandInt];                    
+                    this->numberOfArgumentBytes = thisCommand->getNumberOfArguments()*sizeof(float);   
+                    DEBUG( F("Found command byte: ") << this->commandInt );                             
+                    DEBUG( F("Requires ") << this->numberOfArgumentBytes << " arguments." );                             
+                } else {                    
+                    byte argumentByte = Serial.read();
+                    this->argumentBuffer[this->argumentBufferWritePos++] = argumentByte;
+                
+                    DEBUG( F("Found argument byte: ") << argumentByte << 
+                        " for pos: " << this->argumentBufferWritePos <<
+                        " of " << this->numberOfArgumentBytes );
+
+                    if ( this->argumentBufferWritePos == this->numberOfArgumentBytes ) {
+                        DEBUG( F("Got all arguments") );
+                        //We have got everything we need. Start the command
+                        RemoteRoutine* thisCommand = this->routines[this->commandInt];
+                        
+                        thisCommand->parseArgumentsAndInit (                             
+                            this->argumentBuffer, 
+                            this->argumentBufferWritePos, 
+                            _now );
+                        
+                        this->commandInt = -1;
+                        this->argumentBufferWritePos = 0;                        
+                    }
+                }  
+            }          
         }
         
         virtual const char* getName()

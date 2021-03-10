@@ -26,9 +26,6 @@ void TaskScheduler::add(Task* task) {
 }
 
 void TaskScheduler::run() {	
-	if ( millis() > 1100 )  {
-		return;
-	}
 	
 	unsigned long int nowU = micros();		
 	unsigned long int now = millis();	
@@ -50,7 +47,7 @@ void TaskScheduler::run() {
 			totalTime) / TaskScheduler::filterFactor;
 	}
 	if ( now > this->nextRunTime ) {
-		ERROR(F("Loop time: ") << this->averageLoopTime << "\u03BCs." );
-		this->nextRunTime += 1000;
+		DEBUG(F("Loop time: ") << this->averageLoopTime << "\u03BCs." );
+		this->nextRunTime += 5000;
 	}
 }

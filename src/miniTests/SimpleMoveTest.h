@@ -22,14 +22,10 @@ class SimpleMoveTest: public RemoteRoutine
         {
             DEBUG( F("Motor running") );                 
             RemoteRoutine::run(_now);
-            if ( _now > stopTime - 100 ) {
-                ERROR( F("Speed: ") << encoder->getSpeedCPMS() << " Pos: " << encoder->getPosComp() );
-            }
+            
             if ( _now > stopTime ){
-                driver->setMotorPWM(0);                
-                //Remote Routines should stop when done to 
-                //allow new commands to be sent.
-                this->stop();
+                driver->setMotorPWM(0);                                
+                this->stop(); //Stop to avoid hogging resources
                 ERROR( F("Motor stopped") );                 
             }
         }
@@ -49,7 +45,7 @@ class SimpleMoveTest: public RemoteRoutine
             switch ( argumentNumber )
             {
                 case 0:
-                    this->timeToMoveSec = argumentValue;
+                    this->timeToMoveSec = 1000; //argumentValue;
                     DEBUG( F("Time to move: ") << this->timeToMoveSec );
                     break;                
                 default:

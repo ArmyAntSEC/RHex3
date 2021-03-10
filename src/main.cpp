@@ -49,14 +49,14 @@ void setup()
   driver.setMotorPWM(0);   
 
   ctr.init(millis());
-  //sched.add( &ctr );
+  sched.add( &ctr );
 
   ctr.registerRemoteRoutine(&simpleMoveTest,0);  
-  simpleMoveTest.storeArgument( 0, 1000 );
-  simpleMoveTest.init(millis());
+  //simpleMoveTest.storeArgument( 0, 1000 );
+  //simpleMoveTest.init(millis());
   sched.add(&simpleMoveTest);
 
-  ERROR( F("Setup done") );
+  DEBUG( F("Setup done") );
 }
 
 void loop()
