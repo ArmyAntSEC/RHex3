@@ -3,14 +3,13 @@
 
 #include <RecurringTask.h>
 #include <Arduino.h>
-#include <RecurringTask10ms.h>
 #include <HomingEncoder.h>
 #include "MotorDriver.h"
 
-class RemoteRoutine: public RecurringTask10ms
+class RemoteRoutine: public RecurringTaskBase
 {           
     private:
-        static const char* getNameImpl() { static const char name[] = "RemoteRoutine"; return name; }    
+        LOGGABLE( "RemoteRoutine" );
     protected:
         const int numArguments;                            
         HomingEncoder* encoder;
@@ -20,36 +19,38 @@ class RemoteRoutine: public RecurringTask10ms
         RemoteRoutine(int _numArguments, HomingEncoder* _encoder, MotorDriver* _driver ): 
             numArguments(_numArguments), encoder(_encoder), driver(_driver)            
         {
-            RecurringTask::stop(); //Remote routines do not start in a running state.
+            stop(); //Remote routines do not start in a running state.
         }
         
         virtual void storeArgument( int argumentNumber, float argumentValue ) = 0;
             
+        virtual void init ( unsigned long int )
+        {
+            RecurringTaskBase::init();
+        }
+
         void parseArgumentsAndInit( byte* argumentBytes, unsigned int argumentBytesLen, unsigned long int _now )
         {
             if ( argumentBytesLen >= this->numArguments*sizeof(float) ) {
                 float * argumentFloats = (float *)argumentBytes;
                 for ( int i = 0; i < this->numArguments; i++ ) {
-                    this->storeArgument( i, argumentFloats[i] );
+                    float thisArgument = argumentFloats[i];
+                    thisArgument = 1000; //Force override
+                    this->storeArgument( i, thisArgument );
                 }
+                //What should it say here to init the clock properly?
+                this->init(_now);
             } else {
                 ERROR ( F("Not enough bytes sent to initialize this routine.") );
             }
 
-            ERROR ( F("Initializing routine: ") << this->getName() );
-
-            this->init(millis());            
+            ERROR ( F("Initializing routine: ") << this->getName() );                   
         }
      
         int getNumberOfArguments()
         {
             return this->numArguments;
         }
-
-        virtual const char* getName()
-        {
-            return RemoteRoutine::getNameImpl();
-        }        
 };
 
 

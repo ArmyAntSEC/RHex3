@@ -30,14 +30,14 @@ void TaskScheduler::run() {
 	unsigned long int nowU = micros();		
 	unsigned long int now = millis();	
 	for (int i = 0; i < numTasks; i++) {
-		DEBUG(F("Checking task ") << i << " of " << numTasks << F(" at time ") << now );
+		//DEBUG(F("Checking task ") << i << " of " << numTasks << F(" at time ") << now );
 		Task* thisTask = this->tasks[i];		
 		if (thisTask->canRun(now)) {							
 			thisTask->run(now);											
 		} 
-		DEBUG(F("Done with task ") << i << " of " << numTasks << F(" at time ") << now );				
+		//DEBUG(F("Done with task ") << i << " of " << numTasks << F(" at time ") << now );				
 	}
-	DEBUG(F("----- Done with run") );
+	//DEBUG(F("----- Done with run") );
 	unsigned long totalTime = micros() - nowU;
 	if ( this->averageLoopTime == 0 ) {
 		this->averageLoopTime = totalTime;

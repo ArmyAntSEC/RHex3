@@ -19,10 +19,7 @@ class SimpleMoveTest: public RemoteRoutine
         {}
 
         virtual void run( unsigned long int _now )
-        {
-            DEBUG( F("Motor running") );                 
-            RemoteRoutine::run(_now);
-            
+        {                        
             if ( _now > stopTime ){
                 driver->setMotorPWM(0);                                
                 this->stop(); //Stop to avoid hogging resources
@@ -33,11 +30,10 @@ class SimpleMoveTest: public RemoteRoutine
         virtual void init( unsigned long int _now )
         {
             ERROR(F("SimpleMoveTest initialized at time ") << _now );
-            RemoteRoutine::init (_now );
-            driver->setMotorPWM(64);
+            RemoteRoutine::init(_now);
+            driver->setMotorPWM(128);
             this->stopTime = _now + this->timeToMoveSec;            
-            ERROR(F("Will stop at ") << this->stopTime );
-            this->start(_now);
+            ERROR(F("Will stop at ") << this->stopTime );            
         }
 
         virtual void storeArgument( int argumentNumber, float argumentValue )

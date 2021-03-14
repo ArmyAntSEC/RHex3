@@ -1,28 +1,24 @@
 #ifndef _RECURRINGENCODERWRAPPER_H_
 #define _RECURRINGENCODERWRAPPER_H_
 
-#include "RecurringTask10ms.h"
-#include "RecurringTaskEvery.h"
+#include "Task.h"
+#include "RecurringTaskBase.h"
 #include "HomingEncoder.h"
 
-class RecurringEncoderWrapper10ms: public RecurringTask10ms
+class EncoderWrapperComputeSpeedTask: public Task
 {
     private:
         HomingEncoder* encoder;
     public:
-        RecurringEncoderWrapper10ms( HomingEncoder* _encoder ): encoder(_encoder)
+        EncoderWrapperComputeSpeedTask( HomingEncoder* _encoder ): encoder(_encoder)
         {}
 
-        virtual void run( unsigned long int _now ) {
-            RecurringTask::run(_now);
-
+        virtual void run( unsigned long int _now ) {            
             this->encoder->run();
         }
-
-
 };
 
-template <int N>class RecurringEncoderWrapperHoming: public RecurringTaskEvery
+template <int N>class RecurringEncoderWrapperHoming: public RecurringTaskBase
 {
     private:
         HomingEncoder* encoder;
@@ -31,7 +27,7 @@ template <int N>class RecurringEncoderWrapperHoming: public RecurringTaskEvery
         {}
         
         virtual void init( unsigned long int _now ) {
-            RecurringTaskEvery::init();
+            RecurringTaskBase::init();
         }
 
         virtual void run( unsigned long int ) {

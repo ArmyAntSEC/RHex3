@@ -12,11 +12,13 @@
 
 class Task { // @suppress("Class has a virtual method and non-virtual destructor")
 private:
-    static const char* getNameImpl() { static const char name[] = "Task"; return name; }    
-    virtual const char* getName() { return Task::getNameImpl(); }
+    LOGGABLE( "Task" );
 
 public:
-    virtual bool canRun(unsigned long int now) = 0;
+    virtual bool canRun(unsigned long int now) {
+        return true;
+    }
+
     virtual void run(unsigned long int now) = 0;        
 };
 

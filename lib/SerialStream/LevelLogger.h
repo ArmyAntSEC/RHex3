@@ -14,5 +14,6 @@ const char* getName();
 
 #define ERROR(x) Log << "[ERR][" << millis() << "] " << getName() << "\t" <<  x << endl;
 
+#define LOGGABLE(x) static const char* getName() { static const char name[] = x; return name; }    
 
 #endif

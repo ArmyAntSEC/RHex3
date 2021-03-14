@@ -5,32 +5,28 @@
 
 #include <RemoteRoutine.h>
 #include <TaskScheduler.h>
-#include <RecurringTask10ms.h>
 
-class CommandAndControll: public RecurringTask10ms
+class CommandAndControll: public RecurringTaskBase
 {
     private:
+        LOGGABLE( "Cmnd&Ctrl" );
         static const int MaxRoutines = 16;
-        RemoteRoutine* routines[MaxRoutines];
-        TaskScheduler* scheduler;        
-        static const char* getNameImpl() { static const char name[] = "Comnd&Ctrl"; return name; }    
+        RemoteRoutine* routines[MaxRoutines];             
         byte argumentBuffer[16];
         unsigned int argumentBufferWritePos = 0;
         unsigned int numberOfArgumentBytes = 0;
         int commandInt = -1;
 
     public:
-        CommandAndControll( TaskScheduler* _scheduler )
-        {
-            this->scheduler = _scheduler;
+        CommandAndControll( )
+        {            
             memset( this->routines, 0, sizeof(this->routines) );
         }
 
         void registerRemoteRoutine( RemoteRoutine* _routine, int _command )
         {
             if ( _command < MaxRoutines && routines[_command] == 0 ) {                
-                this->routines[_command] = _routine;
-                this->scheduler->add( _routine );                
+                this->routines[_command] = _routine;                
                 DEBUG( F("Registerd command ") << _command );
             } else {
                 DEBUG( F("Could not register command at pos ") << _command );
@@ -38,10 +34,9 @@ class CommandAndControll: public RecurringTask10ms
         }
 
         void run ( unsigned long int _now )
-        {            
-            RecurringTask10ms::run(_now);        
-            
-            if ( Serial.available() ) {                
+        {                                                              
+            if ( Serial.available() ) {  
+                DEBUG ( F("Found some data.") );              
                 if ( this->commandInt < 0 ) {
                     this->commandInt = Serial.read();
                     
@@ -76,10 +71,6 @@ class CommandAndControll: public RecurringTask10ms
             }          
         }
         
-        virtual const char* getName()
-        {  
-            return CommandAndControll::getNameImpl();            
-        }
 };
 
 #endif

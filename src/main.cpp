@@ -16,47 +16,60 @@
 #include "miniTests/SimpleMoveTest.h"
 #include "CommandAndControll.h"
 #include "RecurringEncoderWrapper.h"
+#include "miniTests/dataLogger.h"
+#include "getFreeMemory.h"
+#include "RecurringTaskGroup.h"
+
+TaskScheduler sched;
+
+RecurringTaskGroup<16> recurring10ms( 10 );
 
 HomingEncoder encoder;
-RecurringEncoderWrapper10ms encoderWrapper10ms ( &encoder );
+EncoderWrapperComputeSpeedTask encoderWrapperComputeSpeed ( &encoder );
 RecurringEncoderWrapperHoming<0> encoderWrapperHoming ( &encoder );
 
 MotorDriver driver;
 
 SimpleMoveTest simpleMoveTest( &encoder, &driver );
 
-TaskScheduler sched;
-CommandAndControll ctr ( &sched );
+CommandAndControll ctr;
+
+DataLogger dataLogger;
 
 
 void setup()
 {
+  
   Serial.begin( 115200 );    
   DEBUG( F("Setup started") );  
+  randomSeed(analogRead(UNCONNECTED_ANALOG));
   
   pinMode ( MOTOR_EN1, OUTPUT );
   pinMode ( MOTOR_EN2, OUTPUT );
   pinMode ( MOTOR_PWM, OUTPUT );
   pinMode ( UNCONNECTED_ANALOG, INPUT );  
 
-  randomSeed(analogRead(UNCONNECTED_ANALOG));
-
-  encoder.init<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );
-  sched.add( &encoderWrapper10ms );  
-  sched.add( &encoderWrapperHoming );  
+  ctr.init();
 
   driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );  
   driver.setMotorPWM(0);   
 
-  ctr.init(millis());
-  sched.add( &ctr );
-
+  encoder.init<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );
+  
+  sched.add( &encoderWrapperHoming );
+  recurring10ms.add( &encoderWrapperComputeSpeed );  
+  
+  recurring10ms.add(&simpleMoveTest);      
+    
   ctr.registerRemoteRoutine(&simpleMoveTest,0);  
-  //simpleMoveTest.storeArgument( 0, 1000 );
-  //simpleMoveTest.init(millis());
-  sched.add(&simpleMoveTest);
 
-  DEBUG( F("Setup done") );
+  recurring10ms.add( &ctr );
+
+  sched.add( &recurring10ms );
+  recurring10ms.init( millis() );  
+  
+
+  ERROR( F("Setup done. Free RAM: ") << getFreeMemory() << " bytes." );  
 }
 
 void loop()

@@ -3,12 +3,11 @@
 
 #include <Task.h>
 
-class RecurringTaskEvery: public Task
+class RecurringTaskBase: public Task
 {
 private:
     bool running = false;
-    static const char* getNameImpl() { static const char name[] = "RTaskEvry"; return name; }    
-    virtual const char* getName() { return RecurringTaskEvery::getNameImpl(); }
+    LOGGABLE( "RTaskBase");    
 
 public:
     virtual bool canRun(unsigned long int ) 
@@ -21,12 +20,12 @@ public:
         this->start();                
     }
 
-    void start() 
+    virtual void start() 
     {         
         this->running = true;         
     }    
     
-    void stop() 
+    virtual void stop() 
     { 
         this->running = false; 
     }
