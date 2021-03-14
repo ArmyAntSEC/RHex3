@@ -21,6 +21,7 @@
 #include "RecurringTaskGroup.h"
 
 TaskScheduler sched;
+DataLogger dataLogger;
 
 RecurringTaskGroup<16> recurring10ms( 10 );
 
@@ -30,12 +31,9 @@ RecurringEncoderWrapperHoming<0> encoderWrapperHoming ( &encoder );
 
 MotorDriver driver;
 
-SimpleMoveTest simpleMoveTest( &encoder, &driver );
+SimpleMoveTest simpleMoveTest( &encoder, &driver, &dataLogger );
 
 CommandAndControll ctr;
-
-DataLogger dataLogger;
-
 
 void setup()
 {
@@ -49,25 +47,27 @@ void setup()
   pinMode ( MOTOR_PWM, OUTPUT );
   pinMode ( UNCONNECTED_ANALOG, INPUT );  
 
-  ctr.init();
-
+  //Initalize the driver
   driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );  
   driver.setMotorPWM(0);   
 
+  //Initialize the encoder and register the homing.
   encoder.init<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );
-  
   sched.add( &encoderWrapperHoming );
-  recurring10ms.add( &encoderWrapperComputeSpeed );  
-  
-  recurring10ms.add(&simpleMoveTest);      
-    
+      
+  //Initialize the Command and Controll
+  ctr.init();
   ctr.registerRemoteRoutine(&simpleMoveTest,0);  
 
+  //Now configure the 10ms group
+  recurring10ms.add( &encoderWrapperComputeSpeed );    
+  recurring10ms.add( &simpleMoveTest );      
   recurring10ms.add( &ctr );
+  recurring10ms.add( &dataLogger ); //Run the data logger last.
 
-  sched.add( &recurring10ms );
   recurring10ms.init( millis() );  
-  
+  sched.add( &recurring10ms );
+    
 
   ERROR( F("Setup done. Free RAM: ") << getFreeMemory() << " bytes." );  
 }

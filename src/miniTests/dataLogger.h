@@ -2,14 +2,16 @@
 #define _DATALOGGER_H_
 
 #include "LevelLogger.h"
+#include "Task.h"
 
-class DataLogger
+class DataLogger: public Task
 {
     private:
         static const unsigned int MaxColumns = 8;               
         char variableNames[MaxColumns][16];
         float thisRow[MaxColumns];
-        unsigned int numVariablesRegistered = 0;        
+        unsigned int numVariablesRegistered = 0;    
+        LOGGABLE( "DataLogger" );    
     public:
         unsigned int registerVariable( char* variableName )
         {
@@ -32,12 +34,18 @@ class DataLogger
             for ( unsigned int i = 0; i < numVariablesRegistered-1; i++ ) {
                 Log << variableNames[i] << ", ";
             }
-            Log << numVariablesRegistered << endl;
+            Log << variableNames[numVariablesRegistered-1] << endl;
         }
 
-        void sendRow()
+        void run( unsigned long int )
         {            
-            Serial.write( (const byte*)thisRow, numVariablesRegistered*sizeof(float) );  
+            //Serial.write( (const byte*)thisRow, numVariablesRegistered*sizeof(float) );  
+            Log << millis() << ": ";
+            for ( unsigned int i = 0; i < numVariablesRegistered-1; i++ ) {
+                Log << thisRow[i] << ", ";
+            }
+            Log << thisRow[numVariablesRegistered-1] << endl;
+
             memset( thisRow, 0, MaxColumns*sizeof(float) );          
         }
 

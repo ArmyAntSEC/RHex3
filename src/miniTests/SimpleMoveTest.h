@@ -4,36 +4,47 @@
 #include "RemoteRoutine.h"
 #include <HomingEncoder.h>
 #include "MotorDriver.h"
-
+#include "dataLogger.h"
 
 class SimpleMoveTest: public RemoteRoutine
 {
     private:
         unsigned long int timeToMoveSec; 
         unsigned long int stopTime;
-        static const char* getNameImpl() { static const char name[] = "SimpMvTest"; return name; }                    
+
+        DataLogger* logger;
+        int posLogIdx = 0;
+        int speedLogIdx = 0;
+        LOGGABLE( "SimpMvTst" );
 
     public:
-        SimpleMoveTest(HomingEncoder* _encoder, MotorDriver* _driver ): 
-            RemoteRoutine ( 1, _encoder, _driver ) 
-        {}
+        SimpleMoveTest(HomingEncoder* _encoder, MotorDriver* _driver, DataLogger* _logger ): 
+            RemoteRoutine ( 1, _encoder, _driver ), logger(_logger) 
+        {
+            posLogIdx = logger->registerVariable((char*)"pos");
+            speedLogIdx = logger->registerVariable((char*)"speed");
+        }
 
         virtual void run( unsigned long int _now )
-        {                        
+        {                                    
             if ( _now > stopTime ){
                 driver->setMotorPWM(0);                                
                 this->stop(); //Stop to avoid hogging resources
                 ERROR( F("Motor stopped") );                 
             }
+            long int pos = encoder->getPosComp();
+            long int speed = encoder->getSpeedCPMS();
+            logger->storeValue(posLogIdx, pos );
+            logger->storeValue(speedLogIdx, speed );
         }
         
         virtual void init( unsigned long int _now )
         {
             ERROR(F("SimpleMoveTest initialized at time ") << _now );
             RemoteRoutine::init(_now);
-            driver->setMotorPWM(128);
+            driver->setMotorPWM(64);
             this->stopTime = _now + this->timeToMoveSec;            
-            ERROR(F("Will stop at ") << this->stopTime );            
+            ERROR(F("Will stop at ") << this->stopTime );                        
         }
 
         virtual void storeArgument( int argumentNumber, float argumentValue )
@@ -47,13 +58,7 @@ class SimpleMoveTest: public RemoteRoutine
                 default:
                     DEBUG( F("Unsupported arg number:") << argumentNumber );
             }
-        }
-
-        virtual const char* getName()
-        {
-            return SimpleMoveTest::getNameImpl();
-        }
-
+        }        
 };
 
 #endif
