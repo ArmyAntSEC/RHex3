@@ -12,6 +12,7 @@ class DataLogger: public Task
         float thisRow[MaxColumns];
         unsigned int numVariablesRegistered = 0;    
         LOGGABLE( "DataLogger" );    
+        const boolean printRaw = true;
     public:
         unsigned int registerVariable( char* variableName )
         {
@@ -30,22 +31,27 @@ class DataLogger: public Task
         }
 
         void sendHeaders()
-        {
+        {            
+            Log << "time, ";
             for ( unsigned int i = 0; i < numVariablesRegistered-1; i++ ) {
                 Log << variableNames[i] << ", ";
             }
-            Log << variableNames[numVariablesRegistered-1] << endl;
+            Log << variableNames[numVariablesRegistered-1] << endl;            
         }
 
-        void run( unsigned long int )
+        void run( unsigned long int now )
         {            
-            //Serial.write( (const byte*)thisRow, numVariablesRegistered*sizeof(float) );  
-            Log << millis() << ": ";
-            for ( unsigned int i = 0; i < numVariablesRegistered-1; i++ ) {
-                Log << thisRow[i] << ", ";
+            
+            if ( printRaw ) {
+                Serial.write ( (byte*)&now, sizeof(now) );
+                Serial.write( (const byte*)thisRow, numVariablesRegistered*sizeof(float) );  
+            } else {            
+                Log << millis() << ": ";
+                for ( unsigned int i = 0; i < numVariablesRegistered-1; i++ ) {
+                    Log << thisRow[i] << ", ";
+                }
+                Log << thisRow[numVariablesRegistered-1] << endl;
             }
-            Log << thisRow[numVariablesRegistered-1] << endl;
-
             memset( thisRow, 0, MaxColumns*sizeof(float) );          
         }
 

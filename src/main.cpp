@@ -64,12 +64,13 @@ void setup()
   recurring10ms.add( &simpleMoveTest );      
   recurring10ms.add( &ctr );
   recurring10ms.add( &dataLogger ); //Run the data logger last.
-
+  dataLogger.sendHeaders();
+  
   recurring10ms.init( millis() );  
   sched.add( &recurring10ms );
     
 
-  ERROR( F("Setup done. Free RAM: ") << getFreeMemory() << " bytes." );  
+  DEBUG( F("Setup done. Free RAM: ") << getFreeMemory() << " bytes." );  
 }
 
 void loop()
