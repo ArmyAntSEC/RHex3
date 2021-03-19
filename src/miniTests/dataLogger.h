@@ -10,6 +10,7 @@ class DataLogger: public Task
         static const unsigned int MaxColumns = 8;               
         char variableNames[MaxColumns][16];
         float thisRow[MaxColumns];
+        bool thisRowWrittenTo = false;
         unsigned int numVariablesRegistered = 0;    
         LOGGABLE( "DataLogger" );    
         const boolean printRaw = true;
@@ -40,24 +41,30 @@ class DataLogger: public Task
         }
 
         void run( unsigned long int now )
-        {            
-            
-            if ( printRaw ) {
-                Serial.write ( (byte*)&now, sizeof(now) );
-                Serial.write( (const byte*)thisRow, numVariablesRegistered*sizeof(float) );  
-            } else {            
-                Log << millis() << ": ";
-                for ( unsigned int i = 0; i < numVariablesRegistered-1; i++ ) {
-                    Log << thisRow[i] << ", ";
+        {                  
+            #ifndef DEBUG_LOG // If we are showing debug log data, sending this data makes no sense.
+            if ( thisRowWrittenTo ) {
+                if ( printRaw ) {                    
+                    float fNow = now;
+                    Serial.write ( (const byte*)&fNow, sizeof(fNow) );
+                    Serial.write( (const byte*)thisRow, numVariablesRegistered*sizeof(float) );  
+                } else {            
+                    Log << millis() << ": ";
+                    for ( unsigned int i = 0; i < numVariablesRegistered-1; i++ ) {
+                        Log << thisRow[i] << ", ";
+                    }
+                    Log << thisRow[numVariablesRegistered-1] << endl;
                 }
-                Log << thisRow[numVariablesRegistered-1] << endl;
-            }
-            memset( thisRow, 0, MaxColumns*sizeof(float) );          
+                memset( thisRow, 0, MaxColumns*sizeof(float) );     
+                thisRowWrittenTo = false;     
+            }            
+            #endif
         }
 
         void storeValue( int columnIdx, float value )
         {
             thisRow[columnIdx] = value;
+            thisRowWrittenTo = true;
         }
         
 };

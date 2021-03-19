@@ -30,7 +30,7 @@ class SimpleMoveTest: public RemoteRoutine
             if ( _now > stopTime ){
                 driver->setMotorPWM(0);                                
                 this->stop(); //Stop to avoid hogging resources
-                ERROR( F("Motor stopped") );                 
+                DEBUG( F( "Motor stopped" ) );                 
             }
             long int pos = encoder->getPosComp();
             long int speed = encoder->getSpeedCPMS();
@@ -40,11 +40,11 @@ class SimpleMoveTest: public RemoteRoutine
         
         virtual void init( unsigned long int _now )
         {
-            ERROR(F("SimpleMoveTest initialized at time ") << _now );
+            DEBUG(F("SimpleMoveTest initialized at time ") << _now );
             RemoteRoutine::init(_now);
-            driver->setMotorPWM(64);
+            driver->setMotorPWM(128);
             this->stopTime = _now + this->timeToMoveSec;            
-            ERROR(F("Will stop at ") << this->stopTime );                        
+            DEBUG(F("Will stop at ") << this->stopTime );                        
         }
 
         virtual void storeArgument( int argumentNumber, float argumentValue )
@@ -52,8 +52,8 @@ class SimpleMoveTest: public RemoteRoutine
             switch ( argumentNumber )
             {
                 case 0:
-                    this->timeToMoveSec = 1000; //argumentValue;
-                    DEBUG( F("Time to move: ") << this->timeToMoveSec );
+                    this->timeToMoveSec = argumentValue;
+                    DEBUG( F("Set time to move: ") << this->timeToMoveSec );
                     break;                
                 default:
                     DEBUG( F("Unsupported arg number:") << argumentNumber );

@@ -11,7 +11,7 @@ class RemoteRoutine: public RecurringTaskBase
     private:
         LOGGABLE( "RemoteRoutine" );
     protected:
-        const int numArguments;                            
+        const unsigned int numArguments;                            
         HomingEncoder* encoder;
         MotorDriver* driver;
 
@@ -29,22 +29,20 @@ class RemoteRoutine: public RecurringTaskBase
             RecurringTaskBase::init();
         }
 
-        void parseArgumentsAndInit( byte* argumentBytes, unsigned int argumentBytesLen, unsigned long int _now )
+        void parseArgumentsAndInit( float* arguments, unsigned int argumentsLen, unsigned long int _now )
         {
-            if ( argumentBytesLen >= this->numArguments*sizeof(float) ) {
-                float * argumentFloats = (float *)argumentBytes;
-                for ( int i = 0; i < this->numArguments; i++ ) {
-                    float thisArgument = argumentFloats[i];
-                    thisArgument = 1000; //Force override
-                    this->storeArgument( i, thisArgument );
-                }
-                //What should it say here to init the clock properly?
+            if ( argumentsLen >= this->numArguments ) {                
+                for ( unsigned int i = 0; i < this->numArguments; i++ ) {
+                    float thisArgument = arguments[i];     
+                    DEBUG( F("Argument value: ") << thisArgument );               
+                    this->storeArgument( i, thisArgument );                    
+                }                
                 this->init(_now);
             } else {
                 ERROR ( F("Not enough bytes sent to initialize this routine.") );
             }
 
-            ERROR ( F("Initializing routine: ") << this->getName() );                   
+            DEBUG ( F("Initializing routine: ") << this->getName() );                   
         }
      
         int getNumberOfArguments()

@@ -35,17 +35,18 @@ class CommandAndControll: public RecurringTaskBase
 
         void run ( unsigned long int _now )
         {                                                              
-            if ( Serial.available() ) {  
-                DEBUG ( F("Found some data.") );              
+            if ( Serial.available() ) {                  
                 if ( this->commandInt < 0 ) {
-                    this->commandInt = Serial.read();
-                    
-                    this->commandInt = 0; //Hard-code for now
-                    
-                    RemoteRoutine* thisCommand = this->routines[commandInt];                    
-                    this->numberOfArgumentBytes = thisCommand->getNumberOfArguments()*sizeof(float);   
-                    DEBUG( F("Found command byte: ") << this->commandInt );                             
-                    DEBUG( F("Requires ") << this->numberOfArgumentBytes << " arguments." );                             
+                    unsigned int command = Serial.read();
+                    if ( routines[command] != 0 ) {
+                        this->commandInt = command;
+                        RemoteRoutine* thisCommand = this->routines[commandInt];                    
+                        this->numberOfArgumentBytes = thisCommand->getNumberOfArguments()*sizeof(float);   
+                        DEBUG( F("Found command byte: ") << this->commandInt );                             
+                        DEBUG( F("Requires ") << this->numberOfArgumentBytes << " arguments." );                             
+                    } else {
+                        ERROR ( F( "Command not recognized: ") << command );
+                    }
                 } else {                    
                     byte argumentByte = Serial.read();
                     this->argumentBuffer[this->argumentBufferWritePos++] = argumentByte;
@@ -59,9 +60,12 @@ class CommandAndControll: public RecurringTaskBase
                         //We have got everything we need. Start the command
                         RemoteRoutine* thisCommand = this->routines[this->commandInt];
                         
+                        float * argumentBufferFloat = (float*)argumentBuffer;
+                        int argumentFloatLength = argumentBufferWritePos/4;
+
                         thisCommand->parseArgumentsAndInit (                             
-                            this->argumentBuffer, 
-                            this->argumentBufferWritePos, 
+                            argumentBufferFloat,
+                            argumentFloatLength, 
                             _now );
                         
                         this->commandInt = -1;
