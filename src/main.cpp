@@ -13,12 +13,14 @@
 #include <TaskScheduler.h>
 #include <LevelLogger.h>
 #include "MotorDriver.h"
-#include "miniTests/SimpleMoveTest.h"
+#include "miniTests/TestSimpleMove.h"
+#include "miniTests/TestMoveAtGivenSpeed.h"
 #include "CommandAndControll.h"
 #include "RecurringEncoderWrapper.h"
 #include "miniTests/dataLogger.h"
 #include "getFreeMemory.h"
 #include "RecurringTaskGroup.h"
+#include "MotorSpeedRegulator.h"
 
 TaskScheduler sched;
 DataLogger dataLogger;
@@ -31,7 +33,10 @@ RecurringEncoderWrapperHoming<0> encoderWrapperHoming ( &encoder );
 
 MotorDriver driver;
 
-SimpleMoveTest simpleMoveTest( &encoder, &driver, &dataLogger );
+MotorSpeedRegulator regulator;
+
+//SimpleMoveTest simpleMoveTest( &encoder, &driver, &dataLogger );
+TestMoveAtGivenSpeed testMoveAtGivenSpeed( &encoder, &driver, &regulator, &dataLogger);
 
 CommandAndControll ctr;
 
@@ -55,22 +60,29 @@ void setup()
   encoder.init<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );
   sched.add( &encoderWrapperHoming );
       
+  //Initialize the regulator
+  regulator.init(&encoder, &driver, 0.2, 0, 0.01, 1 );
+
   //Initialize the Command and Controll
   ctr.init();
-  ctr.registerRemoteRoutine(&simpleMoveTest,0);  
+  //ctr.registerRemoteRoutine(&simpleMoveTest,0);  
+  ctr.registerRemoteRoutine(&testMoveAtGivenSpeed,1);  
 
   //Now configure the 10ms group
+  recurring10ms.add( &regulator );    
   recurring10ms.add( &encoderWrapperComputeSpeed );    
-  recurring10ms.add( &simpleMoveTest );      
+  //recurring10ms.add( &simpleMoveTest );      
+  recurring10ms.add( &testMoveAtGivenSpeed );      
   recurring10ms.add( &ctr );
   recurring10ms.add( &dataLogger ); //Run the data logger last.
-  dataLogger.sendHeaders();
+  
   
   recurring10ms.init( millis() );  
   sched.add( &recurring10ms );
     
 
-  DEBUG( F("Setup done. Free RAM: ") << getFreeMemory() << " bytes." );  
+  ERROR( F("Setup done. Free RAM: ") << getFreeMemory() << " bytes." );  
+  dataLogger.sendHeaders();
 }
 
 void loop()

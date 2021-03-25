@@ -5,9 +5,11 @@ clc;
 %% Open the device
 dev = serialport ( 'COM4', 115200 ); 
 dev.configureTerminator( 'CR' );
+%%
 pause(2);
-dev.write ( 0, 'uint8' );
-dev.write ( 2000, 'single' );
+dev.write ( 1, 'uint8' );
+dev.write ( 1000, 'single' );
+dev.write ( 5000, 'single' );
 pause(2);
 
 %% Now read the data

@@ -42,23 +42,23 @@ class DataLogger: public Task
 
         void run( unsigned long int now )
         {                  
-            #ifndef DEBUG_LOG // If we are showing debug log data, sending this data makes no sense.
-            if ( thisRowWrittenTo ) {
-                if ( printRaw ) {                    
+            if ( thisRowWrittenTo ) {                
+                #ifndef DEBUG_LOG // If we are showing debug log data, sending this data makes no sense.
                     float fNow = now;
                     Serial.write ( (const byte*)&fNow, sizeof(fNow) );
-                    Serial.write( (const byte*)thisRow, numVariablesRegistered*sizeof(float) );  
-                } else {            
-                    Log << millis() << ": ";
-                    for ( unsigned int i = 0; i < numVariablesRegistered-1; i++ ) {
+                    Serial.write( (const byte*)thisRow, numVariablesRegistered*sizeof(float) );                                  
+                #else      
+                    Log << now << ", ";                              
+                    for ( unsigned int i = 0; i < numVariablesRegistered; i++ ) {
                         Log << thisRow[i] << ", ";
                     }
-                    Log << thisRow[numVariablesRegistered-1] << endl;
-                }
+                    Log << endl;                    
+                #endif
+                
                 memset( thisRow, 0, MaxColumns*sizeof(float) );     
                 thisRowWrittenTo = false;     
-            }            
-            #endif
+            }     
+            
         }
 
         void storeValue( int columnIdx, float value )
