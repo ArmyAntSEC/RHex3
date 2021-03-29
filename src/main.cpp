@@ -13,11 +13,14 @@
 #include <TaskScheduler.h>
 #include <LevelLogger.h>
 #include "MotorDriver.h"
+
+#include "miniTests/dataLogger.h"
 #include "miniTests/TestSimpleMove.h"
 #include "miniTests/TestMoveAtGivenSpeed.h"
+#include "miniTests/testMoveToPosition.h"
+
 #include "CommandAndControll.h"
 #include "RecurringEncoderWrapper.h"
-#include "miniTests/dataLogger.h"
 #include "getFreeMemory.h"
 #include "RecurringTaskGroup.h"
 #include "MotorSpeedRegulator.h"
@@ -36,7 +39,8 @@ MotorDriver driver;
 MotorSpeedRegulator regulator;
 
 SimpleMoveTest simpleMoveTest( &encoder, &driver, &dataLogger );
-TestMoveAtGivenSpeed testMoveAtGivenSpeed( &encoder, &driver, &regulator, &dataLogger);
+TestMoveAtGivenSpeed testMoveAtGivenSpeed( &encoder, &driver, &regulator, &dataLogger );
+TestMoveToPosition testMoveToPos (  &encoder, &driver, &regulator, &dataLogger );
 
 CommandAndControll ctr( &dataLogger );
 
@@ -68,12 +72,16 @@ void setup()
   ctr.init();
   ctr.registerRemoteRoutine(&simpleMoveTest,0);  
   ctr.registerRemoteRoutine(&testMoveAtGivenSpeed,1);  
+  ctr.registerRemoteRoutine(&testMoveToPos,2);  
 
   //Now configure the 10ms group
   recurring10ms.add( &regulator );    
   recurring10ms.add( &encoderWrapperComputeSpeed );    
+  
   recurring10ms.add( &simpleMoveTest );      
   recurring10ms.add( &testMoveAtGivenSpeed );      
+  recurring10ms.add( &testMoveToPos );      
+  
   recurring10ms.add( &ctr );
   recurring10ms.add( &dataLogger ); //Run the data logger last.
   
