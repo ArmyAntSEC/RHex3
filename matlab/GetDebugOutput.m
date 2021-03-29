@@ -8,7 +8,7 @@ dev.configureTerminator( 'CR' );
 %%
 pause(2);
 dev.write ( 1, 'uint8' );
-dev.write ( 1000, 'single' );
+dev.write ( 500, 'single' );
 dev.write ( 5000, 'single' );
 pause(2);
 
@@ -19,5 +19,23 @@ rawData = dev.read(bytesAvail, 'char' )';
 disp ( rawData' );
 
 %%
-clear('dev');
+disp ( '****************************' );
+disp ( '****************************' );
+disp ( '****************************' );
+disp ( '****************************' );
+disp ( '****************************' );
+
+%%
+pause(2);
+dev.write ( 0, 'uint8' );
+dev.write ( 500, 'single' );
+pause(2);
+
+bytesAvail = dev.NumBytesAvailable;
+rawData = dev.read(bytesAvail, 'char' )';
+
+disp ( rawData' );
+
+%%
+%clear('dev');
 disp ( 'Done' );

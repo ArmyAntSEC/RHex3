@@ -21,8 +21,6 @@ class SimpleMoveTest: public RemoteRoutine
         SimpleMoveTest(HomingEncoder* _encoder, MotorDriver* _driver, DataLogger* _logger ): 
             RemoteRoutine ( 1, _encoder, _driver ), logger(_logger) 
         {
-            posLogIdx = logger->registerVariable((char*)"pos");
-            speedLogIdx = logger->registerVariable((char*)"speed");
         }
 
         virtual void run( unsigned long int _now )
@@ -36,6 +34,7 @@ class SimpleMoveTest: public RemoteRoutine
             long int speed = encoder->getSpeedCPMS();
             logger->storeValue(posLogIdx, pos );
             logger->storeValue(speedLogIdx, speed );
+            DEBUG ( F("Motor running" ))
         }
         
         virtual void init( unsigned long int _now )
@@ -43,8 +42,13 @@ class SimpleMoveTest: public RemoteRoutine
             DEBUG(F("SimpleMoveTest initialized at time ") << _now );
             RemoteRoutine::init(_now);
             driver->setMotorPWM(128);
-            this->stopTime = _now + this->timeToMoveSec;            
-            DEBUG(F("Will stop at ") << this->stopTime );                        
+            this->stopTime = _now + this->timeToMoveSec;   
+            
+            //Register two variables with the logger.
+            posLogIdx = logger->registerVariable((char*)"pos");
+            speedLogIdx = logger->registerVariable((char*)"speed");
+         
+            DEBUG(F("Will stop at ") << this->stopTime << " Is running: " << this->isRunning() );                        
         }
 
         virtual void storeArgument( int argumentNumber, float argumentValue )

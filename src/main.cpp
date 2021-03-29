@@ -35,10 +35,10 @@ MotorDriver driver;
 
 MotorSpeedRegulator regulator;
 
-//SimpleMoveTest simpleMoveTest( &encoder, &driver, &dataLogger );
+SimpleMoveTest simpleMoveTest( &encoder, &driver, &dataLogger );
 TestMoveAtGivenSpeed testMoveAtGivenSpeed( &encoder, &driver, &regulator, &dataLogger);
 
-CommandAndControll ctr;
+CommandAndControll ctr( &dataLogger );
 
 void setup()
 {
@@ -64,14 +64,15 @@ void setup()
   regulator.init(&encoder, &driver, 0.2, 0, 0.01, 1 );
 
   //Initialize the Command and Controll
+  DEBUG( F("CTR Init") );
   ctr.init();
-  //ctr.registerRemoteRoutine(&simpleMoveTest,0);  
+  ctr.registerRemoteRoutine(&simpleMoveTest,0);  
   ctr.registerRemoteRoutine(&testMoveAtGivenSpeed,1);  
 
   //Now configure the 10ms group
   recurring10ms.add( &regulator );    
   recurring10ms.add( &encoderWrapperComputeSpeed );    
-  //recurring10ms.add( &simpleMoveTest );      
+  recurring10ms.add( &simpleMoveTest );      
   recurring10ms.add( &testMoveAtGivenSpeed );      
   recurring10ms.add( &ctr );
   recurring10ms.add( &dataLogger ); //Run the data logger last.
@@ -82,7 +83,7 @@ void setup()
     
 
   ERROR( F("Setup done. Free RAM: ") << getFreeMemory() << " bytes." );  
-  dataLogger.sendHeaders();
+  //dataLogger.sendHeaders();
 }
 
 void loop()

@@ -25,9 +25,6 @@ class TestMoveAtGivenSpeed: public RemoteRoutine
             RemoteRoutine ( 2, _encoder, _driver ), logger(_logger), 
             regulator( _regulator )
         {
-            posLogIdx = logger->registerVariable((char*)"pos");
-            speedLogIdx = logger->registerVariable((char*)"speed");
-            powerLogIdx = logger->registerVariable((char*)"power");
         }
         
         virtual void init( unsigned long int _now )
@@ -36,6 +33,11 @@ class TestMoveAtGivenSpeed: public RemoteRoutine
             this->regulator->start();
             this->regulator->setSetPoint( this->speedToMove );
             this->stopTime = _now + this->timeToMoveSec;         
+
+            posLogIdx = logger->registerVariable((char*)"pos");
+            speedLogIdx = logger->registerVariable((char*)"speed");
+            powerLogIdx = logger->registerVariable((char*)"power");
+
             DEBUG ( F("Will stop at time ") << this->stopTime );            
         }
 

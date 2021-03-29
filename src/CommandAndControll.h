@@ -5,6 +5,7 @@
 
 #include <RemoteRoutine.h>
 #include <TaskScheduler.h>
+#include <LevelLogger.h>
 
 class CommandAndControll: public RecurringTaskBase
 {
@@ -17,8 +18,11 @@ class CommandAndControll: public RecurringTaskBase
         unsigned int numberOfArgumentBytes = 0;
         int commandInt = -1;
 
+        DataLogger* logger;
+
     public:
-        CommandAndControll( )
+        CommandAndControll( DataLogger* _logger ):
+        logger(_logger)
         {            
             memset( this->routines, 0, sizeof(this->routines) );
         }
@@ -27,7 +31,7 @@ class CommandAndControll: public RecurringTaskBase
         {
             if ( _command < MaxRoutines && routines[_command] == 0 ) {                
                 this->routines[_command] = _routine;                
-                DEBUG( F("Registerd command ") << _command );
+                DEBUG( F("Registered command ") << _command );
             } else {
                 DEBUG( F("Could not register command at pos ") << _command );
             }
@@ -62,6 +66,9 @@ class CommandAndControll: public RecurringTaskBase
                         
                         float * argumentBufferFloat = (float*)argumentBuffer;
                         int argumentFloatLength = argumentBufferWritePos/4;
+                        
+                        //Reset the logger before we start the next command.
+                        logger->reset();
 
                         thisCommand->parseArgumentsAndInit (                             
                             argumentBufferFloat,
@@ -70,6 +77,8 @@ class CommandAndControll: public RecurringTaskBase
                         
                         this->commandInt = -1;
                         this->argumentBufferWritePos = 0;                        
+
+                        logger->sendHeaders();
                     }
                 }  
             }          

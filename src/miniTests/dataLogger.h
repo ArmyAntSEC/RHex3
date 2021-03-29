@@ -36,24 +36,25 @@ class DataLogger: public Task
             Log << "time, ";
             for ( unsigned int i = 0; i < numVariablesRegistered-1; i++ ) {
                 Log << variableNames[i] << ", ";
-            }
-            Log << variableNames[numVariablesRegistered-1] << endl;            
+            }            
+            //Avoid the comma after the last variable name
+            Log <<variableNames[numVariablesRegistered-1] << endl;  
         }
 
         void run( unsigned long int now )
         {                  
             if ( thisRowWrittenTo ) {                
-                #ifndef DEBUG_LOG // If we are showing debug log data, sending this data makes no sense.
+                
                     float fNow = now;
                     Serial.write ( (const byte*)&fNow, sizeof(fNow) );
                     Serial.write( (const byte*)thisRow, numVariablesRegistered*sizeof(float) );                                  
-                #else      
+                /*
                     Log << now << ", ";                              
                     for ( unsigned int i = 0; i < numVariablesRegistered; i++ ) {
                         Log << thisRow[i] << ", ";
                     }
                     Log << endl;                    
-                #endif
+                */
                 
                 memset( thisRow, 0, MaxColumns*sizeof(float) );     
                 thisRowWrittenTo = false;     
@@ -65,6 +66,12 @@ class DataLogger: public Task
         {
             thisRow[columnIdx] = value;
             thisRowWrittenTo = true;
+        }
+
+        void reset()
+        {
+            this->numVariablesRegistered = 0;
+            this->thisRowWrittenTo = false;            
         }
         
 };
