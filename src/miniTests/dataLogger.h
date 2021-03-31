@@ -12,6 +12,7 @@ class DataLogger: public Task
         float thisRow[MaxColumns];
         bool thisRowWrittenTo = false;
         unsigned int numVariablesRegistered = 0;    
+        unsigned long int initTime = 0;
         LOGGABLE( "DataLogger" );    
         const boolean printRaw = true;
     public:
@@ -45,7 +46,7 @@ class DataLogger: public Task
         {                  
             if ( thisRowWrittenTo ) {                
                 
-                    float fNow = now;
+                    float fNow = now - this->initTime;
                     Serial.write ( (const byte*)&fNow, sizeof(fNow) );
                     Serial.write( (const byte*)thisRow, numVariablesRegistered*sizeof(float) );                                  
                 /*
@@ -68,10 +69,11 @@ class DataLogger: public Task
             thisRowWrittenTo = true;
         }
 
-        void reset()
+        void reset( unsigned long int _now )
         {
             this->numVariablesRegistered = 0;
             this->thisRowWrittenTo = false;            
+            this->initTime = _now;
         }
         
 };

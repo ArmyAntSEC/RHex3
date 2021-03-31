@@ -7,9 +7,10 @@ dev = serialport ( 'COM4', 115200 );
 dev.configureTerminator( 'CR' );
 %%
 pause(2);
-dev.write ( 1, 'uint8' );
-dev.write ( 500, 'single' );
+dev.write ( 3, 'uint8' );
 dev.write ( 5000, 'single' );
+dev.write ( 7000, 'single' );
+dev.write ( 1000, 'single' );
 pause(2);
 
 %% Now read the data
@@ -18,6 +19,7 @@ rawData = dev.read(bytesAvail, 'char' )';
 
 disp ( rawData' );
 
+return;
 %%
 disp ( '****************************' );
 disp ( '****************************' );

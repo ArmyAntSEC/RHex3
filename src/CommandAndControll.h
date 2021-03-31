@@ -47,7 +47,7 @@ class CommandAndControll: public RecurringTaskBase
                         RemoteRoutine* thisCommand = this->routines[commandInt];                    
                         this->numberOfArgumentBytes = thisCommand->getNumberOfArguments()*sizeof(float);   
                         DEBUG( F("Found command byte: ") << this->commandInt );                             
-                        DEBUG( F("Requires ") << this->numberOfArgumentBytes << " arguments." );                             
+                        DEBUG( F("Requires ") << this->numberOfArgumentBytes << " arguments." );                                                     
                     } else {
                         ERROR ( F( "Command not recognized: ") << command );
                     }
@@ -68,7 +68,7 @@ class CommandAndControll: public RecurringTaskBase
                         int argumentFloatLength = argumentBufferWritePos/4;
                         
                         //Reset the logger before we start the next command.
-                        logger->reset();
+                        logger->reset(_now);
 
                         thisCommand->parseArgumentsAndInit (                             
                             argumentBufferFloat,

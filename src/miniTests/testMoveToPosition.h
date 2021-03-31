@@ -50,7 +50,7 @@ class TestMoveToPosition: public RemoteRoutine
             if ( pos > this->posToMoveTo ){
                 this->regulator->stop();
                 this->stop(); //Stop to avoid hogging resources
-                DEBUG( F( "Motor stopped at position " << pos ) );                 
+                ERROR( F( "Motor stopped at position " ) );                 
             } else {
                 DEBUG ( F("Go") );
             }            
@@ -70,7 +70,7 @@ class TestMoveToPosition: public RemoteRoutine
                     break;                
                 case 1:
                     this->speedToMove = argumentValue;
-                    DEBUG( F("Set speed: ") << this->speedToMove );
+                    DEBUG( F("Max speed: ") << this->speedToMove );
                     break;                
                 default:
                     DEBUG( F("Unsupported arg number:") << argumentNumber );
