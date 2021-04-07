@@ -37,7 +37,7 @@ void TaskScheduler::run() {
 		} 
 		//DEBUG(F("Done with task ") << i << " of " << numTasks << F(" at time ") << now );				
 	}
-	//DEBUG(F("----- Done with run") );
+	//ERROR(F("----- Done with run") );
 	unsigned long totalTime = micros() - nowU;
 	if ( this->averageLoopTime == 0 ) {
 		this->averageLoopTime = totalTime;

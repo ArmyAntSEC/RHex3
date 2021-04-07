@@ -2,9 +2,9 @@
 #define _DATALOGGER_H_
 
 #include "LevelLogger.h"
-#include "Task.h"
+#include "RecurringTaskBase.h"
 
-class DataLogger: public Task
+class DataLogger: public RecurringTaskBase
 {
     private:
         static const unsigned int MaxColumns = 8;               
@@ -44,6 +44,7 @@ class DataLogger: public Task
 
         void run( unsigned long int now )
         {                  
+            //ERROR ( F("Data logger running") );
             if ( thisRowWrittenTo ) {                
                 
                     float fNow = now - this->initTime;
@@ -69,8 +70,9 @@ class DataLogger: public Task
             thisRowWrittenTo = true;
         }
 
-        void reset( unsigned long int _now )
+        virtual void init( unsigned long int _now )
         {
+            RecurringTaskBase::init();
             this->numVariablesRegistered = 0;
             this->thisRowWrittenTo = false;            
             this->initTime = _now;

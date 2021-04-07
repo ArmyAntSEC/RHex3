@@ -1,4 +1,8 @@
 #include <Arduino.h>
+#include "LevelLogger.h"
+#include "dataLogger.h"
+#include "main.h"
+
 
 #define MOTOR_EN1 4
 #define MOTOR_EN2 5
@@ -9,42 +13,11 @@
 #define MOTOR_PWM 6
 #define UNCONNECTED_ANALOG A2
 
-#include "HomingEncoder.h"
-#include <TaskScheduler.h>
-#include <LevelLogger.h>
-#include "MotorDriver.h"
-
-#include "miniTests/dataLogger.h"
-#include "miniTests/TestSimpleMove.h"
-#include "miniTests/TestMoveAtGivenSpeed.h"
-#include "miniTests/testMoveToPosition.h"
-#include "miniTests/testMoveToPositionAtTime.h"
-
-#include "CommandAndControll.h"
-#include "RecurringEncoderWrapper.h"
-#include "getFreeMemory.h"
-#include "RecurringTaskGroup.h"
-#include "MotorSpeedRegulator.h"
-
-TaskScheduler sched;
-DataLogger dataLogger;
-
-RecurringTaskGroup<16> recurring10ms( 10 );
-
-HomingEncoder encoder;
-EncoderWrapperComputeSpeedTask encoderWrapperComputeSpeed ( &encoder );
-RecurringEncoderWrapperHoming<0> encoderWrapperHoming ( &encoder );
-
-MotorDriver driver;
-
-MotorSpeedRegulator regulator;
-
-SimpleMoveTest simpleMoveTest( &encoder, &driver, &dataLogger );
-TestMoveAtGivenSpeed testMoveAtGivenSpeed( &encoder, &driver, &regulator, &dataLogger );
-TestMoveToPosition testMoveToPos (  &encoder, &driver, &regulator, &dataLogger );
-TestMoveToPositionAtTime testMoveToPosAtTime (  &encoder, &driver, &regulator, &dataLogger );
-
-CommandAndControll ctr( &dataLogger );
+#ifdef HIGH_LEVEL
+  #include "mainHighLevel.h"
+#else
+  #include "mainLowLevel.h"
+#endif
 
 void setup()
 {
@@ -67,36 +40,20 @@ void setup()
   sched.add( &encoderWrapperHoming );
       
   //Initialize the regulator
-  regulator.init(&encoder, &driver, 0.2, 0, 0.01, 1 );
-
-  //Initialize the Command and Controll
-  DEBUG( F("CTR Init") );
-  ctr.init();
-  ctr.registerRemoteRoutine(&simpleMoveTest,0);  
-  ctr.registerRemoteRoutine(&testMoveAtGivenSpeed,1);  
-  ctr.registerRemoteRoutine(&testMoveToPos,2);
-  ctr.registerRemoteRoutine(&testMoveToPosAtTime,3);
-    
-
-  //Now configure the 10ms group
+  regulator.init(&encoder, &driver, 0.2, 0, 0.01, 1 );    
   recurring10ms.add( &regulator );    
+
+  //Make sure we compute the encoder speed every 10ms
   recurring10ms.add( &encoderWrapperComputeSpeed );    
-  
-  recurring10ms.add( &simpleMoveTest );      
-  recurring10ms.add( &testMoveAtGivenSpeed );      
-  recurring10ms.add( &testMoveToPos );      
-  recurring10ms.add( &testMoveToPosAtTime ); 
-  
-  recurring10ms.add( &ctr );
-  recurring10ms.add( &dataLogger ); //Run the data logger last.
-  
-  
+
+  //Now initialize the 10ms group    
   recurring10ms.init( millis() );  
   sched.add( &recurring10ms );
-    
+  
+  //Add any remaining setup needed for the current configuration.
+  setupDetails();
 
-  ERROR( F("Setup done. Free RAM: ") << getFreeMemory() << " bytes." );  
-  //dataLogger.sendHeaders();
+  //ERROR( F("Setup done. Free RAM: ") << getFreeMemory() << " bytes." );  
 }
 
 void loop()

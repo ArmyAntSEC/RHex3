@@ -32,9 +32,10 @@ template <int MaxTasks> class RecurringTaskGroup: public RecurringTask
             for ( unsigned int i = 0; i < numTasks; i++ ) {
                 if ( taskList[i]->canRun(now) ) {
                     taskList[i]->run(now);
+                    //ERROR( F("RecurringTaskGroup running item ") << i );
                 }
             }
-            //DEBUG( F("RecurringTaskGroup run with ") << numTasks << " items" )
+            //ERROR( F("RecurringTaskGroup run with ") << numTasks << " items" );
         }
 
 };
