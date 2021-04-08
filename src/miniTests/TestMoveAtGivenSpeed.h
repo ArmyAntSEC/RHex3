@@ -2,7 +2,7 @@
 #define _TESTMOVEATGIVENSPEED_H_
 
 #include "MotorSpeedRegulator.h"
-
+/*
 class TestMoveAtGivenSpeed: public RemoteRoutine
 {
     private:
@@ -76,5 +76,5 @@ class TestMoveAtGivenSpeed: public RemoteRoutine
         }        
 };
 
-
+*/
 #endif

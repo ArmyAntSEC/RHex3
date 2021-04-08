@@ -16,7 +16,7 @@
 #ifdef HIGH_LEVEL
   #include "mainHighLevel.h"
 #else
-  #include "mainLowLevel.h"
+  #include "miniTests/mainLowLevel.h"
 #endif
 
 void setup()
@@ -46,13 +46,19 @@ void setup()
   //Make sure we compute the encoder speed every 10ms
   recurring10ms.add( &encoderWrapperComputeSpeed );    
 
+  //Initialize the data logger
+  dataLogger.init(millis());  
+  recurring10ms.add( &dataLogger );    
+
   //Now initialize the 10ms group    
   recurring10ms.init( millis() );  
   sched.add( &recurring10ms );
   
+  
   //Add any remaining setup needed for the current configuration.
   setupDetails();
 
+  dataLogger.sendHeaders(); 
   //ERROR( F("Setup done. Free RAM: ") << getFreeMemory() << " bytes." );  
 }
 

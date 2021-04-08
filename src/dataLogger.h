@@ -39,7 +39,7 @@ class DataLogger: public RecurringTaskBase
                 Log << variableNames[i] << ", ";
             }            
             //Avoid the comma after the last variable name
-            Log <<variableNames[numVariablesRegistered-1] << endl;  
+            Log <<variableNames[numVariablesRegistered-1] << endl;              
         }
 
         void run( unsigned long int now )
