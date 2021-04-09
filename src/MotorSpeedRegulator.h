@@ -96,7 +96,8 @@ class MotorSpeedRegulator: public RecurringTaskBase
         }
 
         int getInput() { return this->Input; }
-        int getFilteredOutput() { return this->OutputFiltered; }        
+        int getFilteredOutput() { return this->OutputFiltered; }       
+
 };
 
 #endif
