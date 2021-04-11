@@ -31,6 +31,8 @@ public:
       pinMode(this->driverPinTwo, OUTPUT);	
       pinMode(this->currentPin, INPUT );	
       pinMode(this->driverPinPWM, OUTPUT );
+
+      this->setMotorPWM(0); 
   }
   
   void setMotorPWM( int motorPWM ) {			  

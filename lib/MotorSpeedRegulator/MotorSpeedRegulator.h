@@ -6,6 +6,7 @@
 #include <RecurringTaskBase.h>
 #include "LevelLogger.h"
 
+
 class MotorSpeedRegulator: public RecurringTaskBase
 {
     private:        
@@ -33,8 +34,7 @@ class MotorSpeedRegulator: public RecurringTaskBase
     public:
         virtual void init()
         {
-            RecurringTaskBase::init();            
-            this->stop(); //But we do not start right away            
+            RecurringTaskBase::init();                        
         }
 
         virtual void init( HomingEncoder* _encoder, MotorDriver* _driver, 
@@ -90,7 +90,7 @@ class MotorSpeedRegulator: public RecurringTaskBase
                         
                 OutputFiltered = (Output + OutputFiltered*(filter-1))/filter;
                 driver->setMotorPWM(OutputFiltered);   
-                DEBUG(F("ITerm: ") << ITerm << " Error: " << Error );
+                //Log << "Speed: " << Input << " Power: " << Output << " Error: " << Error << endl;
             }
             
         }
