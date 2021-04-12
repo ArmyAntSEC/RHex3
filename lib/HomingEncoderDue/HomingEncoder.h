@@ -248,6 +248,7 @@ public:
     noInterrupts();
     state.is_homed = true;
     state.pos_at_last_home = state.position;
+    state.position = 0;    
     interrupts();
   }
 

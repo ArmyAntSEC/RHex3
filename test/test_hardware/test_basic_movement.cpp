@@ -23,12 +23,11 @@ void testSimpleMove() {
     unsigned long int endTime = 0;
     unsigned long int startPos = 0;
 
+    endTime = millis() + timeToMove;
+    startPos = encoder.getPosComp();
+    driver.setMotorPWM(128);            
+
     while ( true ) {
-        if ( endTime == 0 ) {
-            endTime = millis() + timeToMove;
-            startPos = encoder.getPosComp();
-            driver.setMotorPWM(128);            
-        }
         if ( endTime < millis() ) {
             unsigned long int endPos = encoder.getPosComp();
             unsigned long int clicksMoved = endPos - startPos;
@@ -44,12 +43,11 @@ void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {
     unsigned long int timeToMove = 2000;  
     unsigned long int endTime = 0;    
 
+    endTime = millis() + timeToMove;
+    regulator.setSetPoint( speedToMoveAt );
+    regulator.start();            
+
     while ( true ) {
-        if ( endTime == 0 ) {            
-            endTime = millis() + timeToMove;
-            regulator.setSetPoint( speedToMoveAt );
-            regulator.start();            
-        }
         if ( endTime < millis() ) {
             unsigned long int speed = encoder.getSpeedCPMS();
             driver.setMotorPWM(0); 
@@ -69,6 +67,28 @@ void testSimpleMoveAtConstantSpeed4000() {
     testSimpleMoveAtConstantSpeed(4000);  
 }
 
+void testSimpleMoveToAPositionAtTime() {
+    unsigned long int timeToMove = 2000;  
+    unsigned long int posToMoveTo = 10000;
+
+    
+    commander.init( millis(), timeToMove, posToMoveTo );  
+    encoder.forceHomed(); //Make sure we start at position 0.              
+
+    unsigned long int endTime = millis() + timeToMove;
+
+    while ( true ) {
+        if ( commander.hasArrived() || millis() > endTime + 5000 ) {
+            unsigned long int pos = encoder.getPosComp();
+            driver.setMotorPWM(0);             
+            TEST_ASSERT_INT_WITHIN( 200, posToMoveTo, pos );
+            TEST_ASSERT_INT_WITHIN( 200, endTime, millis() );
+            return;
+        }
+        sched.run();
+    }
+}
+
 void setup() {
     // NOTE!!! Wait for >2 secs
     // if board doesn't support software reset via Serial.DTR/RTS
@@ -80,6 +100,7 @@ void setup() {
 
     recurring10ms.add( &encoderWrapperComputeSpeed );    
     recurring10ms.add( &regulator );
+    recurring10ms.add( &commander );
     recurring10ms.init( millis() );  
     sched.add( &recurring10ms ); 
 
@@ -89,6 +110,8 @@ void setup() {
     RUN_TEST(testSimpleMoveAtConstantSpeed7000);
     delay(500);
     RUN_TEST(testSimpleMoveAtConstantSpeed4000);
+    delay(500);
+    RUN_TEST(testSimpleMoveToAPositionAtTime);
     UNITY_END();
 }
 

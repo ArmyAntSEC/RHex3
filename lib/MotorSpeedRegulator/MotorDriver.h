@@ -19,7 +19,7 @@ private:
   int lastMotorPWM = 0;
   
 public:	
-  void init( int _driverPinOne, int _driverPinTwo, int _driverPinPWM, 
+  void config( int _driverPinOne, int _driverPinTwo, int _driverPinPWM, 
 	     int _currentPin ) {
       this->driverPinOne = _driverPinOne;
       this->driverPinTwo = _driverPinTwo;
@@ -59,6 +59,12 @@ public:
     float voltageValue = analogRead( this->currentPin ) * 3.3 / 1024; //Read signal in Volts
     return voltageValue / 0.14; //Convert to A.
   }
+
+  int getMotorPWM()
+  {
+    return this->lastMotorPWM;
+  }
+
 };
 
 #endif /* MOTORDRIVER_H_ */

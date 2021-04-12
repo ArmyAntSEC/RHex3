@@ -4,8 +4,7 @@
 #include "HomingEncoder.h"
 #include "MotorDriver.h"
 #include <RecurringTaskBase.h>
-#include "LevelLogger.h"
-
+#include <SerialStream.h>
 
 class MotorSpeedRegulator: public RecurringTaskBase
 {
@@ -27,26 +26,32 @@ class MotorSpeedRegulator: public RecurringTaskBase
         bool isOn = false;
 
         HomingEncoder* encoder;
-        MotorDriver* driver;
+        MotorDriver* driver;        
 
-        LOGGABLE( "SpeedReg" );
+        int clampOutput( int Output ) {
+            if ( Output > 255  ) Output = 255;
+            if ( Output < 0 ) Output = 1;      
+            return Output;
+        }
 
     public:
         virtual void init()
         {
-            RecurringTaskBase::init();                        
+            RecurringTaskBase::init();  
+            Input = encoder->getSpeedCPMS();    
+            lastInput = Input;
+            ITerm = clampOutput(driver->getMotorPWM());
         }
 
-        virtual void init( HomingEncoder* _encoder, MotorDriver* _driver, 
+        virtual void config( HomingEncoder* _encoder, MotorDriver* _driver, 
             float _P, float _D, float _I, float _filter )
-        {            
-            init();
+        {                        
             this->encoder = _encoder;
             this->driver = _driver;
             this->P = _P;
             this->D = _D;
             this->I = _I;
-            this->filter = _filter;                        
+            this->filter = _filter;                                    
         }
 
         virtual void start() 
@@ -84,9 +89,7 @@ class MotorSpeedRegulator: public RecurringTaskBase
                 int dInput = Input - lastInput;
                 lastInput = Input;
 
-                Output = P*Error + D*dInput + ITerm;
-                if ( Output > 255  ) Output = 255;
-                if ( Output < 0 ) Output = 1;      
+                Output = clampOutput( P*Error + D*dInput + ITerm );
                         
                 OutputFiltered = (Output + OutputFiltered*(filter-1))/filter;
                 driver->setMotorPWM(OutputFiltered);   

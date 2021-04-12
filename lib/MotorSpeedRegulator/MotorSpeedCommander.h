@@ -3,8 +3,7 @@
 
 #include <MotorSpeedRegulator.h>
 #include <RecurringTaskBase.h>
-#include "LevelLogger.h"
-#include "dataLogger.h"
+#include <SerialStream.h>
 
 class MotorSpeedCommander: public RecurringTaskBase
 {
@@ -19,50 +18,31 @@ class MotorSpeedCommander: public RecurringTaskBase
         MotorDriver* driver;
         
         MotorSpeedRegulator* regulator;
-        
-        DataLogger* logger;
-
-        int posLogIdx = 0;
-        int speedLogIdx = 0;
-        int powerLogIdx = 0;
-        int targetSpeedLogIdx = 0;
-        LOGGABLE( "MtrSpeedCmdr" );
-
-    public:
-        MotorSpeedCommander ( HomingEncoder* _encoder, MotorDriver* _driver, 
-            MotorSpeedRegulator* _regulator, DataLogger* _logger ): 
-            encoder( _encoder ), driver( _driver ), regulator( _regulator ), 
-            logger(_logger)            
-        {
-        }
-
-        void registerVariables()
-        {
-            posLogIdx = logger->registerVariable((char*)"pos");
-            speedLogIdx = logger->registerVariable((char*)"speed");
-            powerLogIdx = logger->registerVariable((char*)"power");
-            targetSpeedLogIdx = logger->registerVariable((char*)"targetSpeed");            
-            DEBUG ( F("Will stop at position ") << this->posToMoveTo );            
-        }        
-        
+    
+    public:        
         virtual void init( unsigned long int _now, unsigned long int _timeToMove, 
-            unsigned long int _posToMoveTo )
-        {            
+                            unsigned long int _posToMoveTo )
+        {
             RecurringTaskBase::init();
 
-            this->regulator->start();
             this->timeToArrive = _now + _timeToMove;            
             this->posToMoveTo = _posToMoveTo;
-            DEBUG ( F("Time to move: ") << _timeToMove << " arrive: " << this->timeToArrive );
-
             this->hasArrivedAtPos = false;
+
+            this->regulator->init();
+        }   
+        
+        virtual void config(  HomingEncoder* _encoder, MotorDriver* _driver, 
+                            MotorSpeedRegulator* _regulator )
+        {                    
+            this->encoder = _encoder;
+            this->driver = _driver;
+            this->regulator = _regulator;                    
         }
 
         virtual void run( unsigned long int _now )
         {                                    
-            long int pos = this->encoder->getPosComp();
-            long int speed = encoder->getSpeedCPMS();
-            long int power = regulator->getFilteredOutput();
+            long int pos = this->encoder->getPosComp();                        
             
             long int clicksLeft = this->posToMoveTo - pos;
             if ( clicksLeft < 0 ) {
@@ -86,19 +66,15 @@ class MotorSpeedCommander: public RecurringTaskBase
                 targetSpeedClamped = this->maxSpeedToMove;
             }
 
-            if ( pos > this->posToMoveTo ){
+            //Log << pos << ", " << clicksLeft << ", " << timeLeft << ", " << targetSpeedClamped << endl;
+
+            if ( this->hasArrivedAtPos ){
                 this->regulator->stop();
-                this->stop(); //Stop to avoid hogging resources
-                DEBUG( F( "Motor stopped at position ") << pos );                 
+                this->stop(); //Stop to avoid hogging resources                
             } else {
                 this->regulator->setSetPoint( targetSpeedClamped );
-                DEBUG( F("Speed: ") << targetSpeedClamped )
             }            
-            
-            logger->storeValue( posLogIdx, pos );
-            logger->storeValue( speedLogIdx, speed );
-            logger->storeValue( targetSpeedLogIdx, targetSpeed );
-            logger->storeValue( powerLogIdx, power );
+                        
         }
         
         boolean hasArrived()
