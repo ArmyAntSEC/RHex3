@@ -26,7 +26,7 @@ template <int N>class RecurringEncoderWrapperHoming: public RecurringTaskBase
         RecurringEncoderWrapperHoming( HomingEncoder* _encoder ): encoder(_encoder)
         {}
         
-        virtual void init( unsigned long int _now ) {
+        virtual void init( unsigned long int ) {
             RecurringTaskBase::init();
         }
 

@@ -89,7 +89,7 @@ public:
 
   static HomingEncoderState * stateList[MAX_ENCODERS_SUPPORTED];                
   
-  template <int N> void init( unsigned int encoderPin1, 
+  template <int N> void config( unsigned int encoderPin1, 
 			      unsigned int encoderPin2, unsigned int breakerPin,
 			      int offset ) {
     pinMode(encoderPin1, INPUT_PULLUP);
@@ -355,10 +355,13 @@ public:
       #endif
       
       //Depending on direction, we will trigger either on rising or falling. 
-      //We want to make sure we allways trigger on the same edge regardless of direction
-      if ( abs(state->position - state->pos_at_last_home) > 2500 && state->moving_forward ^ breaker_val ) {                                
+      //We want to make sure we allways trigger on the same edge regardless of direction.
+      //If we are allready homed, do not rehome if we have not moved at least 2500 steps. 
+      //This to avoid bouncing of the signal as the homing is happening.
+      if ( (!state->is_homed || abs(state->position - state->pos_at_last_home) > 2500 ) && state->moving_forward ^ breaker_val ) {                                
         if ( !state->is_homed ) {
           //We reset the positon on the first home
+          state->pos_at_last_home = state->position;
           state->position = 0;                 
         } else {
           //We compute lap statistics for subsequent homings

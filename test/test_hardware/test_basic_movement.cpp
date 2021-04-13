@@ -9,13 +9,14 @@ TaskScheduler sched;
 RecurringTaskGroup<16> recurring10ms( 10 );
 
 
-// void setUp(void) {
-// // set stuff up here
-// }
+void setUp(void) {
+    encoder.forceHomed();
+}
 
-// void tearDown(void) {
-// // clean stuff up here
-// }
+void tearDown(void) {
+    driver.setMotorPWM(0);
+    regulator.stop();    
+}
 
 
 void testSimpleMove() {
@@ -23,20 +24,52 @@ void testSimpleMove() {
     unsigned long int endTime = 0;
     unsigned long int startPos = 0;
 
-    endTime = millis() + timeToMove;
+    
+    endTime = millis() + timeToMove;    
     startPos = encoder.getPosComp();
-    driver.setMotorPWM(128);            
+    driver.setMotorPWM(128);     
 
     while ( true ) {
         if ( endTime < millis() ) {
             unsigned long int endPos = encoder.getPosComp();
-            unsigned long int clicksMoved = endPos - startPos;
-            driver.setMotorPWM(0);             
-            TEST_ASSERT_INT_WITHIN( 200, 6000, clicksMoved );            
+            unsigned long int clicksMoved = endPos - startPos;            
+            TEST_ASSERT_INT_WITHIN( 300, 6000, clicksMoved );            
             return;
         }
         sched.run();
     }
+}
+
+void testSimpleHoming() {
+    unsigned long int maxTimeToMove = 5000;  
+    unsigned long int endTime = millis() + maxTimeToMove;
+    
+    encoderWrapperHoming.init( millis() ); //Start the homing
+
+    driver.setMotorPWM(128);
+    encoder.forceHomed(); //Set the position to 0.            
+    encoder.unHome(); //And reset the homing flag.    
+
+    boolean firstRound = true;
+    while ( millis() < endTime ) {        
+        if ( encoder.isHomed() ) {
+            if ( firstRound ) {
+                unsigned long int endPos = encoder.getPosAtLastHome();
+                TEST_ASSERT_LESS_THAN( 3592, endPos ); //Make sure we home within one rotation            
+                encoder.unHome(); //Then we unhome the encoder to keep moving
+                firstRound = false;    
+                //Log << "First homing" << endl;        
+            } else {
+                driver.setMotorPWM(0);
+                unsigned long int endPos = encoder.getPosAtLastHome();
+                TEST_ASSERT_INT_WITHIN( 10, 3592, endPos ); //Make sure we have gone exactly 1 round            
+                //Log << "Second homing" << endl;
+                return;
+            }
+        }
+        sched.run();
+    }    
+    TEST_ASSERT_TRUE( encoder.isHomed() );    
 }
 
 void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {
@@ -45,13 +78,11 @@ void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {
 
     endTime = millis() + timeToMove;
     regulator.setSetPoint( speedToMoveAt );
-    regulator.start();            
+    regulator.init();            
 
     while ( true ) {
         if ( endTime < millis() ) {
-            unsigned long int speed = encoder.getSpeedCPMS();
-            driver.setMotorPWM(0); 
-            regulator.stop();
+            unsigned long int speed = encoder.getSpeedCPMS();                        
             TEST_ASSERT_INT_WITHIN( 200, speedToMoveAt, speed );            
             return;
         }
@@ -73,14 +104,14 @@ void testSimpleMoveToAPositionAtTime() {
 
     
     commander.init( millis(), timeToMove, posToMoveTo );  
+    regulator.init();
     encoder.forceHomed(); //Make sure we start at position 0.              
 
     unsigned long int endTime = millis() + timeToMove;
 
     while ( true ) {
         if ( commander.hasArrived() || millis() > endTime + 5000 ) {
-            unsigned long int pos = encoder.getPosComp();
-            driver.setMotorPWM(0);             
+            unsigned long int pos = encoder.getPosComp();                
             TEST_ASSERT_INT_WITHIN( 200, posToMoveTo, pos );
             TEST_ASSERT_INT_WITHIN( 200, endTime, millis() );
             return;
@@ -103,6 +134,8 @@ void setup() {
     recurring10ms.add( &commander );
     recurring10ms.init( millis() );  
     sched.add( &recurring10ms ); 
+    sched.add( &encoderWrapperHoming );
+
 
     UNITY_BEGIN();
     RUN_TEST(testSimpleMove);  
@@ -112,6 +145,8 @@ void setup() {
     RUN_TEST(testSimpleMoveAtConstantSpeed4000);
     delay(500);
     RUN_TEST(testSimpleMoveToAPositionAtTime);
+    delay(500);
+    RUN_TEST(testSimpleHoming);
     UNITY_END();
 }
 

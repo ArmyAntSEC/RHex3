@@ -28,12 +28,14 @@ void initOneLeg()
     driver.config( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );        
 
     //Initialize the encoder
-    encoder.init<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );
-
+    encoder.config<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );    
+    
     //Intialize the regulator        
     regulator.config(&encoder, &driver, 0.2, 0, 0.01, 1 );    
 
     //Initialize the speed commander
     commander.config( &encoder, &driver, &regulator );
+
+    
 }
 #endif
