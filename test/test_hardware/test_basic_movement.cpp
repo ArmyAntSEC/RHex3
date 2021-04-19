@@ -4,7 +4,6 @@
 #include "RecurringTaskGroup.h"
 #include <configureOneLeg.h>
 
-
 TaskScheduler sched;
 RecurringTaskGroup<16> recurring10ms( 10 );
 
@@ -72,20 +71,43 @@ void testSimpleHoming() {
     TEST_ASSERT_TRUE( encoder.isHomed() );    
 }
 
-void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {
+void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {    
+
     unsigned long int timeToMove = 2000;  
+    unsigned long int timeToSettle = 1000;
     unsigned long int endTime = 0;    
 
     endTime = millis() + timeToMove;
     regulator.setSetPoint( speedToMoveAt );
     regulator.init();            
 
-    while ( true ) {
-        if ( endTime < millis() ) {
-            unsigned long int speed = encoder.getSpeedCPMS();                        
+    float n = 0;
+    float S = 0;
+    float S2 = 0.0;    
+
+    unsigned long int nextRun = millis() + timeToSettle;
+    while ( true ) {                
+        if ( millis() > endTime ) {
+            unsigned long int speed = encoder.getSpeedCPMS();                                    
+            //Log << "Speed: " << speed << " SetPoint: " << speedToMoveAt << endl;
             TEST_ASSERT_INT_WITHIN( 200, speedToMoveAt, speed );            
+            
+            float stdDev = sqrt( (n*S2-S*S)/(n*(n-1)) );
+            //Log << "Standard deviation: " << stdDev << endl;
+            TEST_ASSERT_FLOAT_WITHIN( 80, 0, stdDev );            
             return;
+        } else if ( millis() > nextRun ) {
+            nextRun += 10;
+            unsigned long int speed = encoder.getSpeedCPMS();                        
+            long int speedRel = speed - speedToMoveAt;
+            
+            //Compute STD        
+            n++;
+            S += speedRel;
+            S2 += speedRel*speedRel;
+            //Log << "speedRel: " << speedRel << " n: " << n << " S: " << S << " S2: " << S2 << endl;
         }
+
         sched.run();
     }
 }
@@ -97,6 +119,15 @@ void testSimpleMoveAtConstantSpeed7000() {
 void testSimpleMoveAtConstantSpeed4000() {
     testSimpleMoveAtConstantSpeed(4000);  
 }
+
+void testSimpleMoveAtConstantSpeed2000() {
+    testSimpleMoveAtConstantSpeed(2000);  
+}
+
+void testSimpleMoveAtConstantSpeed1000() {
+    testSimpleMoveAtConstantSpeed(1000);  
+}
+
 
 void testSimpleMoveToAPositionAtTime() {
     unsigned long int timeToMove = 2000;  
@@ -141,12 +172,16 @@ void setup() {
     RUN_TEST(testSimpleMove);  
     delay(500);
     RUN_TEST(testSimpleMoveAtConstantSpeed7000);
-    delay(500);
+    delay(500);    
     RUN_TEST(testSimpleMoveAtConstantSpeed4000);
     delay(500);
+    RUN_TEST(testSimpleMoveAtConstantSpeed2000);
+    delay(500);    
+    RUN_TEST(testSimpleMoveAtConstantSpeed1000);    
+    delay(500); 
     RUN_TEST(testSimpleMoveToAPositionAtTime);
-    delay(500);
-    RUN_TEST(testSimpleHoming);
+    delay(500);    
+    RUN_TEST(testSimpleHoming);    
     UNITY_END();
 }
 

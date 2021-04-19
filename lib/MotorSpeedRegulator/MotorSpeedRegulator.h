@@ -34,6 +34,19 @@ class MotorSpeedRegulator: public RecurringTaskBase
             return Output;
         }
 
+        int clampOutputForSpeed( int Output, int speed ) {
+            if ( Output > 255  ) 
+            {
+                Output = 255;
+            } else {
+                int MinOutput = GetPowerForFreeSpeed( speed )*0.9; //We remove 10%
+                if ( Output < MinOutput ) {
+                    Output = MinOutput;
+                }
+            }
+            return Output;
+        }
+
     public:
         virtual void init()
         {
@@ -89,7 +102,7 @@ class MotorSpeedRegulator: public RecurringTaskBase
                 int dInput = Input - lastInput;
                 lastInput = Input;
 
-                Output = clampOutput( P*Error + D*dInput + ITerm );
+                Output = clampOutputForSpeed( P*Error + D*dInput + ITerm, SetPoint );
                         
                 OutputFiltered = (Output + OutputFiltered*(filter-1))/filter;
                 driver->setMotorPWM(OutputFiltered);   
@@ -100,6 +113,46 @@ class MotorSpeedRegulator: public RecurringTaskBase
 
         int getInput() { return this->Input; }
         int getFilteredOutput() { return this->OutputFiltered; }       
+        
+        static unsigned int GetPowerForFreeSpeed( unsigned int speed )
+        {
+
+            static const unsigned int speedVsPower[7][2] = {{20, 789}, {24,1363}, {32,2145}, {48,3472}, {64,4507}, {128, 6509}, {255,7735}};    
+            
+            //Check if we are out of range
+            if ( speed <= speedVsPower[0][1] ) {
+                return speedVsPower[0][0];
+            } else if ( speed >= speedVsPower[6][1] ) {
+                return speedVsPower[6][0];
+            }
+
+            int speedIdx = 0;    
+            while ( speedVsPower[speedIdx][1] < speed ) {
+                speedIdx++;
+            }
+                    
+            int speedLow = speedVsPower[speedIdx-1][1];
+            int speedHigh = speedVsPower[speedIdx][1];
+            SQ15x16 speedSpan = speedHigh - speedLow;
+            int powerLow = speedVsPower[speedIdx-1][0];
+            int powerHigh = speedVsPower[speedIdx][0];
+            SQ15x16 powerSpan = powerHigh - powerLow;
+                
+            SQ15x16 speedRem = speed - speedLow;
+            SQ15x16 factor = powerSpan / speedSpan;
+            SQ15x16 powerRem = speedRem * factor;
+
+            int power = roundFixed(powerRem).getInteger() + powerLow;
+            /*
+            Log << "Interpolating to: " << speed << endl;
+            Log << speedLow << ", " << speedHigh << ", " << powerLow << ", " << powerHigh << endl;
+            Log << speedSpan.getInteger() << ", " << powerSpan.getInteger() << endl;
+            Log << (double)speedRem << ", " << (double)factor << ", " << (double)powerRem << endl; 
+            Log << power << endl;
+            */
+        
+            return power;
+        }
 
 };
 
