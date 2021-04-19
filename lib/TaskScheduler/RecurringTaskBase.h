@@ -6,8 +6,7 @@
 class RecurringTaskBase: public Task
 {
 private:
-    bool running = false;
-    LOGGABLE( "RTaskBase");    
+    bool running = false; 
 
 public:
     virtual bool canRun(unsigned long int ) 

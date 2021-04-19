@@ -14,8 +14,7 @@ class TaskScheduler {
 public:
     TaskScheduler();
     void add ( Task* task );
-    void run();
-    LOGGABLE( "TaskSched" );    
+    void run();    
 private:
     const static int MaxTasks = 16;
     Task *tasks[MaxTasks];

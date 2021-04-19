@@ -8,11 +8,8 @@
 #ifndef TASK_H_
 #define TASK_H_
 
-#include <LevelLogger.h>
-
 class Task { // @suppress("Class has a virtual method and non-virtual destructor")
-private:
-    LOGGABLE( "Task" );
+private:    
 
 public:
     virtual bool canRun(unsigned long int now) {
