@@ -6,6 +6,7 @@
 #include "RecurringEncoderWrapper.h"
 #include "MotorSpeedRegulator.h"
 #include "MotorSpeedCommander.h"
+#include "LegController.h"
 
 #define MOTOR_EN1 4
 #define MOTOR_EN2 5
@@ -21,6 +22,8 @@ RecurringEncoderWrapperHoming<0> encoderWrapperHoming ( &encoder );
 MotorDriver driver;
 MotorSpeedRegulator regulator;
 MotorSpeedCommander commander;
+LegController leg;
+
 
 void initOneLeg()
 {
@@ -36,6 +39,7 @@ void initOneLeg()
     //Initialize the speed commander
     commander.config( &encoder, &driver, &regulator );
 
-    
+    //Initialize the leg stepper
+    leg.config( &commander );        
 }
 #endif

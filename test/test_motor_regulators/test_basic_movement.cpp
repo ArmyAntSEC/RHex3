@@ -132,11 +132,10 @@ void testSimpleMoveAtConstantSpeed1000() {
 void testSimpleMoveToAPositionAtTime() {
     unsigned long int timeToMove = 2000;  
     unsigned long int posToMoveTo = 10000;
-
-    
-    commander.init( millis(), timeToMove, posToMoveTo );  
+        
     regulator.init();
     encoder.forceHomed(); //Make sure we start at position 0.              
+    commander.init( millis(), timeToMove, posToMoveTo );  
 
     unsigned long int endTime = millis() + timeToMove;
 
