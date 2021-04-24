@@ -10,6 +10,7 @@ RecurringTaskGroup<16> recurring10ms( 10 );
 
 void setUp(void) {
     encoder.forceHomed();
+    encoderWrapperHoming.init( millis() ); //Start the homing
 }
 
 void tearDown(void) {
@@ -18,7 +19,7 @@ void tearDown(void) {
 }
 
 
-void testSimpleMove() {
+void testSimpleMove() {    
     unsigned long int timeToMove = 1000;  
     unsigned long int endTime = 0;    
 
@@ -27,9 +28,11 @@ void testSimpleMove() {
     driver.setMotorPWM(128);     
 
     while ( true ) {
-        if ( endTime < millis() ) {
-            unsigned long int endPos = encoder.getPosComp();            
-            TEST_ASSERT_INT_WITHIN( 300, 6000, endPos );            
+        if ( millis() > endTime ) {
+            long int endPos = encoder.getPosComp();            
+            long int laps = encoder.getLaps();
+            TEST_ASSERT_INT_WITHIN( 300, 6000-3592, endPos );            
+            TEST_ASSERT_EQUAL( 1, laps );            
             return;
         }
         sched.run();
@@ -69,24 +72,50 @@ void testSimpleHoming() {
 }
 
 void testWrapAroundLogic() {
+    double lapRemainder = (double)encoder.clicksPerRevolution - 3591;
+
     long int raw_position = 0;
-    UQ1x15 remainder = 0;
-    encoder.handleOverflow ( raw_position, remainder );
+    SQ1x14 remainder = 0;
+    long int laps = 0;
+    encoder.handleOverflow ( raw_position, remainder, laps );
     TEST_ASSERT_EQUAL( 0, raw_position );
     TEST_ASSERT_DOUBLE_WITHIN(0.000001, 0, 0 );
+    TEST_ASSERT_EQUAL( 0, laps );
 
     raw_position = 3592;
     remainder = 0;    
-    encoder.handleOverflow ( raw_position, remainder );
+    laps = 0;
+    encoder.handleOverflow ( raw_position, remainder, laps );
     TEST_ASSERT_EQUAL( 0, raw_position );
-    TEST_ASSERT_DOUBLE_WITHIN(5e-4, 0.074666667, (double)remainder );
+    TEST_ASSERT_DOUBLE_WITHIN(5e-4, 1-lapRemainder, (double)remainder );
+    TEST_ASSERT_EQUAL( 1, laps );
+
+    raw_position = -3592;
+    remainder = 0;    
+    laps = 0;
+    encoder.handleOverflow ( raw_position, remainder, laps );
+    TEST_ASSERT_EQUAL( -1, raw_position );
+    TEST_ASSERT_DOUBLE_WITHIN(5e-4, lapRemainder, (double)remainder );
+    TEST_ASSERT_EQUAL( -1, laps );
 
     raw_position = 3592*2;
     remainder = 0;    
-    encoder.handleOverflow ( raw_position, remainder );
-    encoder.handleOverflow ( raw_position, remainder );
+    laps = 0;
+    encoder.handleOverflow ( raw_position, remainder, laps );
+    encoder.handleOverflow ( raw_position, remainder, laps );
     TEST_ASSERT_EQUAL( 0, raw_position );
-    TEST_ASSERT_DOUBLE_WITHIN(2*5e-4, 2*0.074666667, (double)remainder );
+    TEST_ASSERT_DOUBLE_WITHIN(2*5e-4, 2*(1-lapRemainder), (double)remainder );
+    TEST_ASSERT_EQUAL( 2, laps );
+
+    raw_position = -3592*2;
+    remainder = 0;    
+    laps = 0;
+    encoder.handleOverflow ( raw_position, remainder, laps );
+    encoder.handleOverflow ( raw_position, remainder, laps );
+    TEST_ASSERT_EQUAL( -1, raw_position );
+    TEST_ASSERT_DOUBLE_WITHIN(2*5e-4, 2*lapRemainder-1, (double)remainder );
+    TEST_ASSERT_EQUAL( -2, laps );
+
 }
 
 void testPositiveSubtraction() {
@@ -113,6 +142,7 @@ void testWrapAroundAndOffset() {
         sched.run();
     }    
     TEST_ASSERT_LESS_THAN( 3593, encoder.getPosComp() );
+    driver.setMotorPWM(0);
 }
 
 void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {    
@@ -220,6 +250,7 @@ void setup() {
     RUN_TEST(testSimpleMove);  
     delay(500);
     RUN_TEST(testSimpleMoveAtConstantSpeed7000);
+    /*
     delay(500);    
     RUN_TEST(testSimpleMoveAtConstantSpeed4000);
     delay(500);
@@ -230,6 +261,7 @@ void setup() {
     RUN_TEST(testSimpleMoveToAPositionAtTime);
     delay(500);    
     RUN_TEST(testSimpleHoming);    
+    */
     UNITY_END();
 }
 

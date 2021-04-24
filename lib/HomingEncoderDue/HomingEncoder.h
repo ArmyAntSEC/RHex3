@@ -57,8 +57,9 @@ struct HomingEncoderState {
   bool moving_forward;
   
   long int raw_position;
+  long int laps;
 
-  UQ1x15 position_remainder;
+  SQ1x14 position_remainder;
   
   bool is_homed;
   
@@ -79,9 +80,9 @@ class HomingEncoder
 {
 private:
   HomingEncoderState state;        
-  static const UQ16x16 clicksPerRevolution;
+  
 public:
-
+  static const SQ15x16 clicksPerRevolution;
   static HomingEncoderState * stateList[MAX_ENCODERS_SUPPORTED];                
   
   template <int N> void config( unsigned int encoderPin1, 
@@ -262,7 +263,16 @@ public:
     interrupts();
     return rValue;
   }
-  
+
+  int getLaps()
+  {
+    int rValue = 0;
+    noInterrupts();
+    rValue = state.laps;
+    interrupts();
+    return rValue;
+  }
+
   unsigned int getBreakerVal()
   {
     return DIRECT_PIN_READ(state.breakerPin_register, 
@@ -327,20 +337,33 @@ public:
       if ( !state->is_homed && state->moving_forward ^ breaker_val ) {                                
         state->pos_at_last_home = state->raw_position;
         state->raw_position = 0;                 
-        state->is_homed = true;                
+        state->is_homed = true;                      
       }
 
-      HomingEncoder::handleOverflow( state->raw_position, state->position_remainder );
+      HomingEncoder::handleOverflow( state->raw_position, state->position_remainder, state->laps );
 
     }
 
-    static void handleOverflow ( long int & raw_position, UQ1x15 & remainder )
+    static void handleOverflow ( long int & raw_position, SQ1x14 & remainder, long int & laps )
     {            
-      if ( raw_position > HomingEncoder::clicksPerRevolution.getInteger() ) {                        
-        UQ16x16 precise_position = UQ16x16(raw_position) + UQ16x16(remainder) - HomingEncoder::clicksPerRevolution;
-        raw_position = precise_position.getInteger();
-        remainder = UQ1x15(precise_position-floorFixed(precise_position));                
+      
+      int clicksPerRevInt = HomingEncoder::clicksPerRevolution.getInteger();
+      SQ15x16 precise_position = 0;
+
+      if ( raw_position > clicksPerRevInt ) {                        
+        precise_position = SQ15x16(raw_position) + SQ15x16(remainder) - HomingEncoder::clicksPerRevolution;
+        raw_position = floorFixed(precise_position).getInteger();
+        remainder = SQ1x14(precise_position-floorFixed(precise_position));
+        laps++;
+        //Log << "Positive: ";        
+      } else if ( raw_position < -clicksPerRevInt ) {                        
+        SQ15x16 precise_position = SQ15x16(raw_position) + SQ15x16(remainder) + HomingEncoder::clicksPerRevolution;
+        raw_position = floorFixed(precise_position).getInteger();
+        remainder = SQ1x14(precise_position-floorFixed(precise_position));
+        laps--;
+        //Log << "Negative: ";
       }      
+      //Log << "Precise: " << (double)precise_position << " raw_position: " << raw_position << " rem: " << (double)remainder << endl;        
     }
 
     static long int positionPositiveDifference( long int pos1, long int pos2 )
