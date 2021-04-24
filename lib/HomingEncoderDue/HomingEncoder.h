@@ -196,13 +196,13 @@ public:
 
   }
 
-  long int getSpeedCPMS()
+  long int getSpeedCPS()
   {
-    int speedCPMS = 0;
+    int speedCPS = 0;
     noInterrupts();
-    speedCPMS = state.speed_cps.getInteger();
+    speedCPS = state.speed_cps.getInteger();
     interrupts();  
-    return speedCPMS;
+    return speedCPS;
   }
 
   int isMovingForward()
@@ -381,7 +381,7 @@ public:
         return pos1 - pos2;
       else
         return HomingEncoder::clicksPerRevolution.getInteger() + pos1 - pos2;
-    }
+    }    
 };
 
 #endif

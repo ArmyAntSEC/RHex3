@@ -8,11 +8,13 @@
 class MotorSpeedCommander: public RecurringTaskBase
 {
     private:
-        long int posToMoveTo; 
+        int posToMoveTo;
+        int lapsToMove;
         long int maxSpeedToMove = 8000;       
         unsigned long int timeToMove;        
         unsigned long int timeToArrive;
         boolean hasArrivedAtPos = false;
+        boolean onSameLapAsTarget = false;
                         
         HomingEncoder* encoder;
         MotorDriver* driver;
@@ -21,13 +23,19 @@ class MotorSpeedCommander: public RecurringTaskBase
     
     public:        
         virtual void init( unsigned long int _now, unsigned long int _timeToMove, 
-                            unsigned long int _posToMoveTo )
+                            int _posToMoveTo )
         {
-            RecurringTaskBase::init();
-
+            RecurringTaskBase::init();            
             this->timeToArrive = _now + _timeToMove;            
-            this->posToMoveTo = _posToMoveTo;
+            this->posToMoveTo = _posToMoveTo;            
             this->hasArrivedAtPos = false;
+            
+            long int pos = this->encoder->getPosComp();                        
+            if ( pos > this->posToMoveTo ) {
+                this->onSameLapAsTarget = false;
+            } else {
+                this->onSameLapAsTarget = true;
+            }
 
             this->regulator->init();
         }   
@@ -42,9 +50,20 @@ class MotorSpeedCommander: public RecurringTaskBase
 
         virtual void run( unsigned long int _now )
         {                                    
+            //TODO: Rewrite this code. It is ugly as what.
             long int pos = this->encoder->getPosComp();                        
+            if ( !this->onSameLapAsTarget && pos < this->posToMoveTo ) {
+                //Detect that we have now moved to be on the same lap as the target
+                this->onSameLapAsTarget = true; //We are now on the same lap as the target
+            }
+            long int clicksLeft = 0;
+            if ( !this->onSameLapAsTarget ) {                
+                clicksLeft = encoder->positionPositiveDifference( this->posToMoveTo, pos );
+            } else {
+                clicksLeft = this->posToMoveTo - pos;
+            }
+            //End the rewrite here.
             
-            long int clicksLeft = this->posToMoveTo - pos;
             if ( clicksLeft < 0 ) {
                 clicksLeft = 0;
                 this->hasArrivedAtPos = true;

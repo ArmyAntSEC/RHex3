@@ -23,13 +23,13 @@ void testStepComputation() {
     LegController leg;
     leg.init( 1500, 2000, 1000, 1000, LegController::AfterStep );
     
-    unsigned long int* posSequence1 = leg.getPosSequence(0);
-    unsigned long int time1 = *(posSequence1);
-    unsigned long int pos1 = *(posSequence1+1);
+    int* posSequence1 = leg.getPosSequence(0);
+    int time1 = *(posSequence1);
+    int pos1 = *(posSequence1+1);
     
-    unsigned long int* posSequence2 = leg.getPosSequence(1);
-    unsigned long int time2 = *(posSequence2);
-    unsigned long int pos2 = *(posSequence2+1);
+    int* posSequence2 = leg.getPosSequence(1);
+    int time2 = *(posSequence2);
+    int pos2 = *(posSequence2+1);
     
     TEST_ASSERT_EQUAL_INT ( 1000, time1 );
     TEST_ASSERT_EQUAL_INT ( 3592-500, pos1 );

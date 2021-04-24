@@ -44,7 +44,7 @@ class TestMoveToPosition: public RemoteRoutine
         virtual void run( unsigned long int _now )
         {                                    
             long int pos = this->encoder->getPosComp();
-            long int speed = encoder->getSpeedCPMS();
+            long int speed = encoder->getSpeedCPS();
             long int power = regulator->getFilteredOutput();
             
             if ( pos > this->posToMoveTo ){

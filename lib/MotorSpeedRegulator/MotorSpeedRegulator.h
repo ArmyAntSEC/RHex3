@@ -51,7 +51,7 @@ class MotorSpeedRegulator: public RecurringTaskBase
         virtual void init()
         {
             RecurringTaskBase::init();  
-            Input = encoder->getSpeedCPMS();    
+            Input = encoder->getSpeedCPS();    
             lastInput = Input;
             ITerm = clampOutput(driver->getMotorPWM());
         }
@@ -71,7 +71,7 @@ class MotorSpeedRegulator: public RecurringTaskBase
         {       
             RecurringTaskBase::start();
             this->isOn = true; 
-            this->lastInput = encoder->getSpeedCPMS(); //No derivative kick on first iteration
+            this->lastInput = encoder->getSpeedCPS(); //No derivative kick on first iteration
             this->ITerm = 0;
         }
         
@@ -90,7 +90,7 @@ class MotorSpeedRegulator: public RecurringTaskBase
         virtual void run( unsigned long int ) 
         {         
             if ( isOn ) {   
-                Input = encoder->getSpeedCPMS();
+                Input = encoder->getSpeedCPS();
                 int Error = SetPoint - Input;
                 ITerm += I * Error;
                 if ( ITerm > maxOutput ) {

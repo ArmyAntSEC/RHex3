@@ -36,7 +36,7 @@ class TestSimpleMove: public RecurringTaskBase
                 //ERROR( F( "Motor stopped" ) );                 
             }
             long int pos = encoder->getPosComp();
-            long int speed = encoder->getSpeedCPMS();
+            long int speed = encoder->getSpeedCPS();
             logger->storeValue(posLogIdx, pos );
             logger->storeValue(speedLogIdx, speed );
             logger->storeValue(powerLogIdx, 128 );

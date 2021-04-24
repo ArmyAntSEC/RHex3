@@ -24,7 +24,7 @@ void testDrift( HomingEncoder* encoder, MotorDriver *driver )
       encoder->run();
       delay(10);
     }
-    Log << "Speed: " << encoder->getSpeedCPMS() << endl;
+    Log << "Speed: " << encoder->getSpeedCPS() << endl;
 
     //Home the encoder
     while ( !encoder->isHomed() ) {    
@@ -49,7 +49,7 @@ void testSpeedMesaurement( HomingEncoder* encoder, MotorDriver *driver )
         encoder->run();
         delay(10);
       }
-      Log << "Speed: " << encoder->getSpeedCPMS() << endl;
+      Log << "Speed: " << encoder->getSpeedCPS() << endl;
     }    
 }
 
@@ -128,7 +128,7 @@ void testSpeedPDController( HomingEncoder* encoder, MotorDriver *driver, float p
       encoder->run();
       nextTime += 10;
       
-      Input = encoder->getSpeedCPMS();
+      Input = encoder->getSpeedCPS();
       int Error = SetPoint - Input;
       int dInput = Input - lastInput;
       lastInput = Input;
@@ -254,7 +254,7 @@ void testGoToPosition( HomingEncoder* encoder, MotorDriver *driver, float parame
         posLog[loopCount] = encoder->getPosComp();        
       } else {
         driver->setMotorPWM( 0 );
-        speedLog[loopCount] = encoder->getSpeedCPMS();
+        speedLog[loopCount] = encoder->getSpeedCPS();
         powerLog[loopCount] = 0;
         posLog[loopCount] = encoder->getPosComp();        
       }
