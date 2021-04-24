@@ -56,14 +56,13 @@ struct HomingEncoderState {
 
   bool moving_forward;
   
-  long int position;
-  int laps;
+  long int raw_position;
+
+  UQ1x15 position_remainder;
   
   bool is_homed;
   
   long int pos_at_last_home;
-  int last_lap_length;
-  int average_lap_length;
   
   int offset;
 
@@ -80,12 +79,8 @@ class HomingEncoder
 {
 private:
   HomingEncoderState state;        
-  
+  static const UQ16x16 clicksPerRevolution;
 public:
-  static int clicksPerRevolution()
-  {
-    return 3592;
-  }
 
   static HomingEncoderState * stateList[MAX_ENCODERS_SUPPORTED];                
   
@@ -99,16 +94,13 @@ public:
     state.encoderPin1 = encoderPin1;
     state.encoderPin2 = encoderPin2;
     state.breakerPin = breakerPin;
-    state.position = 0;
-    state.laps = 0;
+    state.raw_position = 0;    
     state.moving_forward = true;
     state.is_homed = false;
     state.pos_at_last_home = 0;
     state.last_position = 0;
     state.last_position_timestamp_micros = 0;
     state.speed_cps = 0;     
-    state.last_lap_length = 0;
-    state.average_lap_length = 0;   
     
     state.encoderPin1_register = PIN_TO_BASEREG(encoderPin1);
     state.encoderPin2_register = PIN_TO_BASEREG(encoderPin2);
@@ -221,7 +213,7 @@ public:
   {             
     long int r;                        
     noInterrupts();
-    r = state.position + state.offset;
+    r = state.raw_position + state.offset;
     interrupts();
     return r;
   }
@@ -230,7 +222,7 @@ public:
   {             
     long int r;                        
     noInterrupts();
-    r = state.position - state.pos_at_last_home;
+    r = state.raw_position - state.pos_at_last_home;
     interrupts();
     return r;
   }
@@ -247,8 +239,8 @@ public:
   {
     noInterrupts();
     state.is_homed = true;
-    state.pos_at_last_home = state.position;
-    state.position = 0;    
+    state.pos_at_last_home = state.raw_position;
+    state.raw_position = 0;    
     interrupts();
   }
 
@@ -261,14 +253,6 @@ public:
     return is_homed;
   }
 
-  int getLaps()
-  {
-    int laps;
-    noInterrupts();
-    laps = state.laps;
-    interrupts();
-    return laps;
-  }
   
   int getPosAtLastHome()
   {
@@ -279,24 +263,6 @@ public:
     return rValue;
   }
   
-  int getLastLapLength()
-  {
-    int rValue = 0;
-    noInterrupts();
-    rValue = state.last_lap_length;
-    interrupts();
-    return rValue;
-  }
-
-  int getAverageLapLength()
-  {
-    int rValue = 0;
-    noInterrupts();
-    rValue = state.average_lap_length;
-    interrupts();
-    return rValue;
-  }
-
   unsigned int getBreakerVal()
   {
     return DIRECT_PIN_READ(state.breakerPin_register, 
@@ -320,19 +286,19 @@ public:
     
     switch (encoder_state) {
     case 1: case 7: case 8: case 14:
-	    state->position--;
+	    state->raw_position--;
 	    state->moving_forward = false;
       break;
     case 2: case 4: case 11: case 13:
-      state->position++;
+      state->raw_position++;
       state->moving_forward = true;
       break;
     case 3: case 12:
-      state->position -= 2;
+      state->raw_position -= 2;
       state->moving_forward = false;
       break;
     case 6: case 9:
-      state->position += 2;
+      state->raw_position += 2;
     	state->moving_forward = true;
 	  break;
     }                                    
@@ -358,27 +324,31 @@ public:
       //We want to make sure we allways trigger on the same edge regardless of direction.
       //If we are allready homed, do not rehome if we have not moved at least 2500 steps. 
       //This to avoid bouncing of the signal as the homing is happening.
-      if ( (!state->is_homed || abs(state->position - state->pos_at_last_home) > 2500 ) && state->moving_forward ^ breaker_val ) {                                
-        if ( !state->is_homed ) {
-          //We reset the positon on the first home
-          state->pos_at_last_home = state->position;
-          state->position = 0;                 
-        } else {
-          //We compute lap statistics for subsequent homings
-          state->last_lap_length = state->position - state->pos_at_last_home;
-          state->pos_at_last_home = state->position;
-          
-          if ( state->moving_forward ) {
-            state->laps++;
-          } else {
-            state->laps--;
-          }
-          
-          state->average_lap_length = state->position / state->laps; 
-        }
-        
+      if ( !state->is_homed && state->moving_forward ^ breaker_val ) {                                
+        state->pos_at_last_home = state->raw_position;
+        state->raw_position = 0;                 
         state->is_homed = true;                
       }
+
+      HomingEncoder::handleOverflow( state->raw_position, state->position_remainder );
+
+    }
+
+    static void handleOverflow ( long int & raw_position, UQ1x15 & remainder )
+    {            
+      if ( raw_position > HomingEncoder::clicksPerRevolution.getInteger() ) {                        
+        UQ16x16 precise_position = UQ16x16(raw_position) + UQ16x16(remainder) - HomingEncoder::clicksPerRevolution;
+        raw_position = precise_position.getInteger();
+        remainder = UQ1x15(precise_position-floorFixed(precise_position));                
+      }      
+    }
+
+    static long int positionPositiveDifference( long int pos1, long int pos2 )
+    {
+      if ( pos1 > pos2 )
+        return pos1 - pos2;
+      else
+        return HomingEncoder::clicksPerRevolution.getInteger() + pos1 - pos2;
     }
 };
 
