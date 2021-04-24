@@ -159,7 +159,7 @@ public:
     unsigned long int lastTimeU = state.last_position_timestamp_micros;
     interrupts();
 
-    SQ15x16 posDelta = thisPos - lastPos;
+    SQ15x16 posDelta = HomingEncoder::positionPositiveDifference( thisPos, lastPos );
     state.last_position = thisPos;
 
     SQ15x16 timeDelta = nowU - lastTimeU;
@@ -177,8 +177,12 @@ public:
     state.last_position = thisPos;
     state.last_position_timestamp_micros = nowU;
     state.speed_cps = speedCPS;
+
+    //Make sure that we handle any overflows.
+    HomingEncoder::handleOverflow( state.raw_position, state.position_remainder, state.laps );
     interrupts();
 
+    
     /*
     if ( speedCPS == 0 ) {
       //ERROR( F("Unexpected speed") );
@@ -242,6 +246,7 @@ public:
     state.is_homed = true;
     state.pos_at_last_home = state.raw_position;
     state.raw_position = 0;    
+    state.laps = 0;
     interrupts();
   }
 
@@ -338,9 +343,7 @@ public:
         state->pos_at_last_home = state->raw_position;
         state->raw_position = 0;                 
         state->is_homed = true;                      
-      }
-
-      HomingEncoder::handleOverflow( state->raw_position, state->position_remainder, state->laps );
+      }      
 
     }
 
@@ -355,15 +358,21 @@ public:
         raw_position = floorFixed(precise_position).getInteger();
         remainder = SQ1x14(precise_position-floorFixed(precise_position));
         laps++;
-        //Log << "Positive: ";        
+        /*Log << "Positive: ";        
+        Log << "Precise: " << (double)precise_position << 
+          " raw_position: " << raw_position << " rem: " << (double)remainder << 
+          " laps: " << laps << endl;*/
       } else if ( raw_position < -clicksPerRevInt ) {                        
         SQ15x16 precise_position = SQ15x16(raw_position) + SQ15x16(remainder) + HomingEncoder::clicksPerRevolution;
         raw_position = floorFixed(precise_position).getInteger();
         remainder = SQ1x14(precise_position-floorFixed(precise_position));
         laps--;
-        //Log << "Negative: ";
+        /*Log << "Negative: ";
+        Log << "Precise: " << (double)precise_position << 
+          " raw_position: " << raw_position << " rem: " << (double)remainder << 
+          " laps: " << laps << endl;*/
       }      
-      //Log << "Precise: " << (double)precise_position << " raw_position: " << raw_position << " rem: " << (double)remainder << endl;        
+      
     }
 
     static long int positionPositiveDifference( long int pos1, long int pos2 )

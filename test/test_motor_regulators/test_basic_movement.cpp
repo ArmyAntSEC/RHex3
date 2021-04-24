@@ -39,6 +39,26 @@ void testSimpleMove() {
     }
 }
 
+void testSimpleMoveBackwards() {    
+    unsigned long int timeToMove = 1000;  
+    unsigned long int endTime = 0;    
+
+    
+    endTime = millis() + timeToMove;        
+    driver.setMotorPWM(-128);     
+
+    while ( true ) {
+        if ( millis() > endTime ) {
+            long int endPos = encoder.getPosComp();            
+            long int laps = encoder.getLaps();
+            TEST_ASSERT_INT_WITHIN( 300, -6000+3592, endPos );            
+            TEST_ASSERT_EQUAL( -1, laps );            
+            return;
+        }
+        sched.run();
+    }
+}
+
 void testSimpleHoming() {
     unsigned long int maxTimeToMove = 5000;  
     unsigned long int endTime = millis() + maxTimeToMove;
@@ -204,6 +224,7 @@ void testSimpleMoveAtConstantSpeed1000() {
 
 
 void testSimpleMoveToAPositionAtTime() {
+    TEST_FAIL_MESSAGE( "Need to handle moving more than one round." );
     unsigned long int timeToMove = 2000;  
     unsigned long int posToMoveTo = 10000;
         
@@ -249,19 +270,19 @@ void setup() {
     //delay(500);
     RUN_TEST(testSimpleMove);  
     delay(500);
-    RUN_TEST(testSimpleMoveAtConstantSpeed7000);
-    /*
+    RUN_TEST(testSimpleMoveBackwards);
+    delay(500);
+    RUN_TEST(testSimpleMoveAtConstantSpeed7000);    
     delay(500);    
     RUN_TEST(testSimpleMoveAtConstantSpeed4000);
     delay(500);
     RUN_TEST(testSimpleMoveAtConstantSpeed2000);
     delay(500);    
     RUN_TEST(testSimpleMoveAtConstantSpeed1000);    
-    delay(500); 
+    delay(500);     
     RUN_TEST(testSimpleMoveToAPositionAtTime);
     delay(500);    
-    RUN_TEST(testSimpleHoming);    
-    */
+    RUN_TEST(testSimpleHoming);        
     UNITY_END();
 }
 
