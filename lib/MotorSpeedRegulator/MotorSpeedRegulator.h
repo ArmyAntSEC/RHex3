@@ -84,7 +84,11 @@ class MotorSpeedRegulator: public RecurringTaskBase
 
         void setSetPoint( int _SetPoint )
         {
-            this->SetPoint = _SetPoint;
+            //If we are reducing our speed significantly, give the motor a hard break for a split second.
+            if ( _SetPoint < this->SetPoint/2 ) {
+                driver->setMotorPWM(0);
+            }
+            this->SetPoint = _SetPoint;            
             //Log << "Set stepoint: " << _SetPoint << endl;
         }
 

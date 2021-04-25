@@ -56,10 +56,10 @@ void testStepComputation() {
 
 }
 
-void testStepComputationWithMoveAfterStep() {
+void testStepMoveAfterStep() {
     
     int stepTime = 1000;
-    int slowTime = 300;
+    int slowTime = stepTime/2;
     int slowAngle = 1000;
 
     leg.init( millis(), stepTime, slowTime, slowAngle, LegController::AfterStep );    
@@ -86,9 +86,11 @@ void testStepComputationWithMoveAfterStep() {
     expectedPos = slowAngle/2;    
     TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
     TEST_ASSERT_EQUAL ( 1, encoder.getLaps() );
+
+    TEST_FAIL_MESSAGE ( "Right now, the regulator decides itself to do hard breaks, but that should be done by the LegController instead." );
 }
 
-void testStepComputationWithMoveAfterStepTwice() {
+void testStepMoveAfterStepTwice() {
     
     int stepTime = 2000;
     int slowTime = 1000;
@@ -125,7 +127,7 @@ void testStepComputationWithMoveAfterStepTwice() {
     TEST_ASSERT_EQUAL ( 2, encoder.getLaps() );
 }
 
-void testStepComputationWithMoveBeforeStep() {
+void testStepMoveBeforeStep() {
     
     int stepTime = 2000;
     int slowTime = 1000;
@@ -199,11 +201,11 @@ void setup() {
     UNITY_BEGIN();    
     RUN_TEST(testStepComputation);      
     delay(500);
-    RUN_TEST(testStepComputationWithMoveAfterStep);    
+    RUN_TEST(testStepMoveAfterStep);        
     delay(500);
-    RUN_TEST(testStepComputationWithMoveBeforeStep);
+    RUN_TEST(testStepMoveBeforeStep);
     delay(500);    
-    RUN_TEST(testStepComputationWithMoveAfterStepTwice);        
+    RUN_TEST(testStepMoveAfterStepTwice);            
     UNITY_END();
 }
 
