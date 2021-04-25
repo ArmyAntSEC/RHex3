@@ -22,11 +22,11 @@ class MotorSpeedCommander: public RecurringTaskBase
         MotorSpeedRegulator* regulator;
     
     public:        
-        virtual void init( unsigned long int _now, unsigned long int _timeToMove, 
+        virtual void init( unsigned long int _timeToMoveTo, 
                             int _posToMoveTo )
         {
             RecurringTaskBase::init();            
-            this->timeToArrive = _now + _timeToMove;            
+            this->timeToArrive =  _timeToMoveTo;            
             this->posToMoveTo = _posToMoveTo;            
             this->hasArrivedAtPos = false;
             
@@ -105,6 +105,11 @@ class MotorSpeedCommander: public RecurringTaskBase
         {
             RecurringTaskBase::stop();
             regulator->stop();
+        }
+
+        HomingEncoder* getEncoder()
+        {
+            return this->encoder;
         }
 };
 #endif

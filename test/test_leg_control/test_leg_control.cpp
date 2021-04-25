@@ -34,41 +34,110 @@ void testStepComputation() {
     int time2 = *(posSequence2);
     int pos2 = *(posSequence2+1);
     
-    TEST_ASSERT_EQUAL_INT ( 1000, time1 );
+    TEST_ASSERT_EQUAL_INT ( 1500+1000, time1 );
     TEST_ASSERT_EQUAL_INT ( 3592-500, pos1 );
-    TEST_ASSERT_EQUAL_INT ( 2000, time2 );
+    TEST_ASSERT_EQUAL_INT ( 1500+2000, time2 );
     TEST_ASSERT_EQUAL_INT ( 500, pos2 );
+
+    leg.init( 1700, 1800, 1100, 800, LegController::BeforeStep );
+    
+    posSequence1 = leg.getPosSequence(0);
+    time1 = *(posSequence1);
+    pos1 = *(posSequence1+1);
+    
+    posSequence2 = leg.getPosSequence(1);
+    time2 = *(posSequence2);
+    pos2 = *(posSequence2+1);
+    
+    TEST_ASSERT_EQUAL_INT ( 1700+1100, time1 );
+    TEST_ASSERT_EQUAL_INT ( 400, pos1 );
+    TEST_ASSERT_EQUAL_INT ( 1700+1800, time2 );
+    TEST_ASSERT_EQUAL_INT ( 3592-400, pos2 );
+
 }
 
-void testStepComputationWithMove() {
+void testStepComputationWithMoveAfterStep() {
     
     int stepTime = 2000;
     int slowTime = 1000;
     int slowAngle = 1000;
 
-    leg.init( millis(), stepTime, slowTime, slowAngle, LegController::AfterStep );
-    
-    TEST_FAIL_MESSAGE ( "Leg Controller assumes that leg is not at 0, but at slowAngle/2 when it starts.");
+    leg.init( millis(), stepTime, slowTime, slowAngle, LegController::AfterStep );    
 
-    unsigned long int fastTimestamp = millis() + stepTime - slowTime/2;
-    unsigned long int slowTimestamp = millis() + stepTime + slowTime/2;
+    unsigned long int fastTimestamp = millis() + stepTime - slowTime;
+    unsigned long int slowTimestamp = millis() + stepTime;
     
-    Log << fastTimestamp << ", " << slowTimestamp << endl;
+    while ( millis() < fastTimestamp )
+    {        
+        sched.run();
+    }
 
-    unsigned long int nextTime = millis() + 100; 
+    unsigned long int pos = encoder.getPosComp();
+    unsigned long int expectedPos = 3592-slowAngle/2;        
+    TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
+    TEST_ASSERT_EQUAL ( 0, encoder.getLaps() );
+
+    while ( millis() < slowTimestamp )
+    {        
+        sched.run();
+    }
+
+    pos = encoder.getPosComp();
+    expectedPos = slowAngle/2;    
+    TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
+    TEST_ASSERT_EQUAL ( 1, encoder.getLaps() );
+}
+
+void testStepComputationWithMoveBeforeStep() {
+    
+    int stepTime = 2000;
+    int slowTime = 1000;
+    int slowAngle = 1000;
+
+    leg.init( millis(), stepTime, slowTime, slowAngle, LegController::BeforeStep );    
+
+    unsigned long int slowTimestamp = millis() + slowTime;
+    unsigned long int fastTimestamp = millis() + stepTime;
+    //Log << "Slow time: " << slowTimestamp << " Fast Time: " << fastTimestamp << endl;
+
+    unsigned long int nextTime = millis() + 100;
+    //Log << millis() << ": Slow started: " << millis() << endl;
+    while ( millis() < slowTimestamp )
+    {        
+        sched.run();
+        if ( millis() > nextTime ) {
+            nextTime += 100;
+            //Log << millis() << ": Slow: " << encoder.getPosComp() << endl;
+        }
+    }
+    //Log << millis() << ": Slow ended: " << millis() << endl;
+
+    unsigned long int pos = encoder.getPosComp();
+    unsigned long int expectedPos = slowAngle/2;        
+    //TEST_ASSERT_INT_WITHIN( 20, expectedPos, pos );    
+    //TEST_ASSERT_EQUAL ( 0, encoder.getLaps() );
+
+    
     while ( millis() < fastTimestamp )
     {        
         sched.run();
         if ( millis() > nextTime ) {
             nextTime += 100;
-            Log << encoder.getPosComp() << endl;
-        }        
+            //Log << millis() << ": Fast: " << encoder.getPosComp() << endl;
+        }
+    }
+    //Log << millis() << ": Fast ended: " << millis() << endl;
+
+    pos = encoder.getPosComp();
+    expectedPos = 3592 - slowAngle/2;    
+    TEST_ASSERT_INT_WITHIN( 20, expectedPos, pos );    
+    TEST_ASSERT_EQUAL ( 0, encoder.getLaps() );
+
+    while ( millis() < fastTimestamp + 500 )
+    {        
+        sched.run();
     }
 
-    unsigned long int pos = encoder.getPosComp();
-    unsigned long int expected = 3592-slowAngle/2;
-    Log << "Pos: " << pos << " Expected: " << expected << endl;
-    TEST_ASSERT_INT_WITHIN( 100, expected, pos );    
 }
 
 
@@ -93,7 +162,9 @@ void setup() {
     UNITY_BEGIN();
     RUN_TEST(testStepComputation);      
     delay(500);
-    RUN_TEST(testStepComputationWithMove);
+    RUN_TEST(testStepComputationWithMoveAfterStep);
+    delay(500);
+    RUN_TEST(testStepComputationWithMoveBeforeStep);
     UNITY_END();
 }
 

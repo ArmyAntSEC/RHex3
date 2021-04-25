@@ -7,12 +7,10 @@ class LegController: public RecurringTaskBase
 {
     private:
         const unsigned int clicksPerRev = 3592;
-        int posSequence[2][2];        
-        //unsigned long int nextRun = 0;
-
+        int posSequence[2][2];                
         
         MotorSpeedCommander* commander = 0;
-        enum StepSequence { Init, Fast, Slow, Stop };
+        enum StepSequence { Init, First, Second, Stop };
         StepSequence stepSequence = Stop;
     public:
         enum EndPos { AfterStep, BeforeStep };
@@ -26,10 +24,20 @@ class LegController: public RecurringTaskBase
         {
             RecurringTaskBase::init();
             int slowHalfAngle = slowAngle / 2;            
-            posSequence[0][0] = stepTime - slowTime; //Time to finish fast
-            posSequence[0][1] = clicksPerRev - slowHalfAngle; //Pos to finish on fast
-            posSequence[1][0] = stepTime; //Time to finish slow
-            posSequence[1][1] = slowHalfAngle;   //Pos to end on slow
+            switch ( endPos ) {
+                case LegController::AfterStep:
+                    posSequence[0][0] = now + stepTime - slowTime; //Time to finish fast
+                    posSequence[0][1] = clicksPerRev - slowHalfAngle; //Pos to finish on fast
+                    posSequence[1][0] = now + stepTime; //Time to finish slow
+                    posSequence[1][1] = slowHalfAngle;   //Pos to end on slow
+                    break;
+                case LegController::BeforeStep:                
+                    posSequence[0][0] = now + slowTime; //Time to finish slow
+                    posSequence[0][1] = slowHalfAngle;   //Pos to end on slow
+                    posSequence[1][0] = now + stepTime; //Time to finish fast
+                    posSequence[1][1] = clicksPerRev - slowHalfAngle; //Pos to finish on fast                    
+                    break;
+            }
             stepSequence = Init;     
         }
         
@@ -47,18 +55,32 @@ class LegController: public RecurringTaskBase
 
             switch ( stepSequence ) {
                 case Init:                    
-                    Log << _now << ": Init happened. Step started. Goal: " << posSequence[0][1] << " at time: " << _now + posSequence[0][0] << endl;
-                    commander->init( _now, posSequence[0][0], posSequence[0][1] ); //Never move more than one lap, for now                       
-                    stepSequence = Fast;
+                    // Log << _now << ": Init happened. Step started. Goal: " << 
+                    //     posSequence[0][1] << " at time: " << posSequence[0][0] << 
+                    //     " Pos: " << commander->getEncoder()->getPosComp() << 
+                    //     endl;
+                    commander->init( posSequence[0][0], posSequence[0][1] ); //Never move more than one lap, for now                       
+                    stepSequence = First;
                     break;                
-                case Fast:
+                case First:
                     if ( commander->hasArrived() ) {                        
-                        commander->init( _now, posSequence[1][0], posSequence[1][1] ); //Never move more than one lap, for now
-                        stepSequence = Slow;                        
-                        Log << _now << ": Fast phase done. Step started. Goal: " << posSequence[0][1] << " at time: " << _now + posSequence[0][0] << endl;
+                        commander->init( posSequence[1][0], posSequence[1][1] ); //Never move more than one lap, for now
+                        stepSequence = Second;                        
+                        //Log << _now << ": First phase done. Step continued. Goal: " << 
+                        //    posSequence[1][1] << " at time: " << posSequence[1][0] << 
+                        //    " Pos: " << commander->getEncoder()->getPosComp() << 
+                        //    endl;
                     }
-                default:
                     break;
+                case Second:
+                    if ( commander->hasArrived() ) {
+                        //Log << _now << ": Second phase done. Step ended." << 
+                        //    " Pos: " << commander->getEncoder()->getPosComp() << endl;
+                        stepSequence = Stop;
+                    }
+                    break;
+                case Stop:                    
+                    break;                
             }
         }
 
