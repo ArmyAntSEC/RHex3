@@ -100,5 +100,11 @@ class MotorSpeedCommander: public RecurringTaskBase
         {
             return this->hasArrivedAtPos;
         }
+
+        virtual void stop()
+        {
+            RecurringTaskBase::stop();
+            regulator->stop();
+        }
 };
 #endif

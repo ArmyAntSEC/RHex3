@@ -85,6 +85,7 @@ class MotorSpeedRegulator: public RecurringTaskBase
         void setSetPoint( int _SetPoint )
         {
             this->SetPoint = _SetPoint;
+            //Log << "Set stepoint: " << _SetPoint << endl;
         }
 
         virtual void run( unsigned long int ) 

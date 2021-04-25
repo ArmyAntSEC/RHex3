@@ -24,6 +24,7 @@ class LegController: public RecurringTaskBase
     
         virtual void init( unsigned long int now, int stepTime, int slowTime, int slowAngle, EndPos endPos )
         {
+            RecurringTaskBase::init();
             int slowHalfAngle = slowAngle / 2;            
             posSequence[0][0] = stepTime - slowTime; //Time to finish fast
             posSequence[0][1] = clicksPerRev - slowHalfAngle; //Pos to finish on fast
@@ -39,13 +40,14 @@ class LegController: public RecurringTaskBase
 
         virtual void run( unsigned long int _now )
         {
+            //Log << "Ping" << endl;
             if( commander == 0 ) {
                 return;
             }
 
             switch ( stepSequence ) {
                 case Init:                    
-                    Log << "Init happened. Step started. Goal: " << posSequence[0][1] << endl;
+                    Log << _now << ": Init happened. Step started. Goal: " << posSequence[0][1] << " at time: " << _now + posSequence[0][0] << endl;
                     commander->init( _now, posSequence[0][0], posSequence[0][1] ); //Never move more than one lap, for now                       
                     stepSequence = Fast;
                     break;                
@@ -53,7 +55,7 @@ class LegController: public RecurringTaskBase
                     if ( commander->hasArrived() ) {                        
                         commander->init( _now, posSequence[1][0], posSequence[1][1] ); //Never move more than one lap, for now
                         stepSequence = Slow;                        
-                        Log << "Arrived at after fast phase. Goal: " << posSequence[1][1] << endl;                        
+                        Log << _now << ": Fast phase done. Step started. Goal: " << posSequence[0][1] << " at time: " << _now + posSequence[0][0] << endl;
                     }
                 default:
                     break;
@@ -61,6 +63,13 @@ class LegController: public RecurringTaskBase
         }
 
         int* getPosSequence( int i ) { return this->posSequence[i]; } //Only for testing         
+
+        virtual void stop()
+        {
+            RecurringTaskBase::stop();
+            commander->stop();
+        }
+
 };
 
 #endif

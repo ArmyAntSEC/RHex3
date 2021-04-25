@@ -15,7 +15,8 @@ void setUp(void) {
 
 void tearDown(void) {
     driver.setMotorPWM(0);
-    regulator.stop();    
+    regulator.stop();
+    commander.stop();    
 }
 
 
@@ -39,7 +40,7 @@ void testSimpleMove() {
     timeToMove = 1000;  
     startTime = endTime; //We continue where we left off.
     endTime =  startTime + timeToMove;        
-    
+        
     encoder.forceHomed();    
     long int endPosTarget = (timeToMove*speed)/1000;
     int lapsTarget = endPosTarget / HomingEncoder::clicksPerRevolution.getInteger();  //Approximate.

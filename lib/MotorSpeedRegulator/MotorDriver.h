@@ -53,6 +53,8 @@ public:
     
     analogWrite ( this->driverPinPWM, abs(motorPWM) );
     this->lastMotorPWM = motorPWM;
+
+    //Log << "Set motor pwm: " << motorPWM << endl;
   }
   
   float getCurrentInMilliVolt() {

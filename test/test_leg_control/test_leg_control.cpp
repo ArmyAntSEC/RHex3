@@ -11,16 +11,19 @@ RecurringTaskGroup<16> recurring10ms( 10 );
 
 void setUp(void) {
     encoder.forceHomed();
+    encoderWrapperHoming.init( millis() ); //Start the homing
+    regulator.setSetPoint(0);
+    regulator.stop();
+    driver.setMotorPWM(0);    
 }
 
 void tearDown(void) {
     driver.setMotorPWM(0);
-    regulator.stop();    
+    leg.stop();
 }
 
 
-void testStepComputation() {
-    LegController leg;
+void testStepComputation() {    
     leg.init( 1500, 2000, 1000, 1000, LegController::AfterStep );
     
     int* posSequence1 = leg.getPosSequence(0);
@@ -43,46 +46,29 @@ void testStepComputationWithMove() {
     int slowTime = 1000;
     int slowAngle = 1000;
 
-    leg.init( millis(), stepTime, slowTime, slowAngle, LegController::AfterStep );    
-    regulator.init();
-
-    unsigned long int cutoffTime = millis() + stepTime + 1000;
-        
-    boolean checkAfterFast = false;
-    unsigned long int fastTimestamp = millis() + stepTime - slowTime/2;
+    leg.init( millis(), stepTime, slowTime, slowAngle, LegController::AfterStep );
     
-    boolean checkAfterSlow = false;
+    TEST_FAIL_MESSAGE ( "Leg Controller assumes that leg is not at 0, but at slowAngle/2 when it starts.");
+
+    unsigned long int fastTimestamp = millis() + stepTime - slowTime/2;
     unsigned long int slowTimestamp = millis() + stepTime + slowTime/2;
-        
-    while ( millis() < cutoffTime )
-    {
-        leg.run(millis());
+    
+    Log << fastTimestamp << ", " << slowTimestamp << endl;
 
-        if ( !checkAfterFast && millis() > fastTimestamp ) {
-            unsigned long int pos = encoder.getPosComp();
-            unsigned long int expected = 3592-slowAngle/2;
-            Log << "Pos: " << pos << " Expected: " << expected << endl;
-            TEST_ASSERT_INT_WITHIN( 100, expected, pos );
-            checkAfterFast = true; //Only do this once
-        }
-
-        if ( !checkAfterSlow && millis() > slowTimestamp ) {
-            unsigned long int pos = encoder.getPosComp();
-            unsigned long int expected = 3592 + slowAngle/2;
-            Log << "Pos: " << pos << " Expected: " << expected << endl;
-            TEST_FAIL_MESSAGE( "Need to handle the wrap-around that happens somehow...." );
-            TEST_ASSERT_INT_WITHIN( 100, expected, pos );
-            checkAfterSlow = true; //Only do this once
-        }
-
+    unsigned long int nextTime = millis() + 100; 
+    while ( millis() < fastTimestamp )
+    {        
         sched.run();
+        if ( millis() > nextTime ) {
+            nextTime += 100;
+            Log << encoder.getPosComp() << endl;
+        }        
     }
 
-    TEST_ASSERT_TRUE( checkAfterFast );
-    TEST_ASSERT_TRUE( checkAfterSlow );
-    driver.setMotorPWM(0);
-
-    
+    unsigned long int pos = encoder.getPosComp();
+    unsigned long int expected = 3592-slowAngle/2;
+    Log << "Pos: " << pos << " Expected: " << expected << endl;
+    TEST_ASSERT_INT_WITHIN( 100, expected, pos );    
 }
 
 
