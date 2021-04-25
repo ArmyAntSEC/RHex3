@@ -51,7 +51,7 @@ void testSimpleMove() {
     }    
     long int endPos = encoder.getPosComp();            
     long int laps = encoder.getLaps();    
-    TEST_ASSERT_INT_WITHIN( 50, endPosTargetWrapped, endPos );            
+    TEST_ASSERT_INT_WITHIN( 100, endPosTargetWrapped, endPos );            
     TEST_ASSERT_EQUAL( lapsTarget, laps );            
 }
 
@@ -195,7 +195,7 @@ void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {
             
             float stdDev = sqrt( (n*S2-S*S)/(n*(n-1)) );
             //Log << "Standard deviation: " << stdDev << endl;
-            TEST_ASSERT_FLOAT_WITHIN( 80, 0, stdDev );            
+            TEST_ASSERT_FLOAT_WITHIN( 100, 0, stdDev );            
             return;
         } else if ( millis() > nextRun ) {
             nextRun += 10;
@@ -231,14 +231,15 @@ void testSimpleMoveAtConstantSpeed1000() {
 
 
 void testSimpleMoveToAPositionAtTime() {    
-    unsigned long int timeToMove = 2000;      
+    unsigned long int timeToMove = 500;      
     unsigned long int posToMoveTo = 2500;
         
     regulator.init();    
-    commander.init( millis(), timeToMove, posToMoveTo );  
-
     unsigned long int endTime = millis() + timeToMove;
+    commander.init( endTime, posToMoveTo );  
+
     
+    Log << millis() << " Goal pos: " << posToMoveTo << " at time " << endTime << endl;
     boolean hasArrived = false;
     while ( !hasArrived ) {
         if ( commander.hasArrived() || millis() > endTime + 5000 ) {
@@ -251,11 +252,13 @@ void testSimpleMoveToAPositionAtTime() {
     }
     
     //Now move almost one more complete round
-    timeToMove = 3000;
+    timeToMove = 1000;
     posToMoveTo = 2000;
     endTime = millis() + timeToMove;
     
-    commander.init( millis(), timeToMove, posToMoveTo );  
+    commander.init( endTime, posToMoveTo );  
+    
+    Log << millis() << " Goal pos: " << posToMoveTo << " at time " << endTime << endl;
     hasArrived = false;
     while ( !hasArrived ) {
         if ( commander.hasArrived() || millis() > endTime + 5000 ) {
@@ -287,7 +290,7 @@ void setup() {
     sched.add( &encoderWrapperHoming );
 
 
-    UNITY_BEGIN();
+    UNITY_BEGIN();    
     RUN_TEST(testWrapAroundLogic);  
     RUN_TEST(testPositiveSubtraction);    
     delay(500);

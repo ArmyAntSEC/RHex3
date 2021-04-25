@@ -39,7 +39,7 @@ class MotorSpeedRegulator: public RecurringTaskBase
             {
                 Output = 255;
             } else {
-                int MinOutput = GetPowerForFreeSpeed( speed )*0.9; //We remove 10%
+                int MinOutput = GetPowerForFreeSpeed( speed )*0.6; //We remove 10%
                 if ( Output < MinOutput ) {
                     Output = MinOutput;
                 }
@@ -94,11 +94,7 @@ class MotorSpeedRegulator: public RecurringTaskBase
                 Input = encoder->getSpeedCPS();
                 int Error = SetPoint - Input;
                 ITerm += I * Error;
-                if ( ITerm > maxOutput ) {
-                    ITerm = maxOutput;
-                } else if (ITerm < 0 ) {
-                    ITerm = 0;
-                }
+                ITerm = this->clampOutputForSpeed( ITerm, SetPoint );
 
                 int dInput = Input - lastInput;
                 lastInput = Input;

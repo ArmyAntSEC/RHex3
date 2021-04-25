@@ -55,10 +55,10 @@ class LegController: public RecurringTaskBase
 
             switch ( stepSequence ) {
                 case Init:                    
-                    // Log << _now << ": Init happened. Step started. Goal: " << 
-                    //     posSequence[0][1] << " at time: " << posSequence[0][0] << 
-                    //     " Pos: " << commander->getEncoder()->getPosComp() << 
-                    //     endl;
+                    Log << _now << ": Init happened. Step started. Goal: " << 
+                        posSequence[0][1] << " at time: " << posSequence[0][0] << 
+                        " Pos: " << commander->getEncoder()->getPosComp() << 
+                        endl;
                     commander->init( posSequence[0][0], posSequence[0][1] ); //Never move more than one lap, for now                       
                     stepSequence = First;
                     break;                
@@ -66,16 +66,16 @@ class LegController: public RecurringTaskBase
                     if ( commander->hasArrived() ) {                        
                         commander->init( posSequence[1][0], posSequence[1][1] ); //Never move more than one lap, for now
                         stepSequence = Second;                        
-                        //Log << _now << ": First phase done. Step continued. Goal: " << 
-                        //    posSequence[1][1] << " at time: " << posSequence[1][0] << 
-                        //    " Pos: " << commander->getEncoder()->getPosComp() << 
-                        //    endl;
+                        Log << _now << ": First phase done. Step continued. Goal: " << 
+                           posSequence[1][1] << " at time: " << posSequence[1][0] << 
+                           " Pos: " << commander->getEncoder()->getPosComp() << 
+                           endl;
                     }
                     break;
                 case Second:
                     if ( commander->hasArrived() ) {
-                        //Log << _now << ": Second phase done. Step ended." << 
-                        //    " Pos: " << commander->getEncoder()->getPosComp() << endl;
+                        Log << _now << ": Second phase done. Step ended." << 
+                           " Pos: " << commander->getEncoder()->getPosComp() << endl;
                         stepSequence = Stop;
                     }
                     break;

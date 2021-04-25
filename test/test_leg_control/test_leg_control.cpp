@@ -58,8 +58,8 @@ void testStepComputation() {
 
 void testStepComputationWithMoveAfterStep() {
     
-    int stepTime = 2000;
-    int slowTime = 1000;
+    int stepTime = 1000;
+    int slowTime = 300;
     int slowAngle = 1000;
 
     leg.init( millis(), stepTime, slowTime, slowAngle, LegController::AfterStep );    
@@ -86,6 +86,43 @@ void testStepComputationWithMoveAfterStep() {
     expectedPos = slowAngle/2;    
     TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
     TEST_ASSERT_EQUAL ( 1, encoder.getLaps() );
+}
+
+void testStepComputationWithMoveAfterStepTwice() {
+    
+    int stepTime = 2000;
+    int slowTime = 1000;
+    int slowAngle = 1000;
+
+    //Take a first step.
+    leg.init( millis(), stepTime, slowTime, slowAngle, LegController::AfterStep );    
+
+    unsigned long int endTime = millis() + stepTime;    
+    
+    while ( millis() < endTime )
+    {        
+        sched.run();
+    }
+
+    unsigned long int pos = encoder.getPosComp();
+    unsigned long int expectedPos = slowAngle/2;        
+    TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
+    TEST_ASSERT_EQUAL ( 1, encoder.getLaps() );
+
+    //Take a second step.
+    leg.init( millis(), stepTime, slowTime, slowAngle, LegController::AfterStep );    
+
+    endTime = millis() + stepTime;    
+    
+    while ( millis() < endTime )
+    {        
+        sched.run();
+    }
+
+    pos = encoder.getPosComp();
+    expectedPos = slowAngle/2;        
+    TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
+    TEST_ASSERT_EQUAL ( 2, encoder.getLaps() );
 }
 
 void testStepComputationWithMoveBeforeStep() {
@@ -159,12 +196,14 @@ void setup() {
     sched.add( &encoderWrapperHoming );
 
 
-    UNITY_BEGIN();
+    UNITY_BEGIN();    
     RUN_TEST(testStepComputation);      
     delay(500);
-    RUN_TEST(testStepComputationWithMoveAfterStep);
+    RUN_TEST(testStepComputationWithMoveAfterStep);    
     delay(500);
     RUN_TEST(testStepComputationWithMoveBeforeStep);
+    delay(500);    
+    RUN_TEST(testStepComputationWithMoveAfterStepTwice);        
     UNITY_END();
 }
 

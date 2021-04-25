@@ -85,11 +85,11 @@ class MotorSpeedCommander: public RecurringTaskBase
                 targetSpeedClamped = this->maxSpeedToMove;
             }
 
-            //Log << pos << ", " << clicksLeft << ", " << timeLeft << ", " << targetSpeedClamped << endl;
+            //Log << millis() << " Pos: " << pos << ", " << clicksLeft << ", " << timeLeft << ", " << targetSpeedClamped << endl;
 
             if ( this->hasArrivedAtPos ){
-                this->regulator->stop();
-                this->stop(); //Stop to avoid hogging resources                
+                //this->regulator->stop();
+                //this->stop(); //Stop to avoid hogging resources                
             } else {
                 this->regulator->setSetPoint( targetSpeedClamped );
             }            
