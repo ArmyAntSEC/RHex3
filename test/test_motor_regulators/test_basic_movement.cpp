@@ -19,25 +19,39 @@ void tearDown(void) {
 }
 
 
-void testSimpleMove() {    
-    TEST_FAIL_MESSAGE ( "Measure the speed to be able to set tighter tolerances on the assertions here." ); 
+void testSimpleMove() {        
+
     unsigned long int timeToMove = 1000;  
-    unsigned long int endTime = 0;    
+    unsigned long int startTime = millis();
+    unsigned long int endTime =  startTime + timeToMove;        
 
-    
-    endTime = millis() + timeToMove;        
+    //First spin up the motor
     driver.setMotorPWM(128);     
+    while ( millis() < endTime ) {
+        sched.run();
+    }
+    
+    //Measure the speed
+    int speed = encoder.getSpeedCPS();
+    TEST_ASSERT_INT_WITHIN( 300, 6500, speed );                    
 
-    while ( true ) {
-        if ( millis() > endTime ) {
-            long int endPos = encoder.getPosComp();            
-            long int laps = encoder.getLaps();
-            TEST_ASSERT_INT_WITHIN( 300, 6000-3592, endPos );            
-            TEST_ASSERT_EQUAL( 1, laps );            
-            return;
-        }
+    //Compute the distance to move
+    timeToMove = 1000;  
+    startTime = endTime; //We continue where we left off.
+    endTime =  startTime + timeToMove;        
+    
+    encoder.forceHomed();    
+    long int endPosTarget = (timeToMove*speed)/1000;
+    int lapsTarget = endPosTarget / HomingEncoder::clicksPerRevolution.getInteger();  //Approximate.
+    long int endPosTargetWrapped = endPosTarget % HomingEncoder::clicksPerRevolution.getInteger();  //Approximate.
+    
+    while ( millis() < endTime ) {        
         sched.run();
     }    
+    long int endPos = encoder.getPosComp();            
+    long int laps = encoder.getLaps();    
+    TEST_ASSERT_INT_WITHIN( 50, endPosTargetWrapped, endPos );            
+    TEST_ASSERT_EQUAL( lapsTarget, laps );            
 }
 
 void testSimpleMoveBackwards() {    
