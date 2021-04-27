@@ -235,6 +235,30 @@ void testSimpleMoveAtConstantSpeed1000() {
     testSimpleMoveAtConstantSpeed(1000);  
 }
 
+void testRegulatorHardBreak()
+{
+    unsigned long int timeToSettle = 100;      
+    int speedToMoveAt = 6000;
+    
+    regulator.setSetPoint( speedToMoveAt );
+    regulator.init();                
+    //Run to settle the speed.
+    unsigned long int endTime = millis() + timeToSettle;
+    while ( millis() < endTime ) {
+        sched.run();        
+    }
+    TEST_ASSERT_GREATER_THAN_INT( 0.9*speedToMoveAt, encoder.getSpeedCPS() );            
+
+    regulator.setSetPoint( speedToMoveAt/2 );
+    regulator.hardBreak();
+    
+    endTime = millis() + timeToSettle;
+    while ( millis() < endTime ) {
+        sched.run();                
+    }
+    TEST_ASSERT_LESS_THAN_INT( 1.1*speedToMoveAt/2, encoder.getSpeedCPS() );
+
+}
 
 void testSimpleMoveToAPositionAtTime() {    
     unsigned long int timeToMove = 500;      
@@ -296,7 +320,7 @@ void setup() {
     sched.add( &encoderWrapperHoming );
 
 
-    UNITY_BEGIN();    
+    UNITY_BEGIN();        
     RUN_TEST(testWrapAroundLogic);  
     RUN_TEST(testPositiveSubtraction);    
     delay(500);
@@ -313,10 +337,12 @@ void setup() {
     RUN_TEST(testSimpleMoveAtConstantSpeed2000);
     delay(500);    
     RUN_TEST(testSimpleMoveAtConstantSpeed1000);    
-    delay(500);     
+    delay(500);         
+    RUN_TEST(testSimpleHoming);        
+    delay(500);    
     RUN_TEST(testSimpleMoveToAPositionAtTime);
     delay(500);    
-    RUN_TEST(testSimpleHoming);        
+    RUN_TEST(testRegulatorHardBreak);
     UNITY_END();
 }
 

@@ -21,6 +21,27 @@ class MotorSpeedCommander: public RecurringTaskBase
         
         MotorSpeedRegulator* regulator;
     
+        int computeTargetSpeed( long int timeLeft, long int clicksLeft, int maxSpeed )
+        {
+            //Compute the speed to move
+            long int targetSpeed = 0;            
+            if ( timeLeft  < 1 ) {                
+                //If we are past due, move at max allowed speed
+                targetSpeed = maxSpeed; 
+            } else {
+                // Speed is in clicks/microsecond, time is in milliseconds.
+                targetSpeed = (1000*clicksLeft) / timeLeft; 
+            }            
+
+            if ( targetSpeed > this->maxSpeedToMove ) {
+                targetSpeed = this->maxSpeedToMove;
+            } else if ( targetSpeed <= 0 ) {
+                targetSpeed = 1; //If we have moved too far, just coast.
+            }
+            
+            return targetSpeed;
+        }
+
     public:        
         virtual void init( unsigned long int _timeToMoveTo, 
                             int _posToMoveTo )
@@ -38,6 +59,19 @@ class MotorSpeedCommander: public RecurringTaskBase
             }
 
             this->regulator->init();
+            this->regulator->hardBreak();
+                        
+            /*
+            int newTargetSpeed = this->computeTargetSpeed( _timeToMoveTo - millis(),
+                HomingEncoder::positionPositiveDifference( _posToMoveTo, pos ), 
+                this->maxSpeedToMove );
+            Log << "Old SetPoint: " << regulator->getSetPoint() << " New Setpoint: " << newTargetSpeed << endl;
+            if ( regulator->getSetPoint() > newTargetSpeed )
+            {            
+                this->regulator->hardBreak();
+            } 
+            */           
+            
         }   
         
         virtual void config(  HomingEncoder* _encoder, MotorDriver* _driver, 
@@ -68,7 +102,10 @@ class MotorSpeedCommander: public RecurringTaskBase
                 clicksLeft = 0;
                 this->hasArrivedAtPos = true;
             }
-
+            
+            long int targetSpeedClamped = this->computeTargetSpeed ( 
+                    this->timeToArrive - _now, clicksLeft, this->maxSpeedToMove );
+            /*
             //Compute the speed to move
             long int targetSpeed = 0;
             long int timeLeft = this->timeToArrive - _now;
@@ -84,7 +121,12 @@ class MotorSpeedCommander: public RecurringTaskBase
             if ( targetSpeedClamped > this->maxSpeedToMove ) {
                 targetSpeedClamped = this->maxSpeedToMove;
             }
-
+            
+            if ( targetSpeedClampedNew != targetSpeedClamped ) {
+                Log << "New algo: " << targetSpeedClampedNew << " old algo: " << targetSpeedClamped << endl;
+            }
+            */
+            
             //Log << millis() << " Pos: " << pos << ", " << clicksLeft << ", " << timeLeft << ", " << targetSpeedClamped << endl;
 
             if ( this->hasArrivedAtPos ){

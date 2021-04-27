@@ -85,9 +85,7 @@ void testStepMoveAfterStep() {
     pos = encoder.getPosComp();
     expectedPos = slowAngle/2;    
     TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
-    TEST_ASSERT_EQUAL ( 1, encoder.getLaps() );
-
-    TEST_FAIL_MESSAGE ( "Right now, the regulator decides itself to do hard breaks, but that should be done by the LegController instead." );
+    TEST_ASSERT_EQUAL ( 1, encoder.getLaps() );    
 }
 
 void testStepMoveAfterStepTwice() {
@@ -125,6 +123,41 @@ void testStepMoveAfterStepTwice() {
     expectedPos = slowAngle/2;        
     TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
     TEST_ASSERT_EQUAL ( 2, encoder.getLaps() );
+}
+
+void testStepMoveBeforeStepTwice() {
+    
+    int stepTime = 2000;
+    int slowTime = 1000;
+    int slowAngle = 1000;
+
+    //Take a first step.
+    leg.init( millis(), stepTime, slowTime, slowAngle, LegController::BeforeStep );    
+
+    unsigned long int endTime = millis() + stepTime;        
+    while ( millis() < endTime )
+    {        
+        sched.run();
+    }
+
+    unsigned long int pos = encoder.getPosComp();
+    unsigned long int expectedPos = 3592-slowAngle/2;        
+    TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
+    TEST_ASSERT_EQUAL ( 0, encoder.getLaps() );
+
+    //Take a second step.
+    leg.init( millis(), stepTime, slowTime, slowAngle, LegController::BeforeStep );    
+
+    endTime = millis() + stepTime;        
+    while ( millis() < endTime )
+    {        
+        sched.run();
+    }
+
+    pos = encoder.getPosComp();
+    expectedPos = 3592-slowAngle/2;        
+    TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
+    TEST_ASSERT_EQUAL ( 1, encoder.getLaps() );
 }
 
 void testStepMoveBeforeStep() {
@@ -201,11 +234,13 @@ void setup() {
     UNITY_BEGIN();    
     RUN_TEST(testStepComputation);      
     delay(500);
-    RUN_TEST(testStepMoveAfterStep);        
+    RUN_TEST(testStepMoveAfterStep);            
     delay(500);
     RUN_TEST(testStepMoveBeforeStep);
     delay(500);    
-    RUN_TEST(testStepMoveAfterStepTwice);            
+    RUN_TEST(testStepMoveAfterStepTwice);                
+    delay(500);    
+    RUN_TEST(testStepMoveBeforeStepTwice);                
     UNITY_END();
 }
 

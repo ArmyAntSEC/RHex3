@@ -25,6 +25,8 @@ class MotorSpeedRegulator: public RecurringTaskBase
 
         bool isOn = false;
 
+        boolean doHardBreak = false;
+
         HomingEncoder* encoder;
         MotorDriver* driver;        
 
@@ -84,12 +86,18 @@ class MotorSpeedRegulator: public RecurringTaskBase
 
         void setSetPoint( int _SetPoint )
         {
-            //If we are reducing our speed significantly, give the motor a hard break for a split second.
-            if ( _SetPoint < this->SetPoint/2 ) {
-                driver->setMotorPWM(0);
-            }
-            this->SetPoint = _SetPoint;            
+            this->SetPoint = _SetPoint;                        
             //Log << "Set stepoint: " << _SetPoint << endl;
+        }
+
+        int getSetPoint()
+        {
+            return this->SetPoint;            
+        }
+
+        void hardBreak()
+        {
+            this->doHardBreak = true;
         }
 
         virtual void run( unsigned long int ) 
@@ -104,7 +112,21 @@ class MotorSpeedRegulator: public RecurringTaskBase
                 lastInput = Input;
 
                 Output = clampOutputForSpeed( P*Error + D*dInput + ITerm, SetPoint );
-                        
+
+                if ( this->doHardBreak) {
+                    if ( Input > this->SetPoint ) {
+                        //Log << "Doing hard break" << endl;                    
+                        ITerm = 0;
+                        Output = 0;
+                        lastInput = Input;
+                        OutputFiltered = 0;
+                    } else {
+                        this->doHardBreak = false;
+                        lastInput = Input;
+                        ITerm = this->GetPowerForFreeSpeed( Input ); 
+                    }
+                }
+
                 OutputFiltered = (Output + OutputFiltered*(filter-1))/filter;
                 driver->setMotorPWM(OutputFiltered);   
                 //Log << "Speed: " << Input << " Power: " << Output << " Error: " << Error << endl;
