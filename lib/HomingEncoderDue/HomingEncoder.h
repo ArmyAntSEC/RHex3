@@ -29,7 +29,7 @@
 
 #if defined(ARDUINO_SAM_DUE)
   #define IO_REG_TYPE			uint32_t
-#elif defined(ARDUINO_AVR_UNO)
+#elif defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_NANO_EVERY)
   #define IO_REG_TYPE			uint8_t
 #endif
 
@@ -44,7 +44,7 @@ struct HomingEncoderState {
   int encoderPin2;
   int breakerPin;
   
-  volatile IO_REG_TYPE * encoderPin1_register;
+  volatile uint8_t * encoderPin1_register;
   volatile IO_REG_TYPE * encoderPin2_register;
   volatile IO_REG_TYPE * breakerPin_register;
   

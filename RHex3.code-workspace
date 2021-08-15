@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"name": "RHex3",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"cmath": "cpp",
+			"*.tcc": "cpp"
+		}
+	}
+}
