@@ -22,22 +22,25 @@ DataLogger dataLogger;
 
 void setup()
 {
-  
-  Serial.begin( 115200 );    
+  Serial.begin(115200);
+  while (!Serial) {}    
+  Serial.println("Hello World!");
+
   DEBUG( F("Setup started") );  
+  /*
   randomSeed(analogRead(UNCONNECTED_ANALOG));
   pinMode ( UNCONNECTED_ANALOG, INPUT );  
   
   //Initalize the driver
-  driver.init( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );  
+  driver.config( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );  
   driver.setMotorPWM(0);   
 
   //Initialize the encoder and register the homing.
-  encoder.init<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );
+  encoder.config<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );
   sched.add( &encoderWrapperHoming );
       
   //Initialize the regulator
-  regulator.init(&encoder, &driver, 0.2, 0, 0.01, 1 );    
+  regulator.config(&encoder, &driver, 0.2, 0, 0.01, 1 );    
   recurring10ms.add( &regulator );    
 
   //Make sure we compute the encoder speed every 10ms
@@ -53,11 +56,12 @@ void setup()
   
   dataLogger.sendHeaders(); 
   //ERROR( F("Setup done. Free RAM: ") << getFreeMemory() << " bytes." );  
+  */
 }
 
 void loop()
 {  
-  sched.run();
+  //sched.run();
 }
 
 
