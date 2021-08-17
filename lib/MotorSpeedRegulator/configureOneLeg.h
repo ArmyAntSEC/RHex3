@@ -8,13 +8,13 @@
 #include "MotorSpeedCommander.h"
 #include "LegController.h"
 
-#define MOTOR_EN1 4
-#define MOTOR_EN2 5
-#define MOTOR_CS A0
-#define ENCODER_2 2
-#define ENCODER_1 3
-#define OPTO 7
-#define MOTOR_PWM 6
+#define MOTOR_EN1 7
+#define MOTOR_EN2 8
+#define MOTOR_PWM 9
+
+#define OPTO      10
+#define ENCODER_2 11
+#define ENCODER_1 12
 
 HomingEncoder encoder;
 EncoderWrapperComputeSpeedTask encoderWrapperComputeSpeed ( &encoder );
@@ -28,7 +28,7 @@ LegController leg;
 void initOneLeg()
 {
     //Init the driver
-    driver.config( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );        
+    driver.config( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM );        
 
     //Initialize the encoder
     encoder.config<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );    

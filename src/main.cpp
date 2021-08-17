@@ -10,6 +10,8 @@
 #include "getFreeMemory.h"
 #include "RecurringTaskGroup.h"
 
+#include <configureOneLeg.h>
+
 #define UNCONNECTED_ANALOG A2
 
 TaskScheduler sched;
@@ -27,14 +29,20 @@ void setup()
   Serial.println("Hello World!");
 
   DEBUG( F("Setup started") );  
-  /*
+  
   randomSeed(analogRead(UNCONNECTED_ANALOG));
   pinMode ( UNCONNECTED_ANALOG, INPUT );  
   
+  initOneLeg();
+  driver.setMotorPWM(64);
+  delay(1000);
+  driver.setMotorPWM(0);
+
+  /*
   //Initalize the driver
   driver.config( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );  
   driver.setMotorPWM(0);   
-
+  
   //Initialize the encoder and register the homing.
   encoder.config<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );
   sched.add( &encoderWrapperHoming );

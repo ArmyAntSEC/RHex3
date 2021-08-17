@@ -13,23 +13,18 @@
 class MotorDriver {
 private:
   int driverPinOne;
-  int driverPinTwo;	
-  int currentPin;
+  int driverPinTwo;	  
   int driverPinPWM;
   int lastMotorPWM = 0;
   
 public:	
-  void config( int _driverPinOne, int _driverPinTwo, int _driverPinPWM, 
-	     int _currentPin ) {
+  void config( int _driverPinOne, int _driverPinTwo, int _driverPinPWM ) {
       this->driverPinOne = _driverPinOne;
       this->driverPinTwo = _driverPinTwo;
-      this->driverPinPWM = _driverPinPWM;
-      
-      this->currentPin = _currentPin;
+      this->driverPinPWM = _driverPinPWM;      
 		
       pinMode(this->driverPinOne, OUTPUT);
-      pinMode(this->driverPinTwo, OUTPUT);	
-      pinMode(this->currentPin, INPUT );	
+      pinMode(this->driverPinTwo, OUTPUT);	      	
       pinMode(this->driverPinPWM, OUTPUT );
 
       this->setMotorPWM(0); 
@@ -58,8 +53,8 @@ public:
   }
   
   float getCurrentInMilliVolt() {
-    float voltageValue = analogRead( this->currentPin ) * 3.3 / 1024; //Read signal in Volts
-    return voltageValue / 0.14; //Convert to A.
+    
+    return -1; //Depricated
   }
 
   int getMotorPWM()

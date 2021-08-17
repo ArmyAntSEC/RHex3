@@ -324,9 +324,9 @@ void setup() {
     RUN_TEST(testWrapAroundLogic);  
     RUN_TEST(testPositiveSubtraction);    
     delay(500);
-    RUN_TEST(testWrapAroundAndOffset);  
-    delay(500);
     RUN_TEST(testSimpleMove);  
+    delay(500);
+    RUN_TEST(testWrapAroundAndOffset);  
     delay(500);
     RUN_TEST(testSimpleMoveBackwards);
     delay(500);
