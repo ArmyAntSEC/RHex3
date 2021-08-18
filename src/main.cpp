@@ -34,9 +34,24 @@ void setup()
   pinMode ( UNCONNECTED_ANALOG, INPUT );  
   
   initOneLeg();
+  
+  /*
+  //Start the motors just to test
   driver.setMotorPWM(64);
   delay(1000);
   driver.setMotorPWM(0);
+  */
+
+  //Test the encoder
+  while ( true ) {
+    Serial.print( "Breaker: " );
+    Serial.print( encoder.isHomed() );
+    Serial.print( " Encoder: " );
+    Serial.print( encoder.getRawPos() );
+    Serial.println();
+    delay(100);
+  }
+
 
   /*
   //Initalize the driver
