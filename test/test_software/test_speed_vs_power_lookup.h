@@ -1,14 +1,6 @@
 #include <unity.h>
 #include "MotorSpeedRegulator.h"
 
-// void setUp(void) {
-// // set stuff up here
-// }
-
-// void tearDown(void) {
-// // clean stuff up here
-// }
-
 void testGetPowerforFreeSpeedOnStep (void) 
 {
     TEST_ASSERT_EQUAL( 20, MotorSpeedRegulator::GetPowerForFreeSpeed(780) );
@@ -31,35 +23,3 @@ void testGetPowerforFreeSpeedInterpolate (void)
     TEST_ASSERT_INT_WITHIN( 2, 30, MotorSpeedRegulator::GetPowerForFreeSpeed(2000) );
     TEST_ASSERT_INT_WITHIN( 2, 111, MotorSpeedRegulator::GetPowerForFreeSpeed(6000) );    
 }
-
-void process() {
-    UNITY_BEGIN();
-    RUN_TEST(testGetPowerforFreeSpeedExtrapolate);
-    RUN_TEST(testGetPowerforFreeSpeedOnStep);
-    RUN_TEST(testGetPowerforFreeSpeedInterpolate);
-    UNITY_END();
-}
-
-#ifdef ARDUINO
-
-#include <Arduino.h>
-
-void setup() {
-    // NOTE!!! Wait for >2 secs
-    // if board doesn't support software reset via Serial.DTR/RTS
-    delay(2000);
-    
-    process();
-}
-
-void loop() {
-}
-
-#else
-
-int main(int argc, char **argv) {
-    process();
-    return 0;
-}
-
-#endif
