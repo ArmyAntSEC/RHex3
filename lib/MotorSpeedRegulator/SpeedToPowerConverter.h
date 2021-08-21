@@ -2,12 +2,23 @@
 #define _SPEEDTOPOWERCONVERTER_H_
 
 #include <FixedPointsCommon.h>
+#include <EEPROMStorage.h>
+#include <LevelLogger.h>
 
 class SpeedToPowerConverter
 {
-    const unsigned int speedVsPower[7][2] = {{20, 789}, {24, 1363}, {32, 2145}, {48, 3472}, {64, 4507}, {128, 6509}, {255, 7735}};
 
 public:
+    static const int tableLength = 7;
+    static const int tableWidth = 2;
+    unsigned int speedVsPower[tableLength][tableWidth] = {{20, 789}, {24, 1363}, {32, 2145}, {48, 3472}, {64, 4507}, {128, 6509}, {255, 7735}};
+
+    void initFromEEPROM()
+    {                        
+        int* speedVsPowerAddress = (int*)speedVsPower;
+        EEPROMStorage::readIntArrayFromAddress( 0, speedVsPowerAddress, tableLength*tableWidth );        
+    }
+
     unsigned int GetPowerForFreeSpeed(unsigned int speed)
     {        
 
@@ -39,13 +50,12 @@ public:
         SQ15x16 powerRem = speedRem * factor;
 
         int power = roundFixed(powerRem).getInteger() + powerLow;
-        /*
-            Log << "Interpolating to: " << speed << endl;
-            Log << speedLow << ", " << speedHigh << ", " << powerLow << ", " << powerHigh << endl;
-            Log << speedSpan.getInteger() << ", " << powerSpan.getInteger() << endl;
-            Log << (double)speedRem << ", " << (double)factor << ", " << (double)powerRem << endl; 
-            Log << power << endl;
-            */
+    
+        Log << "Interpolating to: " << speed << endl;
+        Log << speedLow << ", " << speedHigh << ", " << powerLow << ", " << powerHigh << endl;
+        Log << speedSpan.getInteger() << ", " << powerSpan.getInteger() << endl;
+        Log << (double)speedRem << ", " << (double)factor << ", " << (double)powerRem << endl; 
+        Log << power << endl;    
 
         return power;
     }

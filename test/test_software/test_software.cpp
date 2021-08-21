@@ -9,13 +9,16 @@ void setup() {
     delay(2000);
     
     UNITY_BEGIN();
+    //EEPROM Storage
+    RUN_TEST(testWriteAndReadEEPROM);
+
     //Speed vs Power conversions
     RUN_TEST(testGetPowerforFreeSpeedExtrapolate);
     RUN_TEST(testGetPowerforFreeSpeedOnStep);
     RUN_TEST(testGetPowerforFreeSpeedInterpolate);
     
-    //EEPROM Storage
-    RUN_TEST(testWriteAndReadEEPROM);
+    //Interact betwen converter and EEPROM.
+    RUN_TEST(testInitFromEEPROM);
 
     UNITY_END();
 }
