@@ -9,8 +9,7 @@ RecurringTaskGroup<16> recurring10ms( 10 );
 
 
 void setUp(void) {
-    encoder.forceHomed();
-    encoderWrapperHoming.init( millis() ); //Start the homing
+    encoder.forceHomed();    
 }
 
 void tearDown(void) {
@@ -19,8 +18,112 @@ void tearDown(void) {
     commander.stop();    
 }
 
+void testWrapAroundLogic() {
+    double lapRemainder = (double)encoder.clicksPerRevolution - 1795;
+
+    encoder.state.raw_position = 0;
+    encoder.state.position_remainder = 0;
+    encoder.state.laps = 0;
+    encoder.handleOverflow();
+    TEST_ASSERT_EQUAL( 0, encoder.getRawPos() );    
+    TEST_ASSERT_EQUAL( 0, encoder.getLaps() );
+    
+    encoder.state.raw_position = 1796;
+    encoder.state.position_remainder = 0;    
+    encoder.state.laps = 0;
+    encoder.handleOverflow ( );
+    TEST_ASSERT_EQUAL( 0, encoder.getRawPos() );
+    TEST_ASSERT_DOUBLE_WITHIN(5e-4, 1-lapRemainder, (double)encoder.state.position_remainder );
+    TEST_ASSERT_EQUAL( 1, encoder.getLaps() );
+
+    encoder.state.raw_position = 1798;
+    encoder.state.position_remainder = 0;    
+    encoder.state.laps = 0;
+    encoder.handleOverflow ( );
+    TEST_ASSERT_EQUAL( 2, encoder.getRawPos() );
+    TEST_ASSERT_DOUBLE_WITHIN(5e-4, 1-lapRemainder, (double)encoder.state.position_remainder );
+    TEST_ASSERT_EQUAL( 1, encoder.getLaps() );
+
+    encoder.state.raw_position = 1796*2;
+    encoder.state.position_remainder = 0;    
+    encoder.state.laps = 0;
+    encoder.handleOverflow ();
+    encoder.handleOverflow ();
+    TEST_ASSERT_EQUAL( 0, encoder.getRawPos() );
+    TEST_ASSERT_DOUBLE_WITHIN(2*5e-4, 2*(1-lapRemainder), (double)encoder.state.position_remainder );
+    TEST_ASSERT_EQUAL( 2, encoder.getLaps() );
+
+}
+
+void testPositiveSubtraction() {
+    TEST_ASSERT_EQUAL( 10, encoder.positionPositiveDifference( 10, 0 ) );
+    TEST_ASSERT_EQUAL( 1795-10, encoder.positionPositiveDifference( 0, 10 ) );
+}
 
 void testSimpleMove() {        
+    
+    unsigned long int timeToMove = 1000;  
+    unsigned long int startTime = millis();
+    unsigned long int endTime =  startTime + timeToMove;        
+
+    //First spin up the motor
+    driver.setMotorPWM(128);     
+    delay(timeToMove);
+            
+    //Reset the position and then move at constant speed.
+    encoder.forceHomed();  
+    delay(timeToMove);
+
+    long int endPos = encoder.getRawPos();                
+    long int endPosTarget = 2700; //Aproximately how far it should move in 1 second
+    TEST_ASSERT_INT_WITHIN( 300, endPosTarget, endPos );                             
+}
+
+void testSimpleHoming() {
+    unsigned long int maxTimeToMove = 5000;  
+    unsigned long int endTime = millis() + maxTimeToMove;    
+
+    driver.setMotorPWM(128);    
+    encoder.unHome(); //And reset the homing flag.    
+
+    boolean firstRound = true;
+    while ( millis() < endTime ) {        
+        if ( encoder.isHomed() ) {
+            if ( firstRound ) {
+                unsigned long int endPos = encoder.getPosAtLastHome();
+                TEST_ASSERT_LESS_THAN( 1796, endPos ); //Make sure we home within one rotation            
+                encoder.unHome(); //Then we unhome the encoder to keep moving
+                firstRound = false;    
+                Log << "First homing" << endl;        
+            } else {
+                driver.setMotorPWM(0);
+                unsigned long int endPos = encoder.getPosAtLastHome();
+                TEST_ASSERT_INT_WITHIN( 10, 1796, endPos ); //Make sure we have gone exactly 1 round            
+                Log << "Second homing" << endl;
+                return;
+            }
+        }
+        sched.run();
+    }    
+    TEST_ASSERT_TRUE( encoder.isHomed() );    
+}
+
+void testWrapAroundAndOffset() {
+    unsigned long int maxTimeToMove = 1500;  
+    unsigned int startTime = millis();
+    unsigned long int endTime = startTime + maxTimeToMove;        
+
+    driver.setMotorPWM(128);    
+        
+    while ( millis() < endTime ) {                
+        sched.run();
+    }    
+    TEST_ASSERT_LESS_THAN( 3593, encoder.getPosComp() );    
+    TEST_ASSERT_EQUAL( 2, encoder.getLaps() );    
+}
+
+
+void testSimpleMoveWithSpeed() {        
 
     unsigned long int timeToMove = 1000;  
     unsigned long int startTime = millis();
@@ -55,122 +158,6 @@ void testSimpleMove() {
     TEST_ASSERT_EQUAL( lapsTarget, laps );            
 }
 
-void testSimpleMoveBackwards() {    
-    unsigned long int timeToMove = 1000;  
-    unsigned long int endTime = 0;    
-
-    
-    endTime = millis() + timeToMove;        
-    driver.setMotorPWM(-128);     
-
-    while ( true ) {
-        if ( millis() > endTime ) {
-            long int endPos = encoder.getPosComp();            
-            long int laps = encoder.getLaps();
-            TEST_ASSERT_INT_WITHIN( 400, -6000+3592, endPos );            
-            TEST_ASSERT_EQUAL( -1, laps );            
-            return;
-        }
-        sched.run();
-    }
-}
-
-void testSimpleHoming() {
-    unsigned long int maxTimeToMove = 5000;  
-    unsigned long int endTime = millis() + maxTimeToMove;
-    
-    encoderWrapperHoming.init( millis() ); //Start the homing
-
-    driver.setMotorPWM(128);    
-    encoder.unHome(); //And reset the homing flag.    
-
-    boolean firstRound = true;
-    while ( millis() < endTime ) {        
-        if ( encoder.isHomed() ) {
-            if ( firstRound ) {
-                unsigned long int endPos = encoder.getPosAtLastHome();
-                TEST_ASSERT_LESS_THAN( 3592, endPos ); //Make sure we home within one rotation            
-                encoder.unHome(); //Then we unhome the encoder to keep moving
-                firstRound = false;    
-                //Log << "First homing" << endl;        
-            } else {
-                driver.setMotorPWM(0);
-                unsigned long int endPos = encoder.getPosAtLastHome();
-                TEST_ASSERT_INT_WITHIN( 10, 3592, endPos ); //Make sure we have gone exactly 1 round            
-                //Log << "Second homing" << endl;
-                return;
-            }
-        }
-        sched.run();
-    }    
-    TEST_ASSERT_TRUE( encoder.isHomed() );    
-}
-
-void testWrapAroundLogic() {
-    double lapRemainder = (double)encoder.clicksPerRevolution - 3591;
-
-    long int raw_position = 0;
-    SQ1x14 remainder = 0;
-    long int laps = 0;
-    encoder.handleOverflow ( raw_position, remainder, laps );
-    TEST_ASSERT_EQUAL( 0, raw_position );
-    TEST_ASSERT_DOUBLE_WITHIN(0.000001, 0, 0 );
-    TEST_ASSERT_EQUAL( 0, laps );
-
-    raw_position = 3592;
-    remainder = 0;    
-    laps = 0;
-    encoder.handleOverflow ( raw_position, remainder, laps );
-    TEST_ASSERT_EQUAL( 0, raw_position );
-    TEST_ASSERT_DOUBLE_WITHIN(5e-4, 1-lapRemainder, (double)remainder );
-    TEST_ASSERT_EQUAL( 1, laps );
-
-    raw_position = -3592;
-    remainder = 0;    
-    laps = 0;
-    encoder.handleOverflow ( raw_position, remainder, laps );
-    TEST_ASSERT_EQUAL( -1, raw_position );
-    TEST_ASSERT_DOUBLE_WITHIN(5e-4, lapRemainder, (double)remainder );
-    TEST_ASSERT_EQUAL( -1, laps );
-
-    raw_position = 3592*2;
-    remainder = 0;    
-    laps = 0;
-    encoder.handleOverflow ( raw_position, remainder, laps );
-    encoder.handleOverflow ( raw_position, remainder, laps );
-    TEST_ASSERT_EQUAL( 0, raw_position );
-    TEST_ASSERT_DOUBLE_WITHIN(2*5e-4, 2*(1-lapRemainder), (double)remainder );
-    TEST_ASSERT_EQUAL( 2, laps );
-
-    raw_position = -3592*2;
-    remainder = 0;    
-    laps = 0;
-    encoder.handleOverflow ( raw_position, remainder, laps );
-    encoder.handleOverflow ( raw_position, remainder, laps );
-    TEST_ASSERT_EQUAL( -1, raw_position );
-    TEST_ASSERT_DOUBLE_WITHIN(2*5e-4, 2*lapRemainder-1, (double)remainder );
-    TEST_ASSERT_EQUAL( -2, laps );
-
-}
-
-void testPositiveSubtraction() {
-    TEST_ASSERT_EQUAL( 10, encoder.positionPositiveDifference( 10, 0 ) );
-    TEST_ASSERT_EQUAL( 3591-10, encoder.positionPositiveDifference( 0, 10 ) );
-}
-
-void testWrapAroundAndOffset() {
-    unsigned long int maxTimeToMove = 1500;  
-    unsigned int startTime = millis();
-    unsigned long int endTime = startTime + maxTimeToMove;        
-
-    driver.setMotorPWM(128);    
-        
-    while ( millis() < endTime ) {                
-        sched.run();
-    }    
-    TEST_ASSERT_LESS_THAN( 3593, encoder.getPosComp() );    
-    TEST_ASSERT_EQUAL( 2, encoder.getLaps() );    
-}
 
 void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {    
 
@@ -316,8 +303,7 @@ void setup() {
     recurring10ms.add( &regulator );
     recurring10ms.add( &commander );
     recurring10ms.init( millis() );  
-    sched.add( &recurring10ms ); 
-    sched.add( &encoderWrapperHoming );
+    sched.add( &recurring10ms );     
 
 
     UNITY_BEGIN();        
@@ -325,10 +311,15 @@ void setup() {
     RUN_TEST(testPositiveSubtraction);    
     delay(500);
     RUN_TEST(testSimpleMove);  
+    delay(500);    
+    RUN_TEST(testSimpleHoming);        
     delay(500);
-    RUN_TEST(testWrapAroundAndOffset);  
-    delay(500);
-    RUN_TEST(testSimpleMoveBackwards);
+    RUN_TEST(testWrapAroundAndOffset); 
+
+    /*
+        delay(500);
+    RUN_TEST(testSimpleMoveWithSpeed);  
+ 
     delay(500);
     RUN_TEST(testSimpleMoveAtConstantSpeed7000);    
     delay(500);    
@@ -338,11 +329,10 @@ void setup() {
     delay(500);    
     RUN_TEST(testSimpleMoveAtConstantSpeed1000);    
     delay(500);         
-    RUN_TEST(testSimpleHoming);        
-    delay(500);    
     RUN_TEST(testSimpleMoveToAPositionAtTime);
     delay(500);    
     RUN_TEST(testRegulatorHardBreak);
+    */
     UNITY_END();
 }
 

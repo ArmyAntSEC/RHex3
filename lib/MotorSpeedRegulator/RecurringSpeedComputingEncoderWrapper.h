@@ -18,21 +18,4 @@ class EncoderWrapperComputeSpeedTask: public Task
         }
 };
 
-template <int N>class RecurringEncoderWrapperHoming: public RecurringTaskBase
-{
-    private:
-        HomingEncoder* encoder;
-    public:
-        RecurringEncoderWrapperHoming( HomingEncoder* _encoder ): encoder(_encoder)
-        {}
-        
-        virtual void init( unsigned long int ) {
-            RecurringTaskBase::init();
-        }
-
-        virtual void run( unsigned long int ) {
-            this->encoder->isr_homing<N>();
-        }
-};
-
 #endif
