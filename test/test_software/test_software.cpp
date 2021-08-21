@@ -1,8 +1,7 @@
 #include <unity.h>
-#include "MotorSpeedRegulator.h"
-
 
 #include "test_speed_vs_power_lookup.h"
+#include "testEEPROMStorage.h"
 
 void setup() {
     // NOTE!!! Wait for >2 secs
@@ -10,9 +9,14 @@ void setup() {
     delay(2000);
     
     UNITY_BEGIN();
+    //Speed vs Power conversions
     RUN_TEST(testGetPowerforFreeSpeedExtrapolate);
     RUN_TEST(testGetPowerforFreeSpeedOnStep);
     RUN_TEST(testGetPowerforFreeSpeedInterpolate);
+    
+    //EEPROM Storage
+    RUN_TEST(testWriteAndReadEEPROM);
+
     UNITY_END();
 }
 
