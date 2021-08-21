@@ -129,15 +129,15 @@ void testSimpleMoveWithSpeed() {
     unsigned long int startTime = millis();
     unsigned long int endTime =  startTime + timeToMove;        
 
-    //First spin up the motor
+    //First spin up the motor    
     driver.setMotorPWM(128);     
     while ( millis() < endTime ) {
         sched.run();
     }
     
     //Measure the speed
-    int speed = encoder.getSpeedCPS();
-    TEST_ASSERT_INT_WITHIN( 300, 6500, speed );                    
+    int speed = encoder.getSpeedCPS();    
+    TEST_ASSERT_INT_WITHIN( 150, 2800, speed );                    
 
     //Compute the distance to move
     timeToMove = 1000;  
@@ -152,7 +152,7 @@ void testSimpleMoveWithSpeed() {
     while ( millis() < endTime ) {        
         sched.run();
     }    
-    long int endPos = encoder.getPosComp();            
+    long int endPos = encoder.getRawPos();            
     long int laps = encoder.getLaps();    
     TEST_ASSERT_INT_WITHIN( 100, endPosTargetWrapped, endPos );            
     TEST_ASSERT_EQUAL( lapsTarget, laps );            
@@ -315,11 +315,9 @@ void setup() {
     RUN_TEST(testSimpleHoming);        
     delay(500);
     RUN_TEST(testWrapAroundAndOffset); 
-
-    /*
-        delay(500);
+    delay(500);
     RUN_TEST(testSimpleMoveWithSpeed);  
- 
+    /*
     delay(500);
     RUN_TEST(testSimpleMoveAtConstantSpeed7000);    
     delay(500);    

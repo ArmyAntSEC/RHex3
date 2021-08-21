@@ -58,9 +58,9 @@ struct HomingEncoderState {
   
   //int offset;
 
-  //long int last_position;
-  //unsigned long int last_position_timestamp_micros;
-  //SQ15x16 speed_cps;
+  long int last_position;
+  unsigned long int last_position_timestamp_micros;
+  SQ15x16 speed_cps;
 
 };
 
@@ -85,14 +85,14 @@ public:
     state.breakerPin = breakerPin;
     
     state.raw_position = 0;    
-    /*
-    state.moving_forward = true;
+    
     state.is_homed = false;
     state.pos_at_last_home = 0;
     state.last_position = 0;
     state.last_position_timestamp_micros = 0;
     state.speed_cps = 0;     
     
+    /*
     state.encoderPin1_register = PIN_TO_BASEREG(encoderPin1);
     state.encoderPin2_register = PIN_TO_BASEREG(encoderPin2);
     state.breakerPin_register = PIN_TO_BASEREG(breakerPin);
@@ -129,11 +129,10 @@ public:
 
     //Min clicks per second 4700
     //Min clicks per 0.01s = 47
- 
-    /*
+    
     unsigned long int nowU = micros();
 
-    int thisPos = this->getPosComp();
+    int thisPos = this->getRawPos();
     noInterrupts();
     int lastPos = state.last_position;
     unsigned long int lastTimeU = state.last_position_timestamp_micros;
@@ -152,42 +151,32 @@ public:
       //First pre-scale by 100, then divide, then scale by 10k for a total of 1e6.
       speedCPS = 10000*((100*posDelta)/timeDelta);
     }    
-    
-    
-    
+        
     state.last_position = thisPos;
     state.last_position_timestamp_micros = nowU;
     state.speed_cps = speedCPS;
-    */
-    noInterrupts();
-  
+        
     //Make sure that we handle any overflows.
+    noInterrupts();
     HomingEncoder::handleOverflow( );
     interrupts();
     
-
     /*
-    if ( speedCPS == 0 ) {
-      //ERROR( F("Unexpected speed") );
-      //ERROR( F("speedCPS:") << speedCPS.getInteger() );
-      //ERROR( F("Pos delta: ") << posDelta.getInteger() );
-      //ERROR( F("Time delta: ") << timeDelta.getInteger() );
-      //DEBUG( F("This pos: ") << thisPos );
-      //DEBUG ( F("Last pos:") << lastPos );
+    if ( speedCPS < 0 ) {
+      ERROR( F("Unexpected speed") );
+      ERROR( F("speedCPS:") << speedCPS.getInteger() );
+      ERROR( F("Pos delta: ") << posDelta.getInteger() );
+      ERROR( F("Time delta: ") << timeDelta.getInteger() );
+      ERROR( F("This pos: ") << thisPos );
+      ERROR ( F("Last pos:") << lastPos );
     }
     */
 
   }
 
   long int getSpeedCPS()
-  {    
-    int speedCPS = 0;
-    /*
-    noInterrupts();
-    speedCPS = state.speed_cps.getInteger();
-    interrupts();  
-    */
-    return speedCPS;
+  {                 
+    return state.speed_cps.getInteger();
   }
 
   long int getRawPos()
@@ -281,7 +270,7 @@ public:
   template<int N> static void isr_homing(void) 
     { 
       HomingEncoderState * state = stateList[N];
-      if ( !state->is_homed ) {
+      if ( !state->is_homed && state->raw_position > 200 ) { //Do some debouncing
         state->is_homed = true;
         state->pos_at_last_home = state->raw_position;
         state->raw_position = 0;
