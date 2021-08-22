@@ -34,46 +34,49 @@ public:
         EEPROMStorage::writeIntArrayToAddress( eepromStorageStartIndex, speedVsPowerAddress, tableLength*tableWidth );        
     }
     
-    unsigned int GetPowerForFreeSpeed(unsigned int speed)    
+    unsigned int doInterpolation(unsigned int x, unsigned int yList[], unsigned int xList[] )
     {        
-
         //Check if we are out of range
-        if (speed <= speedVsPower[1][0])
+        if (x <= xList[0])
         {
-            return speedVsPower[0][0];
+            return yList[0];
         }
-        else if (speed >= speedVsPower[1][6])
+        else if (x >= xList[6])
         {
-            return speedVsPower[0][6];
-        }
-
-        int speedIdx = 0;
-        while (speedVsPower[1][speedIdx] < speed)
-        {
-            speedIdx++;
+            return yList[6];
         }
 
-        int speedLow = speedVsPower[1][speedIdx - 1];
-        int speedHigh = speedVsPower[1][speedIdx];
-        SQ15x16 speedSpan = speedHigh - speedLow;
-        int powerLow = speedVsPower[0][speedIdx - 1];
-        int powerHigh = speedVsPower[0][speedIdx];
-        SQ15x16 powerSpan = powerHigh - powerLow;
+        int xIdx = 0;
+        while (xList[xIdx] < x)
+        {
+            xIdx++;
+        }
 
-        SQ15x16 speedRem = speed - speedLow;
-        SQ15x16 factor = powerSpan / speedSpan;
-        SQ15x16 powerRem = speedRem * factor;
+        int xLow = xList[xIdx - 1];
+        int xHigh = xList[xIdx];
+        SQ15x16 xSpan = xHigh - xLow;
+        int yLow = yList[xIdx - 1];
+        int yHigh = yList[xIdx];
+        SQ15x16 ySpan = yHigh - yLow;
 
-        int power = roundFixed(powerRem).getInteger() + powerLow;
-        /*
+        SQ15x16 xRem = x - xLow;
+        SQ15x16 factor = ySpan / xSpan;
+        SQ15x16 yRem = xRem * factor;
+
+        int y = roundFixed(yRem).getInteger() + yLow;
+        /*        
         Log << "Interpolating to: " << speed << endl;
-        Log << speedLow << ", " << speedHigh << ", " << powerLow << ", " << powerHigh << endl;
-        Log << speedSpan.getInteger() << ", " << powerSpan.getInteger() << endl;
-        Log << (double)speedRem << ", " << (double)factor << ", " << (double)powerRem << endl; 
-        Log << power << endl;            
+        Log << speedLow << ", " << speedHigh << ", " << yLow << ", " << yHigh << endl;
+        Log << speedSpan.getInteger() << ", " << ySpan.getInteger() << endl;
+        Log << (double)xRem << ", " << (double)factor << ", " << (double)yRem << endl; 
+        Log << y << endl;            
         */
-        return power;
+        return y;
     }
+
+    unsigned int GetPowerForFreeSpeed(unsigned int speed) {
+        return doInterpolation(speed, speedVsPower[0], speedVsPower[1] );
+    }  
 
     void setPowerAndSpeedPair( int index, int power, int speed )
     {
