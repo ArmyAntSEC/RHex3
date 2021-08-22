@@ -28,24 +28,24 @@ void testGetPowerforFreeSpeedInterpolate (void)
     TEST_ASSERT_INT_WITHIN( 2, 111, converter.GetPowerForFreeSpeed(6000) );    
 }
 
-void testInitFromEEPROM()
+void testInitSpeedToPowerConverterFromEEPROM()
 {
 
     SpeedToPowerConverter converter;
     TEST_ASSERT_EQUAL( 20, converter.speedVsPower[0][0] );
     
     EEPROMStorage eeprom;
-    eeprom.writeIntToIndex( 0, 56 );
+    eeprom.writeIntToIndex( 96, 56 ); //Overwrite the first value of the default storage location
     converter.initFromEEPROM();
 
     TEST_ASSERT_EQUAL( 56, converter.speedVsPower[0][0] );
 }
 
-void testSaveToEEPROM()
+void testSaveSpeedToPowerConverterToEEPROM()
 {
 
     EEPROMStorage eeprom;
-    eeprom.writeIntToIndex( 0, 56 );    
+    eeprom.writeIntToIndex( 96, 56 );  //Overwrite the first value of the default storage location
 
     SpeedToPowerConverter converter;
     converter.saveToEEPROM();
@@ -53,5 +53,5 @@ void testSaveToEEPROM()
     int valueRead = eeprom.readIntFromIndex( 0 );
     
     
-    TEST_ASSERT_EQUAL( 21, valueRead );
+    TEST_ASSERT_EQUAL( 20, valueRead );
 }

@@ -1,6 +1,8 @@
 #include <unity.h>
 #include <EEPROMStorage.h>
 
+//TODO: Once we have Exception handling, create a test case for writing outside of the EEPROM array.
+
 void testWriteAndReadEEPROM()
 {
     uint8_t testIndex = 120; //Use the end of the array for testing
@@ -14,11 +16,6 @@ void testWriteAndReadEEPROM()
     EEPROMStorage::writeIntToIndex(testIndex,testValue2);
     int testValueRead2 = EEPROMStorage::readIntFromIndex(testIndex);
     TEST_ASSERT_EQUAL ( testValue2, testValueRead2 );
-}
-
-void testWriteOutsideOfEEPROM()
-{
-    //TODO once I have exception handling.
 }
 
 void testReadAndWriteArray()

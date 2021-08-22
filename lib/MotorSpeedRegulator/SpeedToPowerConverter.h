@@ -11,18 +11,27 @@ class SpeedToPowerConverter
 public:
     static const int tableLength = 7;
     static const int tableWidth = 2;
+    
+    //We default to the end of the EEPROM which we use for testing to not accidentally
+    //overwrite the measured values at the start of the EEPROM array.
+    unsigned int eepromStorageStartIndex = 96; 
     unsigned int speedVsPower[tableLength][tableWidth] = {{20, 789}, {24, 1363}, {32, 2145}, {48, 3472}, {64, 4507}, {128, 6509}, {255, 7735}};
+
+    void setEEPROMStartIndex( int startIndex )
+    {
+        this->eepromStorageStartIndex = startIndex;
+    }
 
     void initFromEEPROM()
     {                        
         int* speedVsPowerAddress = (int*)speedVsPower;
-        EEPROMStorage::readIntArrayFromAddress( 0, speedVsPowerAddress, tableLength*tableWidth );        
+        EEPROMStorage::readIntArrayFromAddress( eepromStorageStartIndex, speedVsPowerAddress, tableLength*tableWidth );        
     }
 
     void saveToEEPROM()
     {                        
         int* speedVsPowerAddress = (int*)speedVsPower;
-        EEPROMStorage::writeIntArrayToAddress( 0, speedVsPowerAddress, tableLength*tableWidth );        
+        EEPROMStorage::writeIntArrayToAddress( eepromStorageStartIndex, speedVsPowerAddress, tableLength*tableWidth );        
     }
 
     unsigned int GetPowerForFreeSpeed(unsigned int speed)
