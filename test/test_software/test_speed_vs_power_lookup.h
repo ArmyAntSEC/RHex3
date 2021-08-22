@@ -43,14 +43,14 @@ void testInitSpeedToPowerConverterFromEEPROM()
 
 void testSaveSpeedToPowerConverterToEEPROM()
 {
-
+    const int converterEEPROMStartIndex = 96;
     EEPROMStorage eeprom;
-    eeprom.writeIntToIndex( 96, 56 );  //Overwrite the first value of the default storage location
+    eeprom.writeIntToIndex( converterEEPROMStartIndex, 56 );  //Overwrite the first value of the default storage location
 
     SpeedToPowerConverter converter;
     converter.saveToEEPROM();
     
-    int valueRead = eeprom.readIntFromIndex( 0 );
+    int valueRead = eeprom.readIntFromIndex( converterEEPROMStartIndex );
     
     
     TEST_ASSERT_EQUAL( 20, valueRead );

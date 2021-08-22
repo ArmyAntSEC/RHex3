@@ -15,7 +15,7 @@ public:
     //We default to the end of the EEPROM which we use for testing to not accidentally
     //overwrite the measured values at the start of the EEPROM array.
     unsigned int eepromStorageStartIndex = 96; 
-    unsigned int speedVsPower[tableLength][tableWidth] = {{20, 789}, {24, 1363}, {32, 2145}, {48, 3472}, {64, 4507}, {128, 6509}, {255, 7735}};
+    unsigned int speedVsPower[tableWidth][tableLength] = {{20, 24, 32, 48, 64, 128, 255}, {789, 1363, 2145, 3472, 4507, 6509, 7735}};
 
     void setEEPROMStartIndex( int startIndex )
     {
@@ -33,31 +33,31 @@ public:
         int* speedVsPowerAddress = (int*)speedVsPower;
         EEPROMStorage::writeIntArrayToAddress( eepromStorageStartIndex, speedVsPowerAddress, tableLength*tableWidth );        
     }
-
-    unsigned int GetPowerForFreeSpeed(unsigned int speed)
+    
+    unsigned int GetPowerForFreeSpeed(unsigned int speed)    
     {        
 
         //Check if we are out of range
-        if (speed <= speedVsPower[0][1])
+        if (speed <= speedVsPower[1][0])
         {
             return speedVsPower[0][0];
         }
-        else if (speed >= speedVsPower[6][1])
+        else if (speed >= speedVsPower[1][6])
         {
-            return speedVsPower[6][0];
+            return speedVsPower[0][6];
         }
 
         int speedIdx = 0;
-        while (speedVsPower[speedIdx][1] < speed)
+        while (speedVsPower[1][speedIdx] < speed)
         {
             speedIdx++;
         }
 
-        int speedLow = speedVsPower[speedIdx - 1][1];
-        int speedHigh = speedVsPower[speedIdx][1];
+        int speedLow = speedVsPower[1][speedIdx - 1];
+        int speedHigh = speedVsPower[1][speedIdx];
         SQ15x16 speedSpan = speedHigh - speedLow;
-        int powerLow = speedVsPower[speedIdx - 1][0];
-        int powerHigh = speedVsPower[speedIdx][0];
+        int powerLow = speedVsPower[0][speedIdx - 1];
+        int powerHigh = speedVsPower[0][speedIdx];
         SQ15x16 powerSpan = powerHigh - powerLow;
 
         SQ15x16 speedRem = speed - speedLow;
@@ -70,9 +70,15 @@ public:
         Log << speedLow << ", " << speedHigh << ", " << powerLow << ", " << powerHigh << endl;
         Log << speedSpan.getInteger() << ", " << powerSpan.getInteger() << endl;
         Log << (double)speedRem << ", " << (double)factor << ", " << (double)powerRem << endl; 
-        Log << power << endl;    
+        Log << power << endl;            
         */
         return power;
+    }
+
+    void setPowerAndSpeedPair( int index, int power, int speed )
+    {
+        speedVsPower[0][index] = power;
+        speedVsPower[1][index] = speed;
     }
 };
 

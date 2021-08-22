@@ -51,3 +51,12 @@ void TaskScheduler::run() {
 		this->nextRunTime += 5000;
 	}
 }
+
+void TaskScheduler::delayWithScheduler( unsigned long timeToWait )
+{
+    unsigned long startTime = millis();
+    unsigned long endTime = startTime + timeToWait;
+    while ( millis() < endTime ) {
+        run();
+    }
+}

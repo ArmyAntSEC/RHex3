@@ -15,6 +15,7 @@ public:
     TaskScheduler();
     void add ( Task* task );
     void run();    
+    void delayWithScheduler( unsigned long timeToWait );
 private:
     const static int MaxTasks = 16;
     Task *tasks[MaxTasks];
