@@ -19,6 +19,12 @@ public:
         EEPROMStorage::readIntArrayFromAddress( 0, speedVsPowerAddress, tableLength*tableWidth );        
     }
 
+    void saveToEEPROM()
+    {                        
+        int* speedVsPowerAddress = (int*)speedVsPower;
+        EEPROMStorage::writeIntArrayToAddress( 0, speedVsPowerAddress, tableLength*tableWidth );        
+    }
+
     unsigned int GetPowerForFreeSpeed(unsigned int speed)
     {        
 
@@ -50,13 +56,13 @@ public:
         SQ15x16 powerRem = speedRem * factor;
 
         int power = roundFixed(powerRem).getInteger() + powerLow;
-    
+        /*
         Log << "Interpolating to: " << speed << endl;
         Log << speedLow << ", " << speedHigh << ", " << powerLow << ", " << powerHigh << endl;
         Log << speedSpan.getInteger() << ", " << powerSpan.getInteger() << endl;
         Log << (double)speedRem << ", " << (double)factor << ", " << (double)powerRem << endl; 
         Log << power << endl;    
-
+        */
         return power;
     }
 };

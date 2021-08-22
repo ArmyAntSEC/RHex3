@@ -35,8 +35,23 @@ void testInitFromEEPROM()
     TEST_ASSERT_EQUAL( 20, converter.speedVsPower[0][0] );
     
     EEPROMStorage eeprom;
-    eeprom.writeIntToAddress( 0, 56 );
+    eeprom.writeIntToIndex( 0, 56 );
     converter.initFromEEPROM();
 
     TEST_ASSERT_EQUAL( 56, converter.speedVsPower[0][0] );
+}
+
+void testSaveToEEPROM()
+{
+
+    EEPROMStorage eeprom;
+    eeprom.writeIntToIndex( 0, 56 );    
+
+    SpeedToPowerConverter converter;
+    converter.saveToEEPROM();
+    
+    int valueRead = eeprom.readIntFromIndex( 0 );
+    
+    
+    TEST_ASSERT_EQUAL( 21, valueRead );
 }

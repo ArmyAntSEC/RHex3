@@ -11,6 +11,7 @@ void setup() {
     UNITY_BEGIN();
     //EEPROM Storage
     RUN_TEST(testWriteAndReadEEPROM);
+    RUN_TEST(testReadAndWriteArray);
 
     //Speed vs Power conversions
     RUN_TEST(testGetPowerforFreeSpeedExtrapolate);
