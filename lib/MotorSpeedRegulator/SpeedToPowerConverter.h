@@ -5,6 +5,25 @@
 #include <EEPROMStorage.h>
 #include <LevelLogger.h>
 
+/* Measured values on the test motor
+Power: 32 Average speed: 485 Speed Span: 194
+Power: 48 Average speed: 1117 Speed Span: 222
+Power: 64 Average speed: 1672 Speed Span: 192
+Power: 96 Average speed: 2409 Speed Span: 242
+Power: 128 Average speed: 2892 Speed Span: 111
+Power: 192 Average speed: 3469 Speed Span: 116
+Power: 255 Average speed: 3903 Speed Span: 26
+
+Matlab format:
+[32 485 194;
+48 1117 222;
+64 1672 192;
+96 2409 242;
+128 2892 111;
+192 3469 116;
+255 3903 26]
+*/
+
 class SpeedToPowerConverter
 {
 
@@ -64,13 +83,15 @@ public:
         SQ15x16 yRem = xRem * factor;
 
         int y = roundFixed(yRem).getInteger() + yLow;
-        /*        
-        Log << "Interpolating to: " << speed << endl;
-        Log << speedLow << ", " << speedHigh << ", " << yLow << ", " << yHigh << endl;
-        Log << speedSpan.getInteger() << ", " << ySpan.getInteger() << endl;
+        
+        /*
+        Log << "Interpolating to: " << x << endl;
+        Log << xLow << ", " << xHigh << ", " << yLow << ", " << yHigh << endl;
+        Log << xSpan.getInteger() << ", " << ySpan.getInteger() << endl;
         Log << (double)xRem << ", " << (double)factor << ", " << (double)yRem << endl; 
         Log << y << endl;            
         */
+
         return y;
     }
 
