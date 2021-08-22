@@ -6,6 +6,7 @@
 #include <TaskScheduler.h>
 #include "RecurringTaskGroup.h"
 #include <configureOneLeg.h>
+#include <SpeedToPowerConverter.h>
 
 #include "testBasicMotorFunctions.h"
 
@@ -149,4 +150,37 @@ void testSimpleMoveWithSpeed() {
     TEST_ASSERT_EQUAL( lapsTarget, laps );            
 }
 
+void doTestMoveWithPredictedSpeed( unsigned int power );
+
+void testMoveWithPredictedSpeed()
+{
+    const int powerLength = 4;
+    unsigned int powers[powerLength] = {32, 64, 128, 255};
+
+    for ( int i = 0; i < powerLength; i++ ) {
+        doTestMoveWithPredictedSpeed( powers[i] );
+    }
+}
+
+
+void doTestMoveWithPredictedSpeed( unsigned int power ) {        
+
+    unsigned long int motorSettlingTime = 500;      
+    
+    SpeedToPowerConverterProduction converter;
+    
+    converter.initFromEEPROM();    
+    
+    unsigned int predictedSpeed = converter.GetFreeSpeedForPower( power );    
+
+    //Spin up the motor
+    driver.setMotorPWM(255);     
+    sched.delayWithScheduler( motorSettlingTime );        
+
+    //Set the speed, settle and measure
+    driver.setMotorPWM(power);     
+    sched.delayWithScheduler( motorSettlingTime );        
+    int measuredSpeed = encoder.getSpeedCPS();        
+    TEST_ASSERT_INT_WITHIN( 150, predictedSpeed, measuredSpeed );                    
+}
 #endif

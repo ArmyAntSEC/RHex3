@@ -61,6 +61,7 @@ struct HomingEncoderState {
   long int last_position;
   unsigned long int last_position_timestamp_micros;
   SQ15x16 speed_cps;
+  SQ15x16 speed_cps_filtered;
 
 };
 
@@ -68,10 +69,9 @@ class HomingEncoder
 {
 public:
   HomingEncoderState state;        
-  
-public:
   static const SQ15x16 clicksPerRevolution;
   static HomingEncoderState * stateList[MAX_ENCODERS_SUPPORTED];                
+  const int speedTimeConstant = 10;
   
   template <int N> void config( unsigned int encoderPin1, 
 			      unsigned int encoderPin2, unsigned int breakerPin,
@@ -92,18 +92,6 @@ public:
     state.last_position_timestamp_micros = 0;
     state.speed_cps = 0;     
     
-    /*
-    state.encoderPin1_register = PIN_TO_BASEREG(encoderPin1);
-    state.encoderPin2_register = PIN_TO_BASEREG(encoderPin2);
-    state.breakerPin_register = PIN_TO_BASEREG(breakerPin);
-    
-    state.encoderPin1_bitmask = PIN_TO_BITMASK(encoderPin1);
-    state.encoderPin2_bitmask = PIN_TO_BITMASK(encoderPin2);
-    state.breakerPin_bitmask = PIN_TO_BITMASK(breakerPin);
-    
-    state.offset = offset;
-    */
-
     // allow time for a passive R-C filter to charge
     // through the pullup resistors, before reading
     // the initial state
@@ -123,8 +111,9 @@ public:
   virtual void run()
   {    
     
+    //Calculate the max range for values:
     //Max rpm: 3
-    //Max clicks per second: 3*3500 = 10000
+    //Max clicks per second: 3*3500 = 10000 
     //Max clicks per 0.01 s = 100
 
     //Min clicks per second 4700
@@ -155,28 +144,25 @@ public:
     state.last_position = thisPos;
     state.last_position_timestamp_micros = nowU;
     state.speed_cps = speedCPS;
+    state.speed_cps_filtered = 
+      state.speed_cps_filtered * (this->speedTimeConstant - 1) +
+      state.speed_cps;
         
     //Make sure that we handle any overflows.
     noInterrupts();
     HomingEncoder::handleOverflow( );
     interrupts();
-    
-    /*
-    if ( speedCPS < 0 ) {
-      ERROR( F("Unexpected speed") );
-      ERROR( F("speedCPS:") << speedCPS.getInteger() );
-      ERROR( F("Pos delta: ") << posDelta.getInteger() );
-      ERROR( F("Time delta: ") << timeDelta.getInteger() );
-      ERROR( F("This pos: ") << thisPos );
-      ERROR ( F("Last pos:") << lastPos );
-    }
-    */
 
   }
 
   long int getSpeedCPS()
   {                 
     return state.speed_cps.getInteger();
+  }
+
+  long int getSpeedCPSFiltered()
+  {                 
+    return state.speed_cps_filtered.getInteger();
   }
 
   long int getRawPos()

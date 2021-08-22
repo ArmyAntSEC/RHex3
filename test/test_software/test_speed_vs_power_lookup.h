@@ -4,7 +4,7 @@
 
 void testGetPowerforFreeSpeedOnStep (void) 
 {
-    SpeedToPowerConverter converter;
+    SpeedToPowerConverterTest converter;
     TEST_ASSERT_EQUAL( 20, converter.GetPowerForFreeSpeed(780) );
     TEST_ASSERT_EQUAL( 24, converter.GetPowerForFreeSpeed(1363) );
     TEST_ASSERT_EQUAL( 32, converter.GetPowerForFreeSpeed(2145) );
@@ -16,21 +16,21 @@ void testGetPowerforFreeSpeedOnStep (void)
 
 void testGetPowerforFreeSpeedExtrapolate (void) 
 {
-    SpeedToPowerConverter converter;
+    SpeedToPowerConverterTest converter;
     TEST_ASSERT_EQUAL( 20, converter.GetPowerForFreeSpeed(600) );
     TEST_ASSERT_EQUAL( 255, converter.GetPowerForFreeSpeed(8000) );
 }
 
 void testGetPowerforFreeSpeedInterpolate (void) 
 {    
-    SpeedToPowerConverter converter;
+    SpeedToPowerConverterTest converter;
     TEST_ASSERT_INT_WITHIN( 1, 30, converter.GetPowerForFreeSpeed(2000) );
     TEST_ASSERT_INT_WITHIN( 1, 111, converter.GetPowerForFreeSpeed(6000) );    
 }
 
 void testGetFreeSpeedForPowerInterpolate (void) 
 {    
-    SpeedToPowerConverter converter;
+    SpeedToPowerConverterTest converter;
     TEST_ASSERT_INT_WITHIN( 100, 2000, converter.GetFreeSpeedForPower(30) );
     TEST_ASSERT_INT_WITHIN( 100, 6000, converter.GetFreeSpeedForPower(111) );    
 }
@@ -39,7 +39,7 @@ void testGetFreeSpeedForPowerInterpolate (void)
 void testInitSpeedToPowerConverterFromEEPROM()
 {
 
-    SpeedToPowerConverter converter;
+    SpeedToPowerConverterTest converter;
     TEST_ASSERT_EQUAL( 20, converter.speedVsPower[0][0] );
     
     EEPROMStorage eeprom;
@@ -55,11 +55,10 @@ void testSaveSpeedToPowerConverterToEEPROM()
     EEPROMStorage eeprom;
     eeprom.writeIntToIndex( converterEEPROMStartIndex, 56 );  //Overwrite the first value of the default storage location
 
-    SpeedToPowerConverter converter;
+    SpeedToPowerConverterTest converter;
     converter.saveToEEPROM();
     
-    int valueRead = eeprom.readIntFromIndex( converterEEPROMStartIndex );
-    
+    int valueRead = eeprom.readIntFromIndex( converterEEPROMStartIndex );    
     
     TEST_ASSERT_EQUAL( 20, valueRead );
 }

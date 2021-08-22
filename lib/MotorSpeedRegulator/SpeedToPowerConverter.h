@@ -24,7 +24,7 @@ Matlab format:
 255 3903 26]
 */
 
-class SpeedToPowerConverter
+class SpeedToPowerConverterTest
 {
 
 public:
@@ -51,6 +51,17 @@ public:
     {                        
         int* speedVsPowerAddress = (int*)speedVsPower;
         EEPROMStorage::writeIntArrayToAddress( eepromStorageStartIndex, speedVsPowerAddress, tableLength*tableWidth );        
+    }
+
+    void printContent()
+    {
+        Log << "Power vs Speed: " << endl;
+        for ( int i = 0; i < tableLength; i++ ) {
+            for ( int j = 0; j < tableWidth; j++ ) {
+                Log << speedVsPower[j][i] << ", ";
+            }
+            Log << endl;
+        }
     }
     
     unsigned int doInterpolation(unsigned int x, unsigned int xList[], unsigned int yList[] )
@@ -108,6 +119,15 @@ public:
         speedVsPower[0][index] = power;
         speedVsPower[1][index] = speed;
     }
+};
+
+class SpeedToPowerConverterProduction: public SpeedToPowerConverterTest
+{
+    public:
+        SpeedToPowerConverterProduction() 
+        {
+            this->setEEPROMStartIndex( 0 );
+        }
 };
 
 #endif

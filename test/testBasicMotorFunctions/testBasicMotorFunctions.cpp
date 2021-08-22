@@ -37,7 +37,8 @@ void setup() {
     sched.add( &recurring10ms );     
 
 
-    UNITY_BEGIN();        
+    UNITY_BEGIN();                    
+    
     RUN_TEST(testWrapAroundLogic);  
     RUN_TEST(testPositiveSubtraction);    
     delay(500);
@@ -48,6 +49,9 @@ void setup() {
     RUN_TEST(testWrapAroundAndOffset); 
     delay(500);
     RUN_TEST(testSimpleMoveWithSpeed);  
+    delay(500);
+    RUN_TEST(testMoveWithPredictedSpeed);
+    
     /*
     delay(500);
     RUN_TEST(testSimpleMoveAtConstantSpeed7000);    

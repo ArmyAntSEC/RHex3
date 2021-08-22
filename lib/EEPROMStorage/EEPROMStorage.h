@@ -15,15 +15,14 @@ class EEPROMStorage
         }
 
         static void writeIntToIndex( int index, int value )
-        {            
+        {                      
             int address1 = convertIndexToFirstAddress(index);
             byte value1 = value & 0xFF;
             EEPROM.update(address1, value1 );
             
             int address2 = convertIndexToSecondAddress(index);
             byte value2 = (value >> 8) & 0xFF;
-            EEPROM.update(address2, value2 );
-
+            EEPROM.update(address2, value2 );            
         }
 
         static int readIntFromIndex( int index )
@@ -38,10 +37,10 @@ class EEPROMStorage
         }
 
         static void writeIntArrayToAddress( int index, int values[], int length )
-        {
+        {            
             for ( int i = 0; i < length; i++ ) {
                 EEPROMStorage::writeIntToIndex( index + i, values[i] );
-            }
+            }         
         }
 
         static void readIntArrayFromAddress( int index, int values[], int length )

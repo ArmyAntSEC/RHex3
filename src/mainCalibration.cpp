@@ -19,6 +19,7 @@ TaskScheduler sched;
 RecurringTaskGroup<16> recurring10ms(10);
 
 void measurePowerVsSpeedForOneLeg();
+void storeManuallyMeasuredValuesToEEPROM();
 
 void setup()
 {
@@ -42,15 +43,37 @@ void setup()
     recurring10ms.init(millis());
     sched.add(&recurring10ms);
 
-    measurePowerVsSpeedForOneLeg();
+    storeManuallyMeasuredValuesToEEPROM();
+    //measurePowerVsSpeedForOneLeg();        
 }
+
+void storeManuallyMeasuredValuesToEEPROM()
+{
+    //First chaeck what we have
+    SpeedToPowerConverterTest converter;
+    converter.setEEPROMStartIndex(0);
+    converter.initFromEEPROM();
+    converter.printContent();
+
+    const int tableLength = 7;
+    const int tableWidth = 2;
+    unsigned int eepromStorageStartIndex = 96; 
+    int rawData[tableWidth][tableLength] = {{32, 48, 64, 96, 128, 192, 255}, {485, 1117, 1672, 2409, 2892, 3469, 3903}};
+    
+    EEPROMStorage eeprom;
+    eeprom.writeIntArrayToAddress(eepromStorageStartIndex, (int*)rawData, tableWidth*tableLength ); 
+    
+    //Then check what we got.        
+    converter.initFromEEPROM();
+    converter.printContent();
+}   
 
 void measurePowerVsSpeedForOneLeg()
 {
     const int powerLen = 7;
     int power[] = {32, 48, 64, 96, 128, 192, 255};
 
-    SpeedToPowerConverter converter;
+    SpeedToPowerConverterTest converter;
     converter.setEEPROMStartIndex(0);
 
     for (int i = 0; i < powerLen; i++)
