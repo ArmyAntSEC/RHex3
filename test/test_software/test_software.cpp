@@ -18,6 +18,7 @@ void setup() {
     RUN_TEST(testGetPowerforFreeSpeedExtrapolate);
     RUN_TEST(testGetPowerforFreeSpeedOnStep);
     RUN_TEST(testGetPowerforFreeSpeedInterpolate);
+    RUN_TEST(testGetFreeSpeedForPowerInterpolate);
     
     //Interact betwen converter and EEPROM.
     RUN_TEST(testInitSpeedToPowerConverterFromEEPROM);

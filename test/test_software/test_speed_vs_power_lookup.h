@@ -24,9 +24,17 @@ void testGetPowerforFreeSpeedExtrapolate (void)
 void testGetPowerforFreeSpeedInterpolate (void) 
 {    
     SpeedToPowerConverter converter;
-    TEST_ASSERT_INT_WITHIN( 2, 30, converter.GetPowerForFreeSpeed(2000) );
-    TEST_ASSERT_INT_WITHIN( 2, 111, converter.GetPowerForFreeSpeed(6000) );    
+    TEST_ASSERT_INT_WITHIN( 1, 30, converter.GetPowerForFreeSpeed(2000) );
+    TEST_ASSERT_INT_WITHIN( 1, 111, converter.GetPowerForFreeSpeed(6000) );    
 }
+
+void testGetFreeSpeedForPowerInterpolate (void) 
+{    
+    SpeedToPowerConverter converter;
+    TEST_ASSERT_INT_WITHIN( 100, 2000, converter.GetFreeSpeedForPower(30) );
+    TEST_ASSERT_INT_WITHIN( 100, 6000, converter.GetFreeSpeedForPower(111) );    
+}
+
 
 void testInitSpeedToPowerConverterFromEEPROM()
 {

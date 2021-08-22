@@ -34,7 +34,7 @@ public:
         EEPROMStorage::writeIntArrayToAddress( eepromStorageStartIndex, speedVsPowerAddress, tableLength*tableWidth );        
     }
     
-    unsigned int doInterpolation(unsigned int x, unsigned int yList[], unsigned int xList[] )
+    unsigned int doInterpolation(unsigned int x, unsigned int xList[], unsigned int yList[] )
     {        
         //Check if we are out of range
         if (x <= xList[0])
@@ -75,7 +75,11 @@ public:
     }
 
     unsigned int GetPowerForFreeSpeed(unsigned int speed) {
-        return doInterpolation(speed, speedVsPower[0], speedVsPower[1] );
+        return doInterpolation(speed, speedVsPower[1], speedVsPower[0] );
+    }  
+
+    unsigned int GetFreeSpeedForPower(unsigned int power) {
+        return doInterpolation(power, speedVsPower[0], speedVsPower[1] );
     }  
 
     void setPowerAndSpeedPair( int index, int power, int speed )
