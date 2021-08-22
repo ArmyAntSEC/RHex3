@@ -55,20 +55,20 @@ void testPositiveSubtraction() {
 void testSimpleMove() {        
     
     unsigned long int timeToMove = 1000;  
-    unsigned long int startTime = millis();
-    unsigned long int endTime =  startTime + timeToMove;        
 
     //First spin up the motor
     driver.setMotorPWM(128);     
-    delay(timeToMove);
+    sched.delayWithScheduler(timeToMove);
             
     //Reset the position and then move at constant speed.
     encoder.forceHomed();  
-    delay(timeToMove);
+    sched.delayWithScheduler(timeToMove);
 
     long int endPos = encoder.getRawPos();                
-    long int endPosTarget = 2700; //Aproximately how far it should move in 1 second
-    TEST_ASSERT_INT_WITHIN( 300, endPosTarget, endPos );                             
+    int laps = encoder.getLaps();
+    long int totalPos = endPos + laps * encoder.clicksPerRevolution.getInteger();
+    long int endPosTarget = 3250; //Aproximately how far it should move in 1 second    
+    TEST_ASSERT_INT_WITHIN( 300, endPosTarget, totalPos );                             
 }
 
 void testSimpleHoming() {
@@ -86,12 +86,12 @@ void testSimpleHoming() {
                 TEST_ASSERT_LESS_THAN( 1796, endPos ); //Make sure we home within one rotation            
                 encoder.unHome(); //Then we unhome the encoder to keep moving
                 firstRound = false;    
-                Log << "First homing" << endl;        
+                //Log << "First homing" << endl;        
             } else {
                 driver.setMotorPWM(0);
                 unsigned long int endPos = encoder.getPosAtLastHome();
                 TEST_ASSERT_INT_WITHIN( 10, 1796, endPos ); //Make sure we have gone exactly 1 round            
-                Log << "Second homing" << endl;
+                //Log << "Second homing" << endl;
                 return;
             }
         }
@@ -118,32 +118,24 @@ void testWrapAroundAndOffset() {
 void testSimpleMoveWithSpeed() {        
 
     unsigned long int timeToMove = 1000;  
-    unsigned long int startTime = millis();
-    unsigned long int endTime =  startTime + timeToMove;        
 
     //First spin up the motor    
     driver.setMotorPWM(128);     
-    while ( millis() < endTime ) {
-        sched.run();
-    }
-    
+    sched.delayWithScheduler( timeToMove );
+
     //Measure the speed
-    int speed = encoder.getSpeedCPS();    
-    TEST_ASSERT_INT_WITHIN( 150, 2800, speed );                    
+    int speed = encoder.getSpeedCPSFiltered();    
+    TEST_ASSERT_INT_WITHIN( 150, 3252, speed );                    
 
     //Compute the distance to move
-    timeToMove = 1000;  
-    startTime = endTime; //We continue where we left off.
-    endTime =  startTime + timeToMove;        
-        
+    timeToMove = 1000;          
     encoder.forceHomed();    
     long int endPosTarget = (timeToMove*speed)/1000;
     int lapsTarget = endPosTarget / HomingEncoder::clicksPerRevolution.getInteger();  //Approximate.
     long int endPosTargetWrapped = endPosTarget % HomingEncoder::clicksPerRevolution.getInteger();  //Approximate.
     
-    while ( millis() < endTime ) {        
-        sched.run();
-    }    
+    sched.delayWithScheduler( timeToMove );
+
     long int endPos = encoder.getRawPos();            
     long int laps = encoder.getLaps();    
     TEST_ASSERT_INT_WITHIN( 100, endPosTargetWrapped, endPos );            
@@ -165,7 +157,7 @@ void testMoveWithPredictedSpeed()
 
 void doTestMoveWithPredictedSpeed( unsigned int power ) {        
 
-    unsigned long int motorSettlingTime = 500;      
+    unsigned long int motorSettlingTime = 1000;      
     
     SpeedToPowerConverterProduction converter;
     
@@ -180,7 +172,7 @@ void doTestMoveWithPredictedSpeed( unsigned int power ) {
     //Set the speed, settle and measure
     driver.setMotorPWM(power);     
     sched.delayWithScheduler( motorSettlingTime );        
-    int measuredSpeed = encoder.getSpeedCPS();        
+    int measuredSpeed = encoder.getSpeedCPSFiltered();      
     TEST_ASSERT_INT_WITHIN( 150, predictedSpeed, measuredSpeed );                    
 }
 #endif

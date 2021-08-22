@@ -145,8 +145,8 @@ public:
     state.last_position_timestamp_micros = nowU;
     state.speed_cps = speedCPS;
     state.speed_cps_filtered = 
-      state.speed_cps_filtered * (this->speedTimeConstant - 1) +
-      state.speed_cps;
+      ((state.speed_cps_filtered +
+      state.speed_cps/(this->speedTimeConstant - 1)) / this->speedTimeConstant) * (this->speedTimeConstant - 1);
         
     //Make sure that we handle any overflows.
     noInterrupts();

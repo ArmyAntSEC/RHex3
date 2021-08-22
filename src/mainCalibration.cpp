@@ -43,8 +43,8 @@ void setup()
     recurring10ms.init(millis());
     sched.add(&recurring10ms);
 
-    storeManuallyMeasuredValuesToEEPROM();
-    //measurePowerVsSpeedForOneLeg();        
+    //storeManuallyMeasuredValuesToEEPROM();
+    measurePowerVsSpeedForOneLeg();        
 }
 
 void storeManuallyMeasuredValuesToEEPROM()
@@ -77,35 +77,21 @@ void measurePowerVsSpeedForOneLeg()
     converter.setEEPROMStartIndex(0);
 
     for (int i = 0; i < powerLen; i++)
-    {
-        Log << "Power: " << power[i] << " Speed: ";
+    {        
+        //Spin up the motor
+        driver.setMotorPWM(255);
+        sched.delayWithScheduler(500);
 
-        long int speedSum = 0;
-        int maxSpeed = 0;
-        int minSpeed = 32767; //Max of a short int.
+        //Set the proper speed and let settle
+        driver.setMotorPWM(power[i]);
+        sched.delayWithScheduler(1000);
 
-        for (int j = 0; j < 5; j++)
-        {
-            //Spin up the motor
-            driver.setMotorPWM(255);
-            sched.delayWithScheduler(500);
-
-            //Set the proper speed and let settle
-            driver.setMotorPWM(power[i]);
-            sched.delayWithScheduler(500);
-
-            //Measure the speed
-            int speed = encoder.getSpeedCPS();
-            speedSum += speed;
-            maxSpeed = max( speed, maxSpeed );
-            minSpeed = min( speed, minSpeed );
-
-            Log << speed << ", ";            
-        }
-        Log << endl;
-        Log << "Average speed: " << speedSum / 5 << endl;
-        Log << "Speed Span: " << maxSpeed - minSpeed << endl;
-        converter.setPowerAndSpeedPair(i, power[i], speedSum / 5);
+        //Measure the speed
+        int speed = encoder.getSpeedCPSFiltered();
+        
+        converter.setPowerAndSpeedPair(i, power[i], speed);
+        
+        Log << "Power: " << power[i] << " Speed: " << speed << endl;            
     }
     converter.saveToEEPROM();
     driver.setMotorPWM(0);
