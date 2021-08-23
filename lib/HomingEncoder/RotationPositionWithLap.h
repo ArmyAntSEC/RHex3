@@ -17,6 +17,12 @@ public:
         this->reduceToMinimalFormWithRecursion();
     }
 
+    void incrementClicks( int clicks ) 
+    {
+        this->clickPosition += clicks;
+        this->reduceToMinimalFormWithRecursion();
+    }
+    
     void reduceToMinimalFormWithRecursion()
     {
         if ( this->clickPosition > this->clicksPerRotation.getInteger() )

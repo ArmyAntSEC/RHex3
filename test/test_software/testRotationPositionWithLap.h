@@ -40,10 +40,22 @@ void testConvertClicksToPrecisePosition2Laps()
     TEST_ASSERT_DOUBLE_WITHIN( 1e-4, 0.074667, (double)pos.getRemainder() );
 }
 
+void testIncrement()
+{
+
+    RotationPositionWithLap pos( 2000, 0 );        
+    pos.incrementClicks( 2200 );        
+    //4200 - 2*1795.9626665 = 608.074667
+    TEST_ASSERT_DOUBLE_WITHIN ( 1e-5, 608, (double)pos.getClickPosition()  );
+    TEST_ASSERT_EQUAL ( 2, pos.getLaps()  );
+    TEST_ASSERT_DOUBLE_WITHIN( 1e-4, 0.074667, (double)pos.getRemainder() );
+}
+
 void runAllTestsRotationPositionWithLap()
 {
     RUN_TEST( testSetAndReadPostion );
     RUN_TEST( testGetClicksPerRotation );
     RUN_TEST( testConvertClicksToPrecisePosition );
     RUN_TEST( testConvertClicksToPrecisePosition2Laps );
+    RUN_TEST( testIncrement );
 }
