@@ -9,6 +9,7 @@
 
 #include "testBasicMotorFunctions.h"
 
+
 void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {    
 
     unsigned long int timeToMove = 2000;  
@@ -97,46 +98,54 @@ void testRegulatorHardBreak()
 
 }
 
-void testSimpleMoveToAPositionAtTime() {    
-    unsigned long int timeToMove = 500;      
-    unsigned long int posToMoveTo = 1500;
+void runAllMotorRegulatorTests()
+{
         
-    regulator.init();    
-    unsigned long int endTime = millis() + timeToMove;
-    commander.init( endTime, posToMoveTo );  
+    RUN_TEST(testWrapAroundLogic);  
+    RUN_TEST(testPositiveSubtraction);    
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testSimpleMove);  
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testSimpleHoming);        
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testWrapAroundAndOffset); 
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testEncoderForStandingStill);
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testSimpleMoveWithSpeed);  
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testMoveWithPredictedSpeedPower32);
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testMoveWithPredictedSpeedPower64);
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testMoveWithPredictedSpeedPower128);
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testMoveWithPredictedSpeedPower255);
+    
+    sched.delayWithScheduler(500);    
+    RUN_TEST(testSimpleMoveAtConstantSpeed3500);    
+    
+    sched.delayWithScheduler(500);    
+    RUN_TEST(testSimpleMoveAtConstantSpeed2000);    
+    
+    sched.delayWithScheduler(500);    
+    RUN_TEST(testSimpleMoveAtConstantSpeed1000);    
+    
+    sched.delayWithScheduler(500);    
+    RUN_TEST(testSimpleMoveAtConstantSpeed500);    
 
-    
-    Log << millis() << " Goal pos: " << posToMoveTo << " at time " << endTime << endl;
-    boolean hasArrived = false;
-    while ( !hasArrived ) {
-        if ( commander.hasArrived() || millis() > endTime + 5000 ) {
-            unsigned long int pos = encoder.getPosComp();                
-            TEST_ASSERT_INT_WITHIN( 100, posToMoveTo, pos );
-            TEST_ASSERT_INT_WITHIN( 100, endTime, millis() );
-            hasArrived = true;
-        }
-        sched.run();
-    }
-    
-    //Now move almost one more complete round
-    timeToMove = 1000;
-    posToMoveTo = 1000;
-    endTime = millis() + timeToMove;
-    
-    commander.init( endTime, posToMoveTo );  
-    
-    Log << millis() << " Goal pos: " << posToMoveTo << " at time " << endTime << endl;
-    hasArrived = false;
-    while ( !hasArrived ) {
-        if ( commander.hasArrived() || millis() > endTime + 5000 ) {
-            unsigned long int pos = encoder.getPosComp();                
-            TEST_ASSERT_INT_WITHIN( 100, posToMoveTo, pos );
-            TEST_ASSERT_INT_WITHIN( 100, endTime, millis() );
-            hasArrived = true;
-        }
-        sched.run();
-    }    
-    TEST_ASSERT_TRUE( hasArrived );
+    sched.delayWithScheduler(500);    
+    RUN_TEST(testRegulatorHardBreak);    
 }
+
 
 #endif

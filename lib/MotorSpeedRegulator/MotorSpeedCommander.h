@@ -5,153 +5,133 @@
 #include <RecurringTaskBase.h>
 #include <SerialStream.h>
 
-class MotorSpeedCommander: public RecurringTaskBase
+class MotorSpeedCommander : public RecurringTaskBase
 {
-    private:
-        int posToMoveTo;
-        int lapsToMove;
-        long int maxSpeedToMove = 8000;       
-        unsigned long int timeToMove;        
-        unsigned long int timeToArrive;
-        boolean hasArrivedAtPos = false;
-        boolean onSameLapAsTarget = false;
-                        
-        HomingEncoder* encoder;
-        MotorDriver* driver;
-        
-        MotorSpeedRegulator* regulator;
+private:
+    int posToMoveTo;
+    int lapsToMove;
+    long int maxSpeedToMove = 3500;
+    unsigned long int timeToMove;
+    unsigned long int timeToArrive;
+    boolean hasArrivedAtPos = false;
+    boolean onSameLapAsTarget = false;
+
+    HomingEncoder *encoder;
+    MotorDriver *driver;
+
+    MotorSpeedRegulator *regulator;
+
+public:
+    int getMaxSpeed() { return this->maxSpeedToMove; }
     
-        int computeTargetSpeed( long int timeLeft, long int clicksLeft, int maxSpeed )
-        {
-            //Compute the speed to move
-            long int targetSpeed = 0;            
-            if ( timeLeft  < 1 ) {                
-                //If we are past due, move at max allowed speed
-                targetSpeed = maxSpeed; 
-            } else {
-                // Speed is in clicks/microsecond, time is in milliseconds.
-                targetSpeed = (1000*clicksLeft) / timeLeft; 
-            }            
-
-            if ( targetSpeed > this->maxSpeedToMove ) {
-                targetSpeed = this->maxSpeedToMove;
-            } else if ( targetSpeed <= 0 ) {
-                targetSpeed = 1; //If we have moved too far, just coast.
-            }
-            
-            return targetSpeed;
+    long int computeTargetSpeedTakingNegativeTimeIntoAccount( long int timeLeft, long int clicksLeft )
+    {
+        long int targetSpeed = (1000L * clicksLeft) / timeLeft;
+        if ( timeLeft < 0 ) {
+            targetSpeed = this->maxSpeedToMove;
         }
+        return targetSpeed;
+    }
+    
+    long int capTargetSpeed( long int targetSpeed )
+    {
+        if ( targetSpeed > this->maxSpeedToMove )
+        {            
+            targetSpeed = this->maxSpeedToMove;        
+        } else if ( targetSpeed <= 0 ) {
+            targetSpeed = 1; //If we are asked for a negative speed, we simply coast.
+        }
+        return targetSpeed;
+    }
 
-    public:        
-        virtual void init( unsigned long int _timeToMoveTo, 
-                            int _posToMoveTo )
-        {
-            RecurringTaskBase::init();            
-            this->timeToArrive =  _timeToMoveTo;            
-            this->posToMoveTo = _posToMoveTo;            
-            this->hasArrivedAtPos = false;
-            
-            long int pos = this->encoder->getPosComp();                        
-            if ( pos > this->posToMoveTo ) {
-                this->onSameLapAsTarget = false;
-            } else {
-                this->onSameLapAsTarget = true;
-            }
-
-            this->regulator->init();
-            this->regulator->doHardBreak();
-                        
-            /*
-            int newTargetSpeed = this->computeTargetSpeed( _timeToMoveTo - millis(),
-                HomingEncoder::positionPositiveDifference( _posToMoveTo, pos ), 
-                this->maxSpeedToMove );
-            Log << "Old setPoint: " << regulator->getSetPoint() << " New Setpoint: " << newTargetSpeed << endl;
-            if ( regulator->getSetPoint() > newTargetSpeed )
-            {            
-                this->regulator->doHardBreak();
-            } 
-            */           
-            
-        }   
+    int computeTargetSpeed(long int timeLeft, long int clicksLeft)
+    {        
+        long int targetSpeed = computeTargetSpeedTakingNegativeTimeIntoAccount( timeLeft, clicksLeft );
         
-        virtual void config(  HomingEncoder* _encoder, MotorDriver* _driver, 
-                            MotorSpeedRegulator* _regulator )
-        {                    
-            this->encoder = _encoder;
-            this->driver = _driver;
-            this->regulator = _regulator;                    
-        }
-
-        virtual void run( unsigned long int _now )
-        {                                    
-            //TODO: Rewrite this code. It is ugly as what.
-            long int pos = this->encoder->getPosComp();                        
-            if ( !this->onSameLapAsTarget && pos < this->posToMoveTo ) {
-                //Detect that we have now moved to be on the same lap as the target
-                this->onSameLapAsTarget = true; //We are now on the same lap as the target
-            }
-            long int clicksLeft = 0;
-            if ( !this->onSameLapAsTarget ) {                
-                clicksLeft = encoder->positionPositiveDifference( this->posToMoveTo, pos );
-            } else {
-                clicksLeft = this->posToMoveTo - pos;
-            }
-            //End the rewrite here.
-            
-            if ( clicksLeft < 0 ) {
-                clicksLeft = 0;
-                this->hasArrivedAtPos = true;
-            }
-            
-            long int targetSpeedClamped = this->computeTargetSpeed ( 
-                    this->timeToArrive - _now, clicksLeft, this->maxSpeedToMove );
-            /*
-            //Compute the speed to move
-            long int targetSpeed = 0;
-            long int timeLeft = this->timeToArrive - _now;
-            if ( timeLeft  < 1 ) {                
-                //If we are past due, move at max allowed speed
-                targetSpeed = this->maxSpeedToMove; 
-            } else {
-                // Speed is in clicks/microsecond, time is in milliseconds.
-                targetSpeed = (1000*clicksLeft) / timeLeft; 
-            }            
-            
-            long int targetSpeedClamped = targetSpeed;
-            if ( targetSpeedClamped > this->maxSpeedToMove ) {
-                targetSpeedClamped = this->maxSpeedToMove;
-            }
-            
-            if ( targetSpeedClampedNew != targetSpeedClamped ) {
-                Log << "New algo: " << targetSpeedClampedNew << " old algo: " << targetSpeedClamped << endl;
-            }
-            */
-            
-            //Log << millis() << " Pos: " << pos << ", " << clicksLeft << ", " << timeLeft << ", " << targetSpeedClamped << endl;
-
-            if ( this->hasArrivedAtPos ){
-                //this->regulator->stop();
-                //this->stop(); //Stop to avoid hogging resources                
-            } else {
-                this->regulator->setSetPoint( targetSpeedClamped );
-            }            
-                        
-        }
+        targetSpeed = capTargetSpeed( targetSpeed );
         
-        boolean hasArrived()
+        return targetSpeed;
+    }
+
+    virtual void init(unsigned long int _timeToMoveTo,
+                      int _posToMoveTo)
+    {
+        RecurringTaskBase::init();
+        this->timeToArrive = _timeToMoveTo;
+        this->posToMoveTo = _posToMoveTo;
+        this->hasArrivedAtPos = false;
+
+        long int pos = this->encoder->getPosComp();
+        if (pos > this->posToMoveTo)
         {
-            return this->hasArrivedAtPos;
+            this->onSameLapAsTarget = false;
+        }
+        else
+        {
+            this->onSameLapAsTarget = true;
         }
 
-        virtual void stop()
+        this->regulator->init();
+        this->regulator->doHardBreak();
+    }
+
+    virtual void config(HomingEncoder *_encoder, MotorDriver *_driver,
+                        MotorSpeedRegulator *_regulator)
+    {
+        this->encoder = _encoder;
+        this->driver = _driver;
+        this->regulator = _regulator;
+    }
+
+    virtual void run(unsigned long int _now)
+    {
+        //TODO: Rewrite this code. It is ugly as what.
+        long int pos = this->encoder->getPosComp();
+        if (!this->onSameLapAsTarget && pos < this->posToMoveTo)
         {
-            RecurringTaskBase::stop();
-            regulator->stop();
+            //Detect that we have now moved to be on the same lap as the target
+            this->onSameLapAsTarget = true; //We are now on the same lap as the target
+        }
+        long int clicksLeft = 0;
+        if (!this->onSameLapAsTarget)
+        {
+            clicksLeft = encoder->positionPositiveDifference(this->posToMoveTo, pos);
+        }
+        else
+        {
+            clicksLeft = this->posToMoveTo - pos;
+        }
+        //End the rewrite here.
+
+        if (clicksLeft < 0)
+        {
+            clicksLeft = 0;
+            this->hasArrivedAtPos = true;
         }
 
-        HomingEncoder* getEncoder()
+        long int targetSpeedClamped = this->computeTargetSpeed(
+            this->timeToArrive - _now, clicksLeft);
+
+        if (!this->hasArrivedAtPos)
         {
-            return this->encoder;
+            this->regulator->setSetPoint(targetSpeedClamped);
         }
+    }
+
+    boolean hasArrived()
+    {
+        return this->hasArrivedAtPos;
+    }
+
+    virtual void stop()
+    {
+        RecurringTaskBase::stop();
+        regulator->stop();
+    }
+
+    HomingEncoder *getEncoder()
+    {
+        return this->encoder;
+    }
 };
 #endif

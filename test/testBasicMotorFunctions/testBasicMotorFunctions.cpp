@@ -6,6 +6,7 @@
 #include "testBasicMotorFunctions.h"
 #include "testBasicMovement.h"
 #include "testMotorRegulator.h"
+#include "testMotorCommander.h"
 
 
 RecurringTaskGroup<16> recurring10ms( 10 );
@@ -35,57 +36,14 @@ void setup() {
     recurring10ms.add( &commander );
     recurring10ms.init( millis() );  
     sched.add( &recurring10ms );     
-
-
+        
     UNITY_BEGIN();                        
     
-    RUN_TEST(testWrapAroundLogic);  
-    RUN_TEST(testPositiveSubtraction);    
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testSimpleMove);  
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testSimpleHoming);        
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testWrapAroundAndOffset); 
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testEncoderForStandingStill);
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testSimpleMoveWithSpeed);  
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testMoveWithPredictedSpeedPower32);
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testMoveWithPredictedSpeedPower64);
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testMoveWithPredictedSpeedPower128);
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testMoveWithPredictedSpeedPower255);
-    
-    sched.delayWithScheduler(500);    
-    RUN_TEST(testSimpleMoveAtConstantSpeed3500);    
-    
-    sched.delayWithScheduler(500);    
-    RUN_TEST(testSimpleMoveAtConstantSpeed2000);    
-    
-    sched.delayWithScheduler(500);    
-    RUN_TEST(testSimpleMoveAtConstantSpeed1000);    
-    
-    sched.delayWithScheduler(500);    
-    RUN_TEST(testSimpleMoveAtConstantSpeed500);    
-    /*
-    RUN_TEST(testSimpleMoveToAPositionAtTime);
-    delay(500);    
-    RUN_TEST(testRegulatorHardBreak);
-    */
+    runAllMotorRegulatorTests();
+    runAllMotorCommanderTests();
+        
     UNITY_END();
+    
 }
 
 void loop() {
