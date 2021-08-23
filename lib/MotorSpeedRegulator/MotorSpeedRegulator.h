@@ -4,179 +4,165 @@
 #include "HomingEncoder.h"
 #include "MotorDriver.h"
 #include <RecurringTaskBase.h>
+#include <SpeedToPowerConverter.h>
 #include <SerialStream.h>
 
-class MotorSpeedRegulator: public RecurringTaskBase
+class MotorSpeedRegulator : public RecurringTaskBase
 {
-    private:        
-        float P = 0;
-        float D = 0;
-        float I = 0;
-        float filter = 0;
+private:
+    float proportionalTerm = 0;
+    float derivativeTerm = 0;
+    float integratorTerm = 0;
+    float filter = 0;
 
-        int Input = 0;
-        long int Output = 0;
-        long int OutputFiltered = 0;
-        int SetPoint = 0;
-        int lastInput = 0;
-        float ITerm = 0;
+    int input = 0;
+    long int output = 0;
+    int setPoint = 0;
+    int lastInput = 0;
+    float integratorCumulativeValue = 0;
 
-        int maxOutput = 255;
+    int maxOutput = 255;
 
-        bool isOn = false;
+    bool isOn = false;
 
-        boolean doHardBreak = false;
+    boolean hardBreakMode = false;
 
-        HomingEncoder* encoder;
-        MotorDriver* driver;        
+    HomingEncoder *encoder;
+    MotorDriver *driver;
+    SpeedToPowerConverterProduction *converter;
 
-        int clampOutput( int Output ) {
-            if ( Output > 255  ) Output = 255;
-            if ( Output < 0 ) Output = 1;      
-            return Output;
+public:
+    virtual void init()
+    {
+        RecurringTaskBase::init();
+        input = encoder->getSpeedCPS();
+        lastInput = input;
+        integratorCumulativeValue = clampOutput( driver->getMotorPWM() );
+    }
+
+    virtual void config(HomingEncoder *_encoder, MotorDriver *_driver,
+                        SpeedToPowerConverterProduction *_converter, float _P, float _D, float _I, float _filter)
+    {
+        this->encoder = _encoder;
+        this->driver = _driver;
+        this->converter = _converter;
+        this->proportionalTerm = _P;
+        this->derivativeTerm = _D;
+        this->integratorTerm = _I;
+        this->filter = _filter;
+    }
+
+    virtual void start()
+    {
+        RecurringTaskBase::start();
+        this->isOn = true;
+        this->lastInput = encoder->getSpeedCPS(); //No derivative kick on first iteration
+        this->integratorCumulativeValue = 0;
+    }
+
+    void stop()
+    {
+        RecurringTaskBase::stop();
+        this->isOn = false;
+        this->driver->setMotorPWM(0);
+    }
+
+    int clampOutput(int output)
+    {
+        if (output > maxOutput)
+            output = maxOutput;
+        if (output < 0)
+            output = 1;
+        return output;
+    }
+
+    int clampOutputForSpeed(int output, int speed)
+    {
+        if (output > maxOutput)
+        {
+            output = maxOutput;
         }
-
-        int clampOutputForSpeed( int Output, int speed ) {
-            if ( Output > 255  ) 
+        else
+        {
+            float powerMargin = 0.6;
+            int minOutput = converter->GetPowerForFreeSpeed(speed) * powerMargin;
+            if (output < minOutput)
             {
-                Output = 255;
-            } else {
-                int MinOutput = GetPowerForFreeSpeed( speed )*0.6; //We remove 10%
-                if ( Output < MinOutput ) {
-                    Output = MinOutput;
-                }
+                output = minOutput;
             }
-            return Output;
         }
+        return output;
+    }
 
-    public:
-        virtual void init()
+    void setSetPoint(int _setPoint)
+    {
+        this->setPoint = _setPoint;
+    }
+
+    int getSetPoint()
+    {
+        return this->setPoint;
+    }
+
+    void doHardBreak()
+    {
+        this->hardBreakMode = true;
+    }
+
+    void doCorePIDAlgorithmStepClampedForSpeed()
+    {
+        input = encoder->getSpeedCPSFiltered();
+
+        int errorTerm = setPoint - input;
+        integratorCumulativeValue += integratorTerm * errorTerm;
+        integratorCumulativeValue = this->clampOutputForSpeed(integratorCumulativeValue, setPoint);
+
+        int diffOfInput = input - lastInput;
+        lastInput = input;
+
+        output = clampOutputForSpeed(proportionalTerm * errorTerm + derivativeTerm * diffOfInput + integratorCumulativeValue, setPoint);
+    }
+
+    void handleHardBreak()
+    {
+        if (this->hardBreakMode)
         {
-            RecurringTaskBase::init();  
-            Input = encoder->getSpeedCPS();    
-            lastInput = Input;
-            ITerm = clampOutput(driver->getMotorPWM());
-        }
-
-        virtual void config( HomingEncoder* _encoder, MotorDriver* _driver, 
-            float _P, float _D, float _I, float _filter )
-        {                        
-            this->encoder = _encoder;
-            this->driver = _driver;
-            this->P = _P;
-            this->D = _D;
-            this->I = _I;
-            this->filter = _filter;                                    
-        }
-
-        virtual void start() 
-        {       
-            RecurringTaskBase::start();
-            this->isOn = true; 
-            this->lastInput = encoder->getSpeedCPS(); //No derivative kick on first iteration
-            this->ITerm = 0;
-        }
-        
-        void stop() 
-        {
-            RecurringTaskBase::stop();
-            this->isOn = false; 
-            this->driver->setMotorPWM(0); 
-        }
-
-        void setSetPoint( int _SetPoint )
-        {
-            this->SetPoint = _SetPoint;                        
-            //Log << "Set stepoint: " << _SetPoint << endl;
-        }
-
-        int getSetPoint()
-        {
-            return this->SetPoint;            
-        }
-
-        void hardBreak()
-        {
-            this->doHardBreak = true;
-        }
-
-        virtual void run( unsigned long int ) 
-        {         
-            if ( isOn ) {   
-                Input = encoder->getSpeedCPS();
-                int Error = SetPoint - Input;
-                ITerm += I * Error;
-                ITerm = this->clampOutputForSpeed( ITerm, SetPoint );
-
-                int dInput = Input - lastInput;
-                lastInput = Input;
-
-                Output = clampOutputForSpeed( P*Error + D*dInput + ITerm, SetPoint );
-
-                if ( this->doHardBreak) {
-                    if ( Input > this->SetPoint ) {
-                        //Log << "Doing hard break" << endl;                    
-                        ITerm = 0;
-                        Output = 0;
-                        lastInput = Input;
-                        OutputFiltered = 0;
-                    } else {
-                        this->doHardBreak = false;
-                        lastInput = Input;
-                        ITerm = this->GetPowerForFreeSpeed( Input ); 
-                    }
-                }
-
-                OutputFiltered = (Output + OutputFiltered*(filter-1))/filter;
-                driver->setMotorPWM(OutputFiltered);   
-                //Log << "Speed: " << Input << " Power: " << Output << " Error: " << Error << endl;
+            if (input > this->setPoint)
+            {
+                integratorCumulativeValue = 0;
+                output = 0;
+                lastInput = input;
             }
-            
+            else
+            {
+                this->hardBreakMode = false;
+                lastInput = input;
+                integratorCumulativeValue = this->converter->GetPowerForFreeSpeed(input);
+            }
         }
-
-        int getInput() { return this->Input; }
-        int getFilteredOutput() { return this->OutputFiltered; }       
-        
-        static unsigned int GetPowerForFreeSpeed( unsigned int speed )
+    }
+    virtual void run(unsigned long int)
+    {
+        if (isOn)
         {
+            doCorePIDAlgorithmStepClampedForSpeed();
 
-            static const unsigned int speedVsPower[7][2] = {{20, 789}, {24,1363}, {32,2145}, {48,3472}, {64,4507}, {128, 6509}, {255,7735}};    
-            
-            //Check if we are out of range
-            if ( speed <= speedVsPower[0][1] ) {
-                return speedVsPower[0][0];
-            } else if ( speed >= speedVsPower[6][1] ) {
-                return speedVsPower[6][0];
-            }
+            handleHardBreak();
 
-            int speedIdx = 0;    
-            while ( speedVsPower[speedIdx][1] < speed ) {
-                speedIdx++;
-            }
-                    
-            int speedLow = speedVsPower[speedIdx-1][1];
-            int speedHigh = speedVsPower[speedIdx][1];
-            SQ15x16 speedSpan = speedHigh - speedLow;
-            int powerLow = speedVsPower[speedIdx-1][0];
-            int powerHigh = speedVsPower[speedIdx][0];
-            SQ15x16 powerSpan = powerHigh - powerLow;
-                
-            SQ15x16 speedRem = speed - speedLow;
-            SQ15x16 factor = powerSpan / speedSpan;
-            SQ15x16 powerRem = speedRem * factor;
-
-            int power = roundFixed(powerRem).getInteger() + powerLow;
-            /*
-            Log << "Interpolating to: " << speed << endl;
-            Log << speedLow << ", " << speedHigh << ", " << powerLow << ", " << powerHigh << endl;
-            Log << speedSpan.getInteger() << ", " << powerSpan.getInteger() << endl;
-            Log << (double)speedRem << ", " << (double)factor << ", " << (double)powerRem << endl; 
-            Log << power << endl;
-            */
-        
-            return power;
+            driver->setMotorPWM(output);
         }
+    }
 
+    int getInput()
+    {
+        return this->input;
+    }
+
+    int getOutput()
+    {
+
+        return this->output;
+    }
 };
 
 #endif

@@ -5,6 +5,8 @@
 void testGetPowerforFreeSpeedOnStep (void) 
 {
     SpeedToPowerConverterTest converter;
+    //Power 0 == Speed 0, or else the logic is broken. So make this test pass.
+    //TEST_ASSERT_EQUAL( 0, converter.GetPowerForFreeSpeed(0) );    
     TEST_ASSERT_EQUAL( 20, converter.GetPowerForFreeSpeed(780) );
     TEST_ASSERT_EQUAL( 24, converter.GetPowerForFreeSpeed(1363) );
     TEST_ASSERT_EQUAL( 32, converter.GetPowerForFreeSpeed(2145) );

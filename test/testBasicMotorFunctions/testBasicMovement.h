@@ -144,14 +144,24 @@ void testSimpleMoveWithSpeed() {
 
 void doTestMoveWithPredictedSpeed( unsigned int power );
 
-void testMoveWithPredictedSpeed()
+void testMoveWithPredictedSpeedPower32()
 {
-    const int powerLength = 4;
-    unsigned int powers[powerLength] = {32, 64, 128, 255};
+    doTestMoveWithPredictedSpeed(32);
+}
 
-    for ( int i = 0; i < powerLength; i++ ) {
-        doTestMoveWithPredictedSpeed( powers[i] );
-    }
+void testMoveWithPredictedSpeedPower64()
+{
+    doTestMoveWithPredictedSpeed(64);
+}
+
+void testMoveWithPredictedSpeedPower128()
+{
+    doTestMoveWithPredictedSpeed(128);
+}
+
+void testMoveWithPredictedSpeedPower255()
+{
+    doTestMoveWithPredictedSpeed(255);
 }
 
 

@@ -49,7 +49,13 @@ void setup() {
     delay(500);
     RUN_TEST(testSimpleMoveWithSpeed);  
     delay(500);    
-    RUN_TEST(testMoveWithPredictedSpeed);
+    RUN_TEST(testMoveWithPredictedSpeedPower32);
+    delay(500);    
+    RUN_TEST(testMoveWithPredictedSpeedPower64);
+    delay(500);    
+    RUN_TEST(testMoveWithPredictedSpeedPower128);
+    delay(500);    
+    RUN_TEST(testMoveWithPredictedSpeedPower255);
     
     /*
     delay(500);

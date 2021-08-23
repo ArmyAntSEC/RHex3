@@ -59,16 +59,16 @@ class MotorSpeedCommander: public RecurringTaskBase
             }
 
             this->regulator->init();
-            this->regulator->hardBreak();
+            this->regulator->doHardBreak();
                         
             /*
             int newTargetSpeed = this->computeTargetSpeed( _timeToMoveTo - millis(),
                 HomingEncoder::positionPositiveDifference( _posToMoveTo, pos ), 
                 this->maxSpeedToMove );
-            Log << "Old SetPoint: " << regulator->getSetPoint() << " New Setpoint: " << newTargetSpeed << endl;
+            Log << "Old setPoint: " << regulator->getSetPoint() << " New Setpoint: " << newTargetSpeed << endl;
             if ( regulator->getSetPoint() > newTargetSpeed )
             {            
-                this->regulator->hardBreak();
+                this->regulator->doHardBreak();
             } 
             */           
             

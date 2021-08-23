@@ -87,7 +87,7 @@ void testRegulatorHardBreak()
     TEST_ASSERT_GREATER_THAN_INT( 0.9*speedToMoveAt, encoder.getSpeedCPS() );            
 
     regulator.setSetPoint( speedToMoveAt/2 );
-    regulator.hardBreak();
+    regulator.doHardBreak();
     
     endTime = millis() + timeToSettle;
     while ( millis() < endTime ) {
