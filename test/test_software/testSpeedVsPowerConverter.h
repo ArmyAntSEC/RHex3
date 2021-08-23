@@ -64,3 +64,16 @@ void testSaveSpeedToPowerConverterToEEPROM()
     
     TEST_ASSERT_EQUAL( 0, valueRead );
 }
+
+void runAllTestsSpeedVsPowerConverter()
+{
+    //Speed vs Power conversions    
+    RUN_TEST(testGetPowerforFreeSpeedExtrapolate);    
+    RUN_TEST(testGetPowerforFreeSpeedOnStep);    
+    RUN_TEST(testGetPowerforFreeSpeedInterpolate);    
+    RUN_TEST(testGetFreeSpeedForPowerInterpolate);
+    
+    //Interact betwen converter and EEPROM.    
+    RUN_TEST(testInitSpeedToPowerConverterFromEEPROM);    
+    RUN_TEST(testSaveSpeedToPowerConverterToEEPROM);    
+}

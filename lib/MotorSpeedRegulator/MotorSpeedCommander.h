@@ -53,11 +53,11 @@ public:
         return targetSpeed;
     }
 
-    virtual void init(unsigned long int _timeToMoveTo,
+    virtual void init(unsigned long int _timeToArrive,
                       int _posToMoveTo)
     {
         RecurringTaskBase::init();
-        this->timeToArrive = _timeToMoveTo;
+        this->timeToArrive = _timeToArrive;
         this->posToMoveTo = _posToMoveTo;
         this->hasArrivedAtPos = false;
 

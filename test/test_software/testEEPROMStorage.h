@@ -39,3 +39,9 @@ void testReadAndWriteArray()
     TEST_ASSERT_EQUAL ( testValue2[1], testValueRead[1] );
 }
 
+void runAllEEPROMStorageTests()
+{
+    //EEPROM Storage    
+    RUN_TEST(testWriteAndReadEEPROM);    
+    RUN_TEST(testReadAndWriteArray);    
+}
