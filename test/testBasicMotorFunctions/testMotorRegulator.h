@@ -56,12 +56,8 @@ void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {
 
 }
 
-void testSimpleMoveAtConstantSpeed7000() {
-    testSimpleMoveAtConstantSpeed(7000);  
-}
-
-void testSimpleMoveAtConstantSpeed4000() {
-    testSimpleMoveAtConstantSpeed(4000);  
+void testSimpleMoveAtConstantSpeed3500() {
+    testSimpleMoveAtConstantSpeed(3500);  
 }
 
 void testSimpleMoveAtConstantSpeed2000() {
@@ -72,10 +68,14 @@ void testSimpleMoveAtConstantSpeed1000() {
     testSimpleMoveAtConstantSpeed(1000);  
 }
 
+void testSimpleMoveAtConstantSpeed500() {
+    testSimpleMoveAtConstantSpeed(500);  
+}
+
 void testRegulatorHardBreak()
 {
     unsigned long int timeToSettle = 100;      
-    int speedToMoveAt = 6000;
+    int speedToMoveAt = 3000;
     
     regulator.setSetPoint( speedToMoveAt );
     regulator.init();                
@@ -99,7 +99,7 @@ void testRegulatorHardBreak()
 
 void testSimpleMoveToAPositionAtTime() {    
     unsigned long int timeToMove = 500;      
-    unsigned long int posToMoveTo = 2500;
+    unsigned long int posToMoveTo = 1500;
         
     regulator.init();    
     unsigned long int endTime = millis() + timeToMove;
@@ -120,7 +120,7 @@ void testSimpleMoveToAPositionAtTime() {
     
     //Now move almost one more complete round
     timeToMove = 1000;
-    posToMoveTo = 2000;
+    posToMoveTo = 1000;
     endTime = millis() + timeToMove;
     
     commander.init( endTime, posToMoveTo );  

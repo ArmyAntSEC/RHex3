@@ -69,16 +69,18 @@ void setup() {
     sched.delayWithScheduler(500);
     RUN_TEST(testMoveWithPredictedSpeedPower255);
     
-    /*
-    delay(500);
-    RUN_TEST(testSimpleMoveAtConstantSpeed7000);    
-    delay(500);    
-    RUN_TEST(testSimpleMoveAtConstantSpeed4000);
-    delay(500);
-    RUN_TEST(testSimpleMoveAtConstantSpeed2000);
-    delay(500);    
+    sched.delayWithScheduler(500);    
+    RUN_TEST(testSimpleMoveAtConstantSpeed3500);    
+    
+    sched.delayWithScheduler(500);    
+    RUN_TEST(testSimpleMoveAtConstantSpeed2000);    
+    
+    sched.delayWithScheduler(500);    
     RUN_TEST(testSimpleMoveAtConstantSpeed1000);    
-    delay(500);         
+    
+    sched.delayWithScheduler(500);    
+    RUN_TEST(testSimpleMoveAtConstantSpeed500);    
+    /*
     RUN_TEST(testSimpleMoveToAPositionAtTime);
     delay(500);    
     RUN_TEST(testRegulatorHardBreak);
