@@ -6,7 +6,7 @@ void testGetPowerforFreeSpeedOnStep (void)
 {
     SpeedToPowerConverterTest converter;
     //Power 0 == Speed 0, or else the logic is broken. So make this test pass.
-    //TEST_ASSERT_EQUAL( 0, converter.GetPowerForFreeSpeed(0) );    
+    TEST_ASSERT_EQUAL( 0, converter.GetPowerForFreeSpeed(0) );    
     TEST_ASSERT_EQUAL( 20, converter.GetPowerForFreeSpeed(780) );
     TEST_ASSERT_EQUAL( 24, converter.GetPowerForFreeSpeed(1363) );
     TEST_ASSERT_EQUAL( 32, converter.GetPowerForFreeSpeed(2145) );
@@ -19,7 +19,7 @@ void testGetPowerforFreeSpeedOnStep (void)
 void testGetPowerforFreeSpeedExtrapolate (void) 
 {
     SpeedToPowerConverterTest converter;
-    TEST_ASSERT_EQUAL( 20, converter.GetPowerForFreeSpeed(600) );
+    //The standard dataset foes to 0 so extrapolation downwards isn't possible.    
     TEST_ASSERT_EQUAL( 255, converter.GetPowerForFreeSpeed(8000) );
 }
 
@@ -42,7 +42,7 @@ void testInitSpeedToPowerConverterFromEEPROM()
 {
 
     SpeedToPowerConverterTest converter;
-    TEST_ASSERT_EQUAL( 20, converter.speedVsPower[0][0] );
+    TEST_ASSERT_EQUAL( 0, converter.speedVsPower[0][0] );
     
     EEPROMStorage eeprom;
     eeprom.writeIntToIndex( 96, 56 ); //Overwrite the first value of the default storage location
@@ -62,5 +62,5 @@ void testSaveSpeedToPowerConverterToEEPROM()
     
     int valueRead = eeprom.readIntFromIndex( converterEEPROMStartIndex );    
     
-    TEST_ASSERT_EQUAL( 20, valueRead );
+    TEST_ASSERT_EQUAL( 0, valueRead );
 }

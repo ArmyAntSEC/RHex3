@@ -19,13 +19,13 @@ class SpeedToPowerConverterTest
 {
 
 public:
-    static const int tableLength = 7;
+    static const int tableLength = 8;
     static const int tableWidth = 2;
     
     //We default to the end of the EEPROM which we use for testing to not accidentally
     //overwrite the measured values at the start of the EEPROM array.
     unsigned int eepromStorageStartIndex = 96; 
-    unsigned int speedVsPower[tableWidth][tableLength] = {{20, 24, 32, 48, 64, 128, 255}, {789, 1363, 2145, 3472, 4507, 6509, 7735}};
+    unsigned int speedVsPower[tableWidth][tableLength] = {{0, 20, 24, 32, 48, 64, 128, 255}, {0, 789, 1363, 2145, 3472, 4507, 6509, 7735}};
 
     void setEEPROMStartIndex( int startIndex )
     {
@@ -62,9 +62,9 @@ public:
         {
             return yList[0];
         }
-        else if (x >= xList[6])
+        else if (x >= xList[tableLength-1])
         {
-            return yList[6];
+            return yList[tableLength-1];
         }
 
         int xIdx = 0;
