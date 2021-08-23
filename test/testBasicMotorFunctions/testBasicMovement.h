@@ -49,6 +49,7 @@ void testWrapAroundLogic() {
 
 void testPositiveSubtraction() {
     TEST_ASSERT_EQUAL( 10, encoder.positionPositiveDifference( 10, 0 ) );
+    TEST_ASSERT_EQUAL( 0, encoder.positionPositiveDifference( 10, 10 ) );
     TEST_ASSERT_EQUAL( 1795-10, encoder.positionPositiveDifference( 0, 10 ) );
 }
 
@@ -101,19 +102,34 @@ void testSimpleHoming() {
 }
 
 void testWrapAroundAndOffset() {
-    unsigned long int maxTimeToMove = 1500;  
-    unsigned int startTime = millis();
-    unsigned long int endTime = startTime + maxTimeToMove;        
+    unsigned long int timeToMove = 1500;  
 
     driver.setMotorPWM(128);    
         
-    while ( millis() < endTime ) {                
-        sched.run();
-    }    
+    sched.delayWithScheduler( timeToMove );
+
     TEST_ASSERT_LESS_THAN( 3593, encoder.getPosComp() );    
     TEST_ASSERT_EQUAL( 2, encoder.getLaps() );    
 }
 
+void testEncoderForStandingStill()
+{
+    unsigned long int timeToMove = 1500;  
+    driver.setMotorPWM(0);            
+    sched.delayWithScheduler( timeToMove );    
+    
+    //Log << "Last pos: " << encoder.state.last_position << endl;
+    //Log << "Last time: " << encoder.state.last_position_timestamp_micros << endl;
+    sched.delayWithScheduler( 10 );    
+
+    int speed = encoder.getSpeedCPS();    
+    
+    //Log << "This pos: " << encoder.state.last_position << endl;
+    //Log << "This time: " << encoder.state.last_position_timestamp_micros << endl;
+
+    int speedFiltered = encoder.getSpeedCPSFiltered();    
+    TEST_ASSERT_INT_WITHIN( 10, 0, speedFiltered );                    
+}
 
 void testSimpleMoveWithSpeed() {        
 

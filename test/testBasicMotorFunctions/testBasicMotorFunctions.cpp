@@ -38,23 +38,35 @@ void setup() {
 
 
     UNITY_BEGIN();                        
+    
     RUN_TEST(testWrapAroundLogic);  
     RUN_TEST(testPositiveSubtraction);    
-    delay(500);
+    
+    sched.delayWithScheduler(500);
     RUN_TEST(testSimpleMove);  
-    delay(500);    
+    
+    sched.delayWithScheduler(500);
     RUN_TEST(testSimpleHoming);        
-    delay(500);
+    
+    sched.delayWithScheduler(500);
     RUN_TEST(testWrapAroundAndOffset); 
-    delay(500);
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testEncoderForStandingStill);
+    
+    sched.delayWithScheduler(500);
     RUN_TEST(testSimpleMoveWithSpeed);  
-    delay(500);    
+    
+    sched.delayWithScheduler(500);
     RUN_TEST(testMoveWithPredictedSpeedPower32);
-    delay(500);    
+    
+    sched.delayWithScheduler(500);
     RUN_TEST(testMoveWithPredictedSpeedPower64);
-    delay(500);    
+    
+    sched.delayWithScheduler(500);
     RUN_TEST(testMoveWithPredictedSpeedPower128);
-    delay(500);    
+    
+    sched.delayWithScheduler(500);
     RUN_TEST(testMoveWithPredictedSpeedPower255);
     
     /*

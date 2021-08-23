@@ -70,8 +70,8 @@ void storeManuallyMeasuredValuesToEEPROM()
 
 void measurePowerVsSpeedForOneLeg()
 {
-    const int powerLen = 7;
-    int power[] = {32, 48, 64, 96, 128, 192, 255};
+    const int powerLen = 8;
+    int power[powerLen] = {0, 32, 48, 64, 96, 128, 192, 255};
 
     SpeedToPowerConverterTest converter;
     converter.setEEPROMStartIndex(0);
@@ -87,7 +87,7 @@ void measurePowerVsSpeedForOneLeg()
         sched.delayWithScheduler(1000);
 
         //Measure the speed
-        int speed = encoder.getSpeedCPSFiltered();
+        int speed = encoder.getSpeedCPS(); //Filtered();
         
         converter.setPowerAndSpeedPair(i, power[i], speed);
         

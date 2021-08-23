@@ -139,8 +139,8 @@ public:
     } else {            
       //First pre-scale by 100, then divide, then scale by 10k for a total of 1e6.
       speedCPS = 10000*((100*posDelta)/timeDelta);
-    }    
-        
+    }
+    
     state.last_position = thisPos;
     state.last_position_timestamp_micros = nowU;
     state.speed_cps = speedCPS;
@@ -304,7 +304,7 @@ public:
 
     static long int positionPositiveDifference( long int pos1, long int pos2 )
     {
-      if ( pos1 > pos2 )
+      if ( pos1 >= pos2 )
         return pos1 - pos2;
       else
         return HomingEncoder::clicksPerRevolution.getInteger() + pos1 - pos2;
