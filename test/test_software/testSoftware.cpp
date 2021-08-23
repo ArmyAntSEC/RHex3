@@ -13,7 +13,7 @@ void setup() {
     UNITY_BEGIN();    
     runAllEEPROMStorageTests();
     runAllTestsSpeedVsPowerConverter();
-
+    runAllTestsRotationPositionWithLap();
     
     
     UNITY_END();
