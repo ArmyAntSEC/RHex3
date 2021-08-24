@@ -59,6 +59,16 @@ public:
     {
         return this->clicksPerRotation;
     }
+
+    int getShortestPositiveDifferenceInt( RotationPositionWithLap* pos2 )
+    {
+        long clicksDifference = this->getClickPosition() - pos2->getClickPosition();
+        if ( clicksDifference < 0 ) {                    
+            clicksDifference +=  this->getClicksPerRotation().getInteger();
+        }
+
+        return  clicksDifference; // + clicksDifferenceFromLaps;
+    }
 };
 
 #endif

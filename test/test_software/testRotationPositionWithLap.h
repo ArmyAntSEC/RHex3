@@ -1,4 +1,6 @@
 #include <RotationPositionWithLap.h>
+#include <unity.h>
+#include <LevelLogger.h>
 
 void testSetAndReadPostion()
 {
@@ -51,11 +53,36 @@ void testIncrement()
     TEST_ASSERT_DOUBLE_WITHIN( 1e-4, 0.074667, (double)pos.getRemainder() );
 }
 
-void runAllTestsRotationPositionWithLap()
+void testPositiveDifferenceSimpleOnSameLap()
 {
+    RotationPositionWithLap pos1( 2500, 0 );        
+    RotationPositionWithLap pos2( 2000, 0 );            
+    TEST_ASSERT_EQUAL( 500, pos1.getShortestPositiveDifferenceInt( &pos2 ) );
+}
+
+void testPositiveDifferenceSimpleTenLapDifference()
+{    
+    RotationPositionWithLap pos1( 2500, 10 );        
+    RotationPositionWithLap pos2( 2000, 0 );            
+    TEST_ASSERT_EQUAL( 500, 
+        pos1.getShortestPositiveDifferenceInt( &pos2 ) );
+}
+
+void testPositiveDifferenceReverseOnSameLap()
+{ 
+    RotationPositionWithLap pos1( 2000, 0 );        
+    RotationPositionWithLap pos2( 2500, 0 );   
+    TEST_ASSERT_EQUAL( pos1.getClicksPerRotation().getInteger() - 500, pos1.getShortestPositiveDifferenceInt( &pos2 ) );
+}
+
+void runAllTestsRotationPositionWithLap()
+{        
     RUN_TEST( testSetAndReadPostion );
     RUN_TEST( testGetClicksPerRotation );
     RUN_TEST( testConvertClicksToPrecisePosition );
     RUN_TEST( testConvertClicksToPrecisePosition2Laps );
     RUN_TEST( testIncrement );
+    RUN_TEST( testPositiveDifferenceSimpleOnSameLap);    
+    RUN_TEST( testPositiveDifferenceSimpleTenLapDifference );
+    RUN_TEST( testPositiveDifferenceReverseOnSameLap );
 }
