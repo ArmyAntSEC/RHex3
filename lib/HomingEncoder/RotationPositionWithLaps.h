@@ -3,16 +3,24 @@
 
 #include <FixedPointsCommon.h>
 
-class RotationPositionWithLap
+class RotationPositionWithLaps
 {
 private:
     int clickPosition;
     long int laps;
-    SQ15x16 clicksPerRotation = 1795.9626665;
-    SQ1x14 remainder = 0;
+    SQ1x14 remainder;
+
+    static SQ15x16 clicksPerRotation;
+    
 
 public:
-    RotationPositionWithLap(int _clickPosition, long int _laps) : clickPosition(_clickPosition), laps(_laps)
+    RotationPositionWithLaps(int _clickPosition, long int _laps) : clickPosition(_clickPosition), laps(_laps)
+    {    
+        this->reduceToMinimalFormWithRecursion();
+    }
+
+    RotationPositionWithLaps(int _clickPosition, long int _laps, SQ1x14 _remainder) : 
+        clickPosition(_clickPosition), laps(_laps), remainder(_remainder)
     {    
         this->reduceToMinimalFormWithRecursion();
     }
@@ -60,14 +68,29 @@ public:
         return this->clicksPerRotation;
     }
 
-    int getShortestPositiveDifferenceInt( RotationPositionWithLap* pos2 )
+    int getShortestPositiveDifferenceInt( RotationPositionWithLaps* pos2 )
     {
         long clicksDifference = this->getClickPosition() - pos2->getClickPosition();
         if ( clicksDifference < 0 ) {                    
             clicksDifference +=  this->getClicksPerRotation().getInteger();
         }
 
-        return  clicksDifference; // + clicksDifferenceFromLaps;
+        return  clicksDifference;
+    }
+
+    bool operator ==(const RotationPositionWithLaps &_pos2) const
+    {
+        RotationPositionWithLaps pos1(*this);
+        RotationPositionWithLaps pos2(_pos2);
+
+        pos1.reduceToMinimalFormWithRecursion();
+        pos2.reduceToMinimalFormWithRecursion();
+
+        bool clicksEqual = pos1.getClickPosition() == pos2.getClickPosition();
+        bool lapsEqual = pos1.getLaps() == pos2.getLaps();
+        bool remaindersEqual = pos1.getRemainder() == pos2.getRemainder();
+
+        return clicksEqual && lapsEqual && remaindersEqual;
     }
 };
 

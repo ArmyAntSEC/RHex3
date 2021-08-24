@@ -1,4 +1,4 @@
-#include <RotationPositionWithLap.h>
+#include <RotationPositionWithLaps.h>
 #include <unity.h>
 #include <LevelLogger.h>
 
@@ -6,7 +6,7 @@ void testSetAndReadPostion()
 {
     int clickPosition = 234;
     int laps = 3;
-    RotationPositionWithLap pos( clickPosition, laps );
+    RotationPositionWithLaps pos( clickPosition, laps );
 
     TEST_ASSERT_EQUAL( clickPosition, pos.getClickPosition() );
     TEST_ASSERT_EQUAL( laps, pos.getLaps() );
@@ -16,7 +16,7 @@ void testSetAndReadPostion()
 void testGetClicksPerRotation()
 {
 
-    RotationPositionWithLap pos( 0, 0 );    
+    RotationPositionWithLaps pos( 0, 0 );    
     SQ15x16 clicksPerRotation = pos.getClicksPerRotation();
     
     TEST_ASSERT_DOUBLE_WITHIN ( 1e-5, 1795.9626665, (double)clicksPerRotation  );
@@ -25,7 +25,7 @@ void testGetClicksPerRotation()
 void testConvertClicksToPrecisePosition()
 {
 
-    RotationPositionWithLap pos( 3156, 0 );        
+    RotationPositionWithLaps pos( 3156, 0 );        
     
     TEST_ASSERT_DOUBLE_WITHIN ( 1e-5, 3156 - 1796, (double)pos.getClickPosition()  );
     TEST_ASSERT_EQUAL ( 1, pos.getLaps()  );
@@ -35,7 +35,7 @@ void testConvertClicksToPrecisePosition()
 void testConvertClicksToPrecisePosition2Laps()
 {
 
-    RotationPositionWithLap pos( 4200, 0 );        
+    RotationPositionWithLaps pos( 4200, 0 );        
     //4200 - 2*1795.9626665 = 608.074667
     TEST_ASSERT_DOUBLE_WITHIN ( 1e-5, 608, (double)pos.getClickPosition()  );
     TEST_ASSERT_EQUAL ( 2, pos.getLaps()  );
@@ -45,7 +45,7 @@ void testConvertClicksToPrecisePosition2Laps()
 void testIncrement()
 {
 
-    RotationPositionWithLap pos( 2000, 0 );        
+    RotationPositionWithLaps pos( 2000, 0 );        
     pos.incrementClicks( 2200 );        
     //4200 - 2*1795.9626665 = 608.074667
     TEST_ASSERT_DOUBLE_WITHIN ( 1e-5, 608, (double)pos.getClickPosition()  );
@@ -55,24 +55,63 @@ void testIncrement()
 
 void testPositiveDifferenceSimpleOnSameLap()
 {
-    RotationPositionWithLap pos1( 2500, 0 );        
-    RotationPositionWithLap pos2( 2000, 0 );            
+    RotationPositionWithLaps pos1( 2500, 0 );        
+    RotationPositionWithLaps pos2( 2000, 0 );            
     TEST_ASSERT_EQUAL( 500, pos1.getShortestPositiveDifferenceInt( &pos2 ) );
 }
 
 void testPositiveDifferenceSimpleTenLapDifference()
 {    
-    RotationPositionWithLap pos1( 2500, 10 );        
-    RotationPositionWithLap pos2( 2000, 0 );            
+    RotationPositionWithLaps pos1( 2500, 10 );        
+    RotationPositionWithLaps pos2( 2000, 0 );            
     TEST_ASSERT_EQUAL( 500, 
         pos1.getShortestPositiveDifferenceInt( &pos2 ) );
 }
 
 void testPositiveDifferenceReverseOnSameLap()
 { 
-    RotationPositionWithLap pos1( 2000, 0 );        
-    RotationPositionWithLap pos2( 2500, 0 );   
+    RotationPositionWithLaps pos1( 2000, 0 );        
+    RotationPositionWithLaps pos2( 2500, 0 );   
     TEST_ASSERT_EQUAL( pos1.getClicksPerRotation().getInteger() - 500, pos1.getShortestPositiveDifferenceInt( &pos2 ) );
+}
+
+void testMakeCopy()
+{ 
+    //Test the implicit copy constructor
+    RotationPositionWithLaps pos1( 2000, 2 );
+    RotationPositionWithLaps pos2( pos1 );   
+    TEST_ASSERT_EQUAL( pos1.getClickPosition(), pos2.getClickPosition() );
+    TEST_ASSERT_EQUAL( pos1.getLaps(), pos2.getLaps() );
+    TEST_ASSERT_TRUE( pos1.getRemainder() == pos2.getRemainder() );
+}
+
+void testCompareEquals()
+{ 
+    //Test the implicit copy constructor
+    RotationPositionWithLaps pos1( 2000, 2 );
+    RotationPositionWithLaps pos2( pos1 );   
+    TEST_ASSERT_TRUE( pos1 == pos2 );
+}
+
+void testCompareDiffInRemainder()
+{
+    RotationPositionWithLaps pos1( 1000, 2, 0 );
+    RotationPositionWithLaps pos2( 1000, 2, 0.5 );   
+    TEST_ASSERT_FALSE( pos1 == pos2 );
+}
+
+void testCompareDiffInLaps()
+{
+    RotationPositionWithLaps pos1( 1000, 2, 0 );
+    RotationPositionWithLaps pos2( 1000, 3, 0 );   
+    TEST_ASSERT_FALSE( pos1 == pos2 );
+}
+
+void testCompareDiffInClicks()
+{
+    RotationPositionWithLaps pos1( 1200, 2, 0 );
+    RotationPositionWithLaps pos2( 1000, 2, 0 );   
+    TEST_ASSERT_FALSE( pos1 == pos2 );
 }
 
 void runAllTestsRotationPositionWithLap()
@@ -85,4 +124,9 @@ void runAllTestsRotationPositionWithLap()
     RUN_TEST( testPositiveDifferenceSimpleOnSameLap);    
     RUN_TEST( testPositiveDifferenceSimpleTenLapDifference );
     RUN_TEST( testPositiveDifferenceReverseOnSameLap );
+    RUN_TEST( testMakeCopy );
+    RUN_TEST( testCompareEquals );
+    RUN_TEST( testCompareDiffInRemainder );
+    RUN_TEST( testCompareDiffInLaps );
+    RUN_TEST( testCompareDiffInClicks );
 }

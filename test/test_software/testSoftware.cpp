@@ -1,7 +1,7 @@
 #include <unity.h>
 
 #include "testSpeedVsPowerConverter.h"
-#include "testRotationPositionWithLap.h"
+#include "testRotationPositionWithLaps.h"
 #include "testEEPROMStorage.h"
 
 void setup() {
