@@ -39,6 +39,7 @@ void setup() {
         
     UNITY_BEGIN();                        
     
+    runAllBasicMovementTests();
     runAllMotorRegulatorTests();
     runAllMotorCommanderTests();
         

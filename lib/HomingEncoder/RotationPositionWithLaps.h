@@ -92,6 +92,16 @@ public:
 
         return clicksEqual && lapsEqual && remaindersEqual;
     }
+
+    long int getSerialPosition()
+    {
+        SQ31x32 clicksFromClicks = this->getClickPosition();
+        SQ31x32 clicksFromLaps = SQ31x32(this->getClicksPerRotation() * this->getLaps());
+        SQ31x32 clicksFromRemainder = SQ31x32( this->getRemainder() );
+
+
+        return (clicksFromClicks + clicksFromLaps + clicksFromRemainder).getInteger();
+    }
 };
 
 #endif

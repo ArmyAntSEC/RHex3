@@ -10,49 +10,6 @@
 
 #include "testBasicMotorFunctions.h"
 
-void testWrapAroundLogic() {
-    double lapRemainder = (double)encoder.clicksPerRevolution - 1795;
-
-    encoder.state.raw_position = 0;
-    encoder.state.position_remainder = 0;
-    encoder.state.laps = 0;
-    encoder.handleOverflow();
-    TEST_ASSERT_EQUAL( 0, encoder.getRawPos() );    
-    TEST_ASSERT_EQUAL( 0, encoder.getLaps() );
-    
-    encoder.state.raw_position = 1796;
-    encoder.state.position_remainder = 0;    
-    encoder.state.laps = 0;
-    encoder.handleOverflow ( );
-    TEST_ASSERT_EQUAL( 0, encoder.getRawPos() );
-    TEST_ASSERT_DOUBLE_WITHIN(5e-4, 1-lapRemainder, (double)encoder.state.position_remainder );
-    TEST_ASSERT_EQUAL( 1, encoder.getLaps() );
-
-    encoder.state.raw_position = 1798;
-    encoder.state.position_remainder = 0;    
-    encoder.state.laps = 0;
-    encoder.handleOverflow ( );
-    TEST_ASSERT_EQUAL( 2, encoder.getRawPos() );
-    TEST_ASSERT_DOUBLE_WITHIN(5e-4, 1-lapRemainder, (double)encoder.state.position_remainder );
-    TEST_ASSERT_EQUAL( 1, encoder.getLaps() );
-
-    encoder.state.raw_position = 1796*2;
-    encoder.state.position_remainder = 0;    
-    encoder.state.laps = 0;
-    encoder.handleOverflow ();
-    encoder.handleOverflow ();
-    TEST_ASSERT_EQUAL( 0, encoder.getRawPos() );
-    TEST_ASSERT_DOUBLE_WITHIN(2*5e-4, 2*(1-lapRemainder), (double)encoder.state.position_remainder );
-    TEST_ASSERT_EQUAL( 2, encoder.getLaps() );
-
-}
-
-void testPositiveSubtraction() {
-    TEST_ASSERT_EQUAL( 10, encoder.positionPositiveDifference( 10, 0 ) );
-    TEST_ASSERT_EQUAL( 0, encoder.positionPositiveDifference( 10, 10 ) );
-    TEST_ASSERT_EQUAL( 1795-10, encoder.positionPositiveDifference( 0, 10 ) );
-}
-
 void testSimpleMove() {        
     
     unsigned long int timeToMove = 1000;  
@@ -65,11 +22,9 @@ void testSimpleMove() {
     encoder.forceHomed();  
     sched.delayWithScheduler(timeToMove);
 
-    long int endPos = encoder.getRawPos();                
-    int laps = encoder.getLaps();
-    long int totalPos = endPos + laps * encoder.clicksPerRevolution.getInteger();
+    long int endPos = encoder.getPosition().getSerialPosition();                        
     long int endPosTarget = 3250; //Aproximately how far it should move in 1 second    
-    TEST_ASSERT_INT_WITHIN( 300, endPosTarget, totalPos );                             
+    TEST_ASSERT_INT_WITHIN( 300, endPosTarget, endPos );                             
 }
 
 void testSimpleHoming() {
@@ -108,8 +63,9 @@ void testWrapAroundAndOffset() {
         
     sched.delayWithScheduler( timeToMove );
 
-    TEST_ASSERT_LESS_THAN( 3593, encoder.getPosComp() );    
-    TEST_ASSERT_EQUAL( 2, encoder.getLaps() );    
+    RotationPositionWithLaps pos = encoder.getPosition();
+    TEST_ASSERT_LESS_THAN( 3593, pos.getClickPosition() );    
+    TEST_ASSERT_EQUAL( 2, pos.getLaps() );    
 }
 
 void testEncoderForStandingStill()
@@ -118,15 +74,10 @@ void testEncoderForStandingStill()
     driver.setMotorPWM(0);            
     sched.delayWithScheduler( timeToMove );    
     
-    //Log << "Last pos: " << encoder.state.last_position << endl;
-    //Log << "Last time: " << encoder.state.last_position_timestamp_micros << endl;
     sched.delayWithScheduler( 10 );    
 
     int speed = encoder.getSpeedCPS();    
     
-    //Log << "This pos: " << encoder.state.last_position << endl;
-    //Log << "This time: " << encoder.state.last_position_timestamp_micros << endl;
-
     int speedFiltered = encoder.getSpeedCPSFiltered();    
     TEST_ASSERT_INT_WITHIN( 10, 0, speedFiltered );                    
 }
@@ -145,17 +96,12 @@ void testSimpleMoveWithSpeed() {
 
     //Compute the distance to move
     timeToMove = 1000;          
-    encoder.forceHomed();    
-    long int endPosTarget = (timeToMove*speed)/1000;
-    int lapsTarget = endPosTarget / HomingEncoder::clicksPerRevolution.getInteger();  //Approximate.
-    long int endPosTargetWrapped = endPosTarget % HomingEncoder::clicksPerRevolution.getInteger();  //Approximate.
-    
+    encoder.forceHomed();        
     sched.delayWithScheduler( timeToMove );
 
-    long int endPos = encoder.getRawPos();            
-    long int laps = encoder.getLaps();    
-    TEST_ASSERT_INT_WITHIN( 100, endPosTargetWrapped, endPos );            
-    TEST_ASSERT_EQUAL( lapsTarget, laps );            
+    long int endPosTarget = (timeToMove*speed)/1000;    
+    long int endPos = encoder.getPosition().getSerialPosition();                
+    TEST_ASSERT_INT_WITHIN( 100, endPosTarget, endPos );                
 }
 
 void doTestMoveWithPredictedSpeed( unsigned int power );
@@ -202,3 +148,33 @@ void doTestMoveWithPredictedSpeed( unsigned int power ) {
     TEST_ASSERT_INT_WITHIN( 150, predictedSpeed, measuredSpeed );                    
 }
 #endif
+
+void runAllBasicMovementTests()
+{
+    RUN_TEST(testSimpleMove);  
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testSimpleHoming);        
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testWrapAroundAndOffset); 
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testEncoderForStandingStill);
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testSimpleMoveWithSpeed);  
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testMoveWithPredictedSpeedPower32);
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testMoveWithPredictedSpeedPower64);
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testMoveWithPredictedSpeedPower128);
+    
+    sched.delayWithScheduler(500);
+    RUN_TEST(testMoveWithPredictedSpeedPower255);
+
+}

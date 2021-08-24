@@ -26,99 +26,122 @@
 #include <Arduino.h>
 #include <FixedPointsCommon.h>
 #include <LevelLogger.h>
+#include "RotationPositionWithLaps.h"
 
-#define PIN_TO_BASEREG(pin)             (portInputRegister(digitalPinToPort(pin)))
-#define PIN_TO_BITMASK(pin)             (digitalPinToBitMask(pin))
-#define DIRECT_PIN_READ(base, mask)     (((*(base)) & (mask)) ? 1 : 0)
+#define PIN_TO_BASEREG(pin) (portInputRegister(digitalPinToPort(pin)))
+#define PIN_TO_BITMASK(pin) (digitalPinToBitMask(pin))
+#define DIRECT_PIN_READ(base, mask) (((*(base)) & (mask)) ? 1 : 0)
 
 #define MAX_ENCODERS_SUPPORTED 6
 
-struct HomingEncoderState {
+struct HomingEncoderState
+{
   int encoderPin1;
   int encoderPin2;
   int breakerPin;
-  
-  volatile uint8_t * encoderPin1_register;
-  volatile uint8_t * encoderPin2_register;
-  volatile uint8_t * breakerPin_register;
-  
+
+  volatile uint8_t *encoderPin1_register;
+  volatile uint8_t *encoderPin2_register;
+  volatile uint8_t *breakerPin_register;
+
   uint8_t encoderPin1_bitmask;
   uint8_t encoderPin2_bitmask;
   uint8_t breakerPin_bitmask;
-  
+
   uint8_t encoder_state;
 
   volatile long int raw_position;
   long int laps;
 
   SQ1x14 position_remainder;
-  
-  volatile bool is_homed;  
+
+  volatile bool is_homed;
   volatile long int pos_at_last_home;
-  
+
   //int offset;
 
   long int last_position;
   unsigned long int last_position_timestamp_micros;
   SQ15x16 speed_cps;
   SQ15x16 speed_cps_filtered;
-
 };
 
 class HomingEncoder
 {
+
+private:
+  long int getRawPos()
+  {
+    long int r;
+    noInterrupts();
+    r = state.raw_position;
+    interrupts();
+    return r;
+  }
+
+  int getLaps()
+  {    
+    return state.laps;;
+  }
+
+  SQ1x14 getRemainder()
+  {
+    return state.position_remainder;
+  }
+
 public:
-  HomingEncoderState state;        
+  HomingEncoderState state;
   static const SQ15x16 clicksPerRevolution;
-  static HomingEncoderState * stateList[MAX_ENCODERS_SUPPORTED];                
+  static HomingEncoderState *stateList[MAX_ENCODERS_SUPPORTED];
   const int speedTimeConstant = 10;
-  
-  template <int N> void config( unsigned int encoderPin1, 
-			      unsigned int encoderPin2, unsigned int breakerPin,
-			      int offset ) {
+
+  template <int N>
+  void config(unsigned int encoderPin1,
+              unsigned int encoderPin2, unsigned int breakerPin,
+              int offset)
+  {
     pinMode(encoderPin1, INPUT_PULLUP);
     pinMode(encoderPin2, INPUT_PULLUP);
     pinMode(breakerPin, INPUT_PULLUP);
-    
+
     state.encoderPin1 = encoderPin1;
     state.encoderPin2 = encoderPin2;
     state.breakerPin = breakerPin;
-    
-    state.raw_position = 0;    
-    
+
+    state.raw_position = 0;
+
     state.is_homed = false;
     state.pos_at_last_home = 0;
     state.last_position = 0;
     state.last_position_timestamp_micros = 0;
-    state.speed_cps = 0;     
-    
+    state.speed_cps = 0;
+
     // allow time for a passive R-C filter to charge
     // through the pullup resistors, before reading
     // the initial state
     delayMicroseconds(2000);
-        
-    static_assert( N < MAX_ENCODERS_SUPPORTED  );
-    
+
+    static_assert(N < MAX_ENCODERS_SUPPORTED);
+
     stateList[N] = &state;
-    
-    attachInterrupt(digitalPinToInterrupt(encoderPin1), isr_encoder<N>, CHANGE );
-    attachInterrupt(digitalPinToInterrupt(encoderPin2), isr_encoder<N>, CHANGE );
-    attachInterrupt(digitalPinToInterrupt(breakerPin), isr_homing<N>, RISING );  //Only trigger on rising or we home twice per rotation                   
-    
+
+    attachInterrupt(digitalPinToInterrupt(encoderPin1), isr_encoder<N>, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(encoderPin2), isr_encoder<N>, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(breakerPin), isr_homing<N>, RISING); //Only trigger on rising or we home twice per rotation
   }
-  
+
   //Should be called once every 10ms to compute the speed.
   virtual void run()
-  {    
-    
+  {
+
     //Calculate the max range for values:
     //Max rpm: 3
-    //Max clicks per second: 3*3500 = 10000 
+    //Max clicks per second: 3*3500 = 10000
     //Max clicks per 0.01 s = 100
 
     //Min clicks per second 4700
     //Min clicks per 0.01s = 47
-    
+
     unsigned long int nowU = micros();
 
     int thisPos = this->getRawPos();
@@ -127,56 +150,56 @@ public:
     unsigned long int lastTimeU = state.last_position_timestamp_micros;
     interrupts();
 
-    SQ15x16 posDelta = HomingEncoder::positionPositiveDifference( thisPos, lastPos );
+    SQ15x16 posDelta = HomingEncoder::positionPositiveDifference(thisPos, lastPos);
     state.last_position = thisPos;
 
     SQ15x16 timeDelta = nowU - lastTimeU;
     state.last_position_timestamp_micros = nowU;
 
     SQ15x16 speedCPS;
-    if ( timeDelta == 0 ) {
+    if (timeDelta == 0)
+    {
       speedCPS = 0;
-    } else {            
-      //First pre-scale by 100, then divide, then scale by 10k for a total of 1e6.
-      speedCPS = 10000*((100*posDelta)/timeDelta);
     }
-    
+    else
+    {
+      //First pre-scale by 100, then divide, then scale by 10k for a total of 1e6.
+      speedCPS = 10000 * ((100 * posDelta) / timeDelta);
+    }
+
     state.last_position = thisPos;
     state.last_position_timestamp_micros = nowU;
     state.speed_cps = speedCPS;
-    state.speed_cps_filtered = 
-      ((state.speed_cps_filtered +
-      state.speed_cps/(this->speedTimeConstant - 1)) / this->speedTimeConstant) * (this->speedTimeConstant - 1);
-        
+    state.speed_cps_filtered =
+        ((state.speed_cps_filtered +
+          state.speed_cps / (this->speedTimeConstant - 1)) /
+         this->speedTimeConstant) *
+        (this->speedTimeConstant - 1);
+
     //Make sure that we handle any overflows.
     noInterrupts();
-    HomingEncoder::handleOverflow( );
+    HomingEncoder::handleOverflow();
     interrupts();
-
   }
 
   long int getSpeedCPS()
-  {                 
+  {
     return state.speed_cps.getInteger();
   }
 
   long int getSpeedCPSFiltered()
-  {                 
+  {
     return state.speed_cps_filtered.getInteger();
   }
 
-  long int getRawPos()
-  {             
-    long int r;              
-    noInterrupts();
-    r = state.raw_position;
-    interrupts();    
-    return r;
+  RotationPositionWithLaps getPosition()
+  {
+    return RotationPositionWithLaps(this->getRawPos(), this->getLaps(), this->getRemainder() );
   }
 
   long int getPosComp()
-  {             
-    long int r;  
+  {
+    long int r;
     /*                      
     noInterrupts();
     r = state.raw_position + state.offset;
@@ -186,8 +209,8 @@ public:
   }
 
   long int getPosSinceLastHoming()
-  {             
-    long int r; 
+  {
+    long int r;
     /*                       
     noInterrupts();
     r = state.raw_position - state.pos_at_last_home;
@@ -195,73 +218,66 @@ public:
     */
     return r;
   }
-  
+
   void unHome()
-  {    
-    noInterrupts();    
+  {
+    noInterrupts();
     state.is_homed = false;
     state.pos_at_last_home = 0;
-    interrupts();   
+    interrupts();
   }
-  
+
   void forceHomed()
-  {   
+  {
     noInterrupts();
     state.is_homed = true;
     state.pos_at_last_home = state.raw_position;
-    state.raw_position = 0;    
+    state.raw_position = 0;
     state.laps = 0;
-    interrupts();   
+    interrupts();
   }
 
-  bool isHomed() 
-  {     
+  bool isHomed()
+  {
     noInterrupts();
     bool is_homed = state.is_homed;
-    interrupts();    
+    interrupts();
     return is_homed;
   }
 
-  
   int getPosAtLastHome()
-  {    
+  {
     noInterrupts();
     int rValue = state.pos_at_last_home;
-    interrupts();    
-    return rValue;
-  }
-
-  int getLaps()
-  {
-        
-    noInterrupts();
-    int rValue = state.laps;
-    interrupts();    
+    interrupts();
     return rValue;
   }
 
   unsigned int getBreakerVal()
   {
-    return DIRECT_PIN_READ(state.breakerPin_register, 
-      state.breakerPin_bitmask );                           
+    return DIRECT_PIN_READ(state.breakerPin_register,
+                           state.breakerPin_bitmask);
   }
-  
+
 public:
-  template<int N> static void isr_encoder(void) 
+  template <int N>
+  static void isr_encoder(void)
   {
-    HomingEncoderState * state = stateList[N];    
-    state->raw_position++; 
+    HomingEncoderState *state = stateList[N];
+    state->raw_position++;
   }
-  
-  template<int N> static void isr_homing(void) 
-    { 
-      HomingEncoderState * state = stateList[N];
-      if ( !state->is_homed && state->raw_position > 200 ) { //Do some debouncing
-        state->is_homed = true;
-        state->pos_at_last_home = state->raw_position;
-        state->raw_position = 0;
-      }
-      /*
+
+  template <int N>
+  static void isr_homing(void)
+  {
+    HomingEncoderState *state = stateList[N];
+    if (!state->is_homed && state->raw_position > 200)
+    { //Do some debouncing
+      state->is_homed = true;
+      state->pos_at_last_home = state->raw_position;
+      state->raw_position = 0;
+    }
+    /*
       uint8_t breaker_val = DIRECT_PIN_READ(state->breakerPin_register, 
         state->breakerPin_bitmask );                           
       #if defined (ARDUINO_AVR_UNO)
@@ -284,31 +300,31 @@ public:
         state->is_homed = true;                      
       }      
       */
+  }
 
-    }
+  void handleOverflow()
+  {
+    int clicksPerRevInt = clicksPerRevolution.getInteger();
+    SQ15x16 precise_position = 0;
 
-    void handleOverflow ( )
-    {                        
-      int clicksPerRevInt = clicksPerRevolution.getInteger();
-      SQ15x16 precise_position = 0;
-
-      noInterrupts();
-      if ( state.raw_position > clicksPerRevInt ) {                        
-        precise_position = SQ15x16((long int)state.raw_position) + SQ15x16(state.position_remainder) - HomingEncoder::clicksPerRevolution;
-        state.raw_position = floorFixed(precise_position).getInteger();
-        state.position_remainder = SQ1x14(precise_position-floorFixed(precise_position));
-        state.laps++;
-      }              
-      interrupts();    
-    }
-
-    static long int positionPositiveDifference( long int pos1, long int pos2 )
+    noInterrupts();
+    if (state.raw_position > clicksPerRevInt)
     {
-      if ( pos1 >= pos2 )
-        return pos1 - pos2;
-      else
-        return HomingEncoder::clicksPerRevolution.getInteger() + pos1 - pos2;
-    }    
+      precise_position = SQ15x16((long int)state.raw_position) + SQ15x16(state.position_remainder) - HomingEncoder::clicksPerRevolution;
+      state.raw_position = floorFixed(precise_position).getInteger();
+      state.position_remainder = SQ1x14(precise_position - floorFixed(precise_position));
+      state.laps++;
+    }
+    interrupts();
+  }
+
+  static long int positionPositiveDifference(long int pos1, long int pos2)
+  {
+    if (pos1 >= pos2)
+      return pos1 - pos2;
+    else
+      return HomingEncoder::clicksPerRevolution.getInteger() + pos1 - pos2;
+  }
 };
 
 #endif

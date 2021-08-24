@@ -99,37 +99,7 @@ void testRegulatorHardBreak()
 }
 
 void runAllMotorRegulatorTests()
-{
-        
-    RUN_TEST(testWrapAroundLogic);  
-    RUN_TEST(testPositiveSubtraction);    
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testSimpleMove);  
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testSimpleHoming);        
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testWrapAroundAndOffset); 
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testEncoderForStandingStill);
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testSimpleMoveWithSpeed);  
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testMoveWithPredictedSpeedPower32);
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testMoveWithPredictedSpeedPower64);
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testMoveWithPredictedSpeedPower128);
-    
-    sched.delayWithScheduler(500);
-    RUN_TEST(testMoveWithPredictedSpeedPower255);
+{       
     
     sched.delayWithScheduler(500);    
     RUN_TEST(testSimpleMoveAtConstantSpeed3500);    

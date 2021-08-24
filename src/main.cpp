@@ -47,7 +47,7 @@ void setup()
     Serial.print( "Breaker: " );
     Serial.print( encoder.isHomed() );
     Serial.print( " Encoder: " );
-    Serial.print( encoder.getRawPos() );
+    Serial.print( encoder.getPosition().getSerialPosition() );
     Serial.println();
     delay(100);
   }
