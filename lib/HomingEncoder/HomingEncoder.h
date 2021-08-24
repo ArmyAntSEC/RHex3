@@ -40,15 +40,6 @@ struct HomingEncoderState
   int encoderPin2;
   int breakerPin;
 
-  volatile uint8_t *encoderPin1_register;
-  volatile uint8_t *encoderPin2_register;
-  volatile uint8_t *breakerPin_register;
-
-  uint8_t encoderPin1_bitmask;
-  uint8_t encoderPin2_bitmask;
-  uint8_t breakerPin_bitmask;
-
-  uint8_t encoder_state;
 
   volatile long int raw_position;
   long int laps;
@@ -255,8 +246,7 @@ public:
 
   unsigned int getBreakerVal()
   {
-    return DIRECT_PIN_READ(state.breakerPin_register,
-                           state.breakerPin_bitmask);
+    return digitalRead( state.breakerPin );
   }
 
 public:
