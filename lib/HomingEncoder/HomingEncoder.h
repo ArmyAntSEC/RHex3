@@ -40,7 +40,6 @@ struct HomingEncoderState
   int encoderPin2;
   int breakerPin;
 
-
   volatile long int raw_position;
   long int laps;
 
@@ -49,36 +48,32 @@ struct HomingEncoderState
   volatile bool is_homed;
   volatile long int pos_at_last_home;
 
-  //int offset;
-
   long int last_position;
   unsigned long int last_position_timestamp_micros;
   SQ15x16 speed_cps;
   SQ15x16 speed_cps_filtered;
-};
 
-class HomingEncoder
-{
-
-private:
   long int getRawPos()
   {
     long int r;
     noInterrupts();
-    r = state.raw_position;
+    r = raw_position;
     interrupts();
     return r;
   }
 
-  int getLaps()
-  {    
-    return state.laps;;
+  RotationPositionWithLaps getPosition()
+  {
+    return RotationPositionWithLaps(this->getRawPos(), this->laps, this->position_remainder );
   }
 
-  SQ1x14 getRemainder()
-  {
-    return state.position_remainder;
-  }
+};
+
+//TODO: Convert HomingEncoder to a factory class that generates state objects.
+class HomingEncoder
+{
+
+private:
 
 public:
   HomingEncoderState state;
@@ -135,7 +130,7 @@ public:
 
     unsigned long int nowU = micros();
 
-    int thisPos = this->getRawPos();
+    int thisPos = this->state.getRawPos();
     noInterrupts();
     int lastPos = state.last_position;
     unsigned long int lastTimeU = state.last_position_timestamp_micros;
@@ -185,7 +180,7 @@ public:
 
   RotationPositionWithLaps getPosition()
   {
-    return RotationPositionWithLaps(this->getRawPos(), this->getLaps(), this->getRemainder() );
+    return this->state.getPosition();
   }
 
   long int getPosComp()
