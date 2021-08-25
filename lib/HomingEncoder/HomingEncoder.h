@@ -36,13 +36,14 @@
 
 struct HomingEncoderState
 {
+  static const SQ15x16 clicksPerRevolution;
+
   int encoderPin1;
   int encoderPin2;
   int breakerPin;
 
   volatile long int raw_position;
   long int laps;
-
   SQ1x14 position_remainder;
 
   volatile bool is_homed;
@@ -66,6 +67,23 @@ struct HomingEncoderState
   {
     return RotationPositionWithLaps(this->getRawPos(), this->laps, this->position_remainder );
   }
+
+  void handleOverflow()
+  {
+    int clicksPerRevInt = clicksPerRevolution.getInteger();
+    SQ15x16 precise_position = 0;
+
+    noInterrupts();
+    if (raw_position > clicksPerRevInt)
+    {
+      precise_position = SQ15x16((long int)raw_position) + SQ15x16(position_remainder) - clicksPerRevolution;
+      raw_position = floorFixed(precise_position).getInteger();
+      position_remainder = SQ1x14(precise_position - floorFixed(precise_position));
+      laps++;
+    }
+    interrupts();
+  }
+
 
 };
 
@@ -130,11 +148,9 @@ public:
 
     unsigned long int nowU = micros();
 
-    int thisPos = this->state.getRawPos();
-    noInterrupts();
+    int thisPos = this->state.getRawPos();    
     int lastPos = state.last_position;
-    unsigned long int lastTimeU = state.last_position_timestamp_micros;
-    interrupts();
+    unsigned long int lastTimeU = state.last_position_timestamp_micros;    
 
     SQ15x16 posDelta = HomingEncoder::positionPositiveDifference(thisPos, lastPos);
     state.last_position = thisPos;
@@ -181,28 +197,6 @@ public:
   RotationPositionWithLaps getPosition()
   {
     return this->state.getPosition();
-  }
-
-  long int getPosComp()
-  {
-    long int r;
-    /*                      
-    noInterrupts();
-    r = state.raw_position + state.offset;
-    interrupts();
-    */
-    return r;
-  }
-
-  long int getPosSinceLastHoming()
-  {
-    long int r;
-    /*                       
-    noInterrupts();
-    r = state.raw_position - state.pos_at_last_home;
-    interrupts();
-    */
-    return r;
   }
 
   void unHome()
@@ -256,35 +250,12 @@ public:
   static void isr_homing(void)
   {
     HomingEncoderState *state = stateList[N];
-    if (!state->is_homed && state->raw_position > 200)
-    { //Do some debouncing
+    if (!state->is_homed && state->raw_position > 200) //Do some debouncing
+    { 
       state->is_homed = true;
       state->pos_at_last_home = state->raw_position;
       state->raw_position = 0;
     }
-    /*
-      uint8_t breaker_val = DIRECT_PIN_READ(state->breakerPin_register, 
-        state->breakerPin_bitmask );                           
-      #if defined (ARDUINO_AVR_UNO)
-        //A bit of an ugly hack, but it allows u to call this function as often as we want on the Uno, but it only
-        //does anything if the breaker has actually toggled
-
-        if ( breaker_val == state->homing_pin_last_value )
-	        return;
-        else
-	        state->homing_pin_last_value = breaker_val; 
-      #endif
-      
-      //Depending on direction, we will trigger either on rising or falling. 
-      //We want to make sure we allways trigger on the same edge regardless of direction.
-      //If we are allready homed, do not rehome if we have not moved at least 2500 steps. 
-      //This to avoid bouncing of the signal as the homing is happening.
-      if ( !state->is_homed && state->moving_forward ^ breaker_val ) {                                
-        state->pos_at_last_home = state->raw_position;
-        state->raw_position = 0;                 
-        state->is_homed = true;                      
-      }      
-      */
   }
 
   void handleOverflow()
@@ -302,14 +273,14 @@ public:
     }
     interrupts();
   }
-
+  
   static long int positionPositiveDifference(long int pos1, long int pos2)
   {
     if (pos1 >= pos2)
       return pos1 - pos2;
     else
       return HomingEncoder::clicksPerRevolution.getInteger() + pos1 - pos2;
-  }
+  }  
 };
 
 #endif
