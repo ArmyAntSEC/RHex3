@@ -31,14 +31,14 @@ public:
     }
 
     void moveForwardTo( int _clickPosition )
-    {
-        //TODO:  Write a unit test for this one.
+    {        
         if ( _clickPosition < this->clickPosition )
         {
             this->laps++;
         }
         this->clickPosition = _clickPosition;
         this->remainder = 0;
+        this->reduceToMinimalFormWithRecursion();
     }
 
     void incrementClicks( int clicks ) 

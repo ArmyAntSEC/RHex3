@@ -144,6 +144,26 @@ void testConvertToLongInt()
     TEST_ASSERT_EQUAL_INT32( 1200 + (pos1.getClicksPerRotation()*10 + SQ15x16(0.5)).getInteger(), pos1.getSerialPosition() );
 }
 
+void testMoveForwardToSameLap()
+{
+    RotationPositionWithLaps pos1( 1200, 10, 0.5 );    
+    pos1.moveForwardTo( 1500 );
+
+    TEST_ASSERT_EQUAL( 1500, pos1.getClickPosition() );
+    TEST_ASSERT_EQUAL( 10, pos1.getLaps() );
+    TEST_ASSERT_TRUE( 0 == pos1.getRemainder() )
+}
+
+void testMoveForwardToOtherLap()
+{
+    RotationPositionWithLaps pos1( 1200, 10, 0.5 );    
+    pos1.moveForwardTo( 5500 );
+
+    TEST_ASSERT_EQUAL( 112, pos1.getClickPosition() );
+    TEST_ASSERT_EQUAL( 13, pos1.getLaps() );
+    TEST_ASSERT_DOUBLE_WITHIN( 1e-3, 0.1120, (double)pos1.getRemainder() );
+}
+
 void runAllTestsRotationPositionWithLap()
 {        
     RUN_TEST( testSetAndReadPostion );
@@ -163,5 +183,7 @@ void runAllTestsRotationPositionWithLap()
     RUN_TEST( testDifferenceSimpleOnSameLap );
     RUN_TEST( testDifferenceSimpleTenLapDifference );
     RUN_TEST( testDifferenceReverseOnSameLap );
+    RUN_TEST( testMoveForwardToSameLap );
+    RUN_TEST( testMoveForwardToOtherLap );
     
 };
