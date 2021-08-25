@@ -37,6 +37,7 @@
 struct HomingEncoderState
 {
   static const SQ15x16 clicksPerRevolution;
+  const int speedTimeConstant = 10;
 
   int encoderPin1;
   int encoderPin2;
@@ -84,6 +85,61 @@ struct HomingEncoderState
     interrupts();
   }
 
+  //Should be called once every 10ms to compute the speed.
+  virtual void run()
+  {
+
+    //Calculate the max range for values:
+    //Max rpm: 3
+    //Max clicks per second: 3*3500 = 10000
+    //Max clicks per 0.01 s = 100
+
+    //Min clicks per second 4700
+    //Min clicks per 0.01s = 47
+
+    unsigned long int nowU = micros();
+
+    int thisPos = this->getRawPos();    
+    int lastPos = last_position;
+    unsigned long int lastTimeU = last_position_timestamp_micros;    
+
+    SQ15x16 posDelta = positionPositiveDifference(thisPos, lastPos);
+    last_position = thisPos;
+
+    SQ15x16 timeDelta = nowU - lastTimeU;
+    last_position_timestamp_micros = nowU;
+
+    SQ15x16 speedCPS;
+    if (timeDelta == 0)
+    {
+      speedCPS = 0;
+    }
+    else
+    {
+      //First pre-scale by 100, then divide, then scale by 10k for a total of 1e6.
+      speedCPS = 10000 * ((100 * posDelta) / timeDelta);
+    }
+
+    last_position = thisPos;
+    last_position_timestamp_micros = nowU;
+    speed_cps = speedCPS;
+    speed_cps_filtered =
+        ((speed_cps_filtered +
+          speed_cps / (this->speedTimeConstant - 1)) /
+         this->speedTimeConstant) *
+        (this->speedTimeConstant - 1);
+
+    //Make sure that we handle any overflows.    
+    handleOverflow();    
+  }
+  
+  static long int positionPositiveDifference(long int pos1, long int pos2)
+  {
+    if (pos1 >= pos2)
+      return pos1 - pos2;
+    else
+      return clicksPerRevolution.getInteger() + pos1 - pos2;
+  }  
 
 };
 
@@ -137,51 +193,7 @@ public:
   //Should be called once every 10ms to compute the speed.
   virtual void run()
   {
-
-    //Calculate the max range for values:
-    //Max rpm: 3
-    //Max clicks per second: 3*3500 = 10000
-    //Max clicks per 0.01 s = 100
-
-    //Min clicks per second 4700
-    //Min clicks per 0.01s = 47
-
-    unsigned long int nowU = micros();
-
-    int thisPos = this->state.getRawPos();    
-    int lastPos = state.last_position;
-    unsigned long int lastTimeU = state.last_position_timestamp_micros;    
-
-    SQ15x16 posDelta = HomingEncoder::positionPositiveDifference(thisPos, lastPos);
-    state.last_position = thisPos;
-
-    SQ15x16 timeDelta = nowU - lastTimeU;
-    state.last_position_timestamp_micros = nowU;
-
-    SQ15x16 speedCPS;
-    if (timeDelta == 0)
-    {
-      speedCPS = 0;
-    }
-    else
-    {
-      //First pre-scale by 100, then divide, then scale by 10k for a total of 1e6.
-      speedCPS = 10000 * ((100 * posDelta) / timeDelta);
-    }
-
-    state.last_position = thisPos;
-    state.last_position_timestamp_micros = nowU;
-    state.speed_cps = speedCPS;
-    state.speed_cps_filtered =
-        ((state.speed_cps_filtered +
-          state.speed_cps / (this->speedTimeConstant - 1)) /
-         this->speedTimeConstant) *
-        (this->speedTimeConstant - 1);
-
-    //Make sure that we handle any overflows.
-    noInterrupts();
-    HomingEncoder::handleOverflow();
-    interrupts();
+    state.run();
   }
 
   long int getSpeedCPS()
@@ -257,30 +269,7 @@ public:
       state->raw_position = 0;
     }
   }
-
-  void handleOverflow()
-  {
-    int clicksPerRevInt = clicksPerRevolution.getInteger();
-    SQ15x16 precise_position = 0;
-
-    noInterrupts();
-    if (state.raw_position > clicksPerRevInt)
-    {
-      precise_position = SQ15x16((long int)state.raw_position) + SQ15x16(state.position_remainder) - HomingEncoder::clicksPerRevolution;
-      state.raw_position = floorFixed(precise_position).getInteger();
-      state.position_remainder = SQ1x14(precise_position - floorFixed(precise_position));
-      state.laps++;
-    }
-    interrupts();
-  }
   
-  static long int positionPositiveDifference(long int pos1, long int pos2)
-  {
-    if (pos1 >= pos2)
-      return pos1 - pos2;
-    else
-      return HomingEncoder::clicksPerRevolution.getInteger() + pos1 - pos2;
-  }  
 };
 
 #endif
