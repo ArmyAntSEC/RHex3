@@ -141,6 +141,55 @@ struct HomingEncoderState
       return clicksPerRevolution.getInteger() + pos1 - pos2;
   }  
 
+   long int getSpeedCPS()
+  {
+    return speed_cps.getInteger();
+  }
+
+  long int getSpeedCPSFiltered()
+  {
+    return speed_cps_filtered.getInteger();
+  }
+  
+  void unHome()
+  {
+    noInterrupts();
+    is_homed = false;
+    pos_at_last_home = 0;
+    interrupts();
+  }
+
+  void forceHomed()
+  {
+    noInterrupts();
+    is_homed = true;
+    pos_at_last_home = raw_position;
+    raw_position = 0;    
+    laps = 0;
+    interrupts();  
+  }
+
+  bool isHomed()
+  {
+    noInterrupts();
+    bool is_homed = is_homed;
+    interrupts();
+    return is_homed;
+  }
+
+  int getPosAtLastHome()
+  {
+    noInterrupts();
+    int rValue = pos_at_last_home;
+    interrupts();
+    return rValue;
+  }
+
+  unsigned int getBreakerVal()
+  {
+    return digitalRead( breakerPin );
+  }
+
 };
 
 //TODO: Convert HomingEncoder to a factory class that generates state objects.
@@ -198,56 +247,42 @@ public:
 
   long int getSpeedCPS()
   {
-    return state.speed_cps.getInteger();
+    return state.getSpeedCPS();
   }
 
   long int getSpeedCPSFiltered()
   {
-    return state.speed_cps_filtered.getInteger();
+    return state.getSpeedCPSFiltered();
   }
 
   RotationPositionWithLaps getPosition()
   {
-    return this->state.getPosition();
+    return state.getPosition();
   }
 
   void unHome()
   {
-    noInterrupts();
-    state.is_homed = false;
-    state.pos_at_last_home = 0;
-    interrupts();
+    state.unHome();
   }
 
   void forceHomed()
   {
-    noInterrupts();
-    state.is_homed = true;
-    state.pos_at_last_home = state.raw_position;
-    state.raw_position = 0;
-    state.laps = 0;
-    interrupts();
+    state.forceHomed();
   }
 
   bool isHomed()
   {
-    noInterrupts();
-    bool is_homed = state.is_homed;
-    interrupts();
-    return is_homed;
+    return state.isHomed();
   }
 
   int getPosAtLastHome()
   {
-    noInterrupts();
-    int rValue = state.pos_at_last_home;
-    interrupts();
-    return rValue;
+    return state.getPosAtLastHome();
   }
 
   unsigned int getBreakerVal()
   {
-    return digitalRead( state.breakerPin );
+    return state.getBreakerVal();
   }
 
 public:
