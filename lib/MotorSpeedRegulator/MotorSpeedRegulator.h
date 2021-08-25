@@ -104,7 +104,7 @@ public:
         return this->setPoint;
     }
 
-    void doHardBreak()
+    void useHardBreaks()
     {
         this->hardBreakMode = true;
     }

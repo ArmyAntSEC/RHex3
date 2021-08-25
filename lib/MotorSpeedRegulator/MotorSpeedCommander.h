@@ -8,13 +8,12 @@
 class MotorSpeedCommander : public RecurringTaskBase
 {
 private:
-    int posToMoveTo;
+    RotationPositionWithLaps posToMoveTo;
     int lapsToMove;
     long int maxSpeedToMove = 3500;
     unsigned long int timeToMove;
     unsigned long int timeToArrive;
-    boolean hasArrivedAtPos = false;
-    boolean onSameLapAsTarget = false;
+    boolean hasArrivedAtPos = false;    
 
     HomingEncoder *encoder;
     MotorDriver *driver;
@@ -57,22 +56,16 @@ public:
                       int _posToMoveTo)
     {
         RecurringTaskBase::init();
+        RotationPositionWithLaps currentPosition = this->encoder->getPosition();
+
         this->timeToArrive = _timeToArrive;
-        this->posToMoveTo = _posToMoveTo;
+        this->posToMoveTo = currentPosition;
+        this->posToMoveTo.moveForwardTo( _posToMoveTo );
+
         this->hasArrivedAtPos = false;
-
-        long int pos = this->encoder->getPosComp();
-        if (pos > this->posToMoveTo)
-        {
-            this->onSameLapAsTarget = false;
-        }
-        else
-        {
-            this->onSameLapAsTarget = true;
-        }
-
+    
         this->regulator->init();
-        this->regulator->doHardBreak();
+        this->regulator->useHardBreaks();
     }
 
     virtual void config(HomingEncoder *_encoder, MotorDriver *_driver,
@@ -84,24 +77,9 @@ public:
     }
 
     virtual void run(unsigned long int _now)
-    {
-        //TODO: Rewrite this code. It is ugly as what.
-        long int pos = this->encoder->getPosComp();
-        if (!this->onSameLapAsTarget && pos < this->posToMoveTo)
-        {
-            //Detect that we have now moved to be on the same lap as the target
-            this->onSameLapAsTarget = true; //We are now on the same lap as the target
-        }
-        long int clicksLeft = 0;
-        if (!this->onSameLapAsTarget)
-        {
-            clicksLeft = encoder->positionPositiveDifference(this->posToMoveTo, pos);
-        }
-        else
-        {
-            clicksLeft = this->posToMoveTo - pos;
-        }
-        //End the rewrite here.
+    {        
+        RotationPositionWithLaps pos = this->encoder->getPosition();        
+        long int clicksLeft = this->posToMoveTo.getDifferenceInClicks( &pos );
 
         if (clicksLeft < 0)
         {

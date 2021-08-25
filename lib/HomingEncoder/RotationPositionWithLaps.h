@@ -2,18 +2,23 @@
 #define _ROTATIONPOSITIONWITHLAP_H_
 
 #include <FixedPointsCommon.h>
+#include <LevelLogger.h>
 
 class RotationPositionWithLaps
 {
 private:
-    int clickPosition;
-    long int laps;
-    SQ1x14 remainder;
+    int clickPosition = 0;
+    long int laps = 0;
+    SQ1x14 remainder = 0;
 
     static SQ15x16 clicksPerRotation;
     
 
 public:
+    RotationPositionWithLaps(): 
+        clickPosition(0), laps(0), remainder(0)
+    {}
+
     RotationPositionWithLaps(int _clickPosition, long int _laps) : clickPosition(_clickPosition), laps(_laps)
     {    
         this->reduceToMinimalFormWithRecursion();
@@ -23,6 +28,17 @@ public:
         clickPosition(_clickPosition), laps(_laps), remainder(_remainder)
     {    
         this->reduceToMinimalFormWithRecursion();
+    }
+
+    void moveForwardTo( int _clickPosition )
+    {
+        //TODO:  Write a unit test for this one.
+        if ( _clickPosition < this->clickPosition )
+        {
+            this->laps++;
+        }
+        this->clickPosition = _clickPosition;
+        this->remainder = 0;
     }
 
     void incrementClicks( int clicks ) 
@@ -76,6 +92,15 @@ public:
         }
 
         return  clicksDifference;
+    }
+
+    long getDifferenceInClicks( RotationPositionWithLaps* pos2 )
+    {        
+        long clicksDifference = this->getClickPosition() - pos2->getClickPosition();
+        long lapDifference = this->getLaps() - pos2->getLaps();        
+        long clickDifferenceFromLaps = (lapDifference * this->getClicksPerRotation()).getInteger();
+        //Log << "Lap difference: " << lapDifference << " clickDifference: " << clicksDifference << endl;
+        return clicksDifference + clickDifferenceFromLaps;
     }
 
     bool operator ==(const RotationPositionWithLaps &_pos2) const

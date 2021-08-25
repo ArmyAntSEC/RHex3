@@ -75,6 +75,30 @@ void testPositiveDifferenceReverseOnSameLap()
     TEST_ASSERT_EQUAL( pos1.getClicksPerRotation().getInteger() - 500, pos1.getShortestPositiveDifferenceInt( &pos2 ) );
 }
 
+void testDifferenceSimpleOnSameLap()
+{
+    RotationPositionWithLaps pos1( 2500, 0 );        
+    RotationPositionWithLaps pos2( 2000, 0 );            
+    TEST_ASSERT_EQUAL( 500, pos1.getDifferenceInClicks( &pos2 ) );
+}
+
+void testDifferenceSimpleTenLapDifference()
+{    
+    RotationPositionWithLaps pos1( 2500, 10 );        
+    RotationPositionWithLaps pos2( 2000, 0 );            
+    TEST_ASSERT_EQUAL( 500 + (10 * pos1.getClicksPerRotation()).getInteger(), 
+        pos1.getDifferenceInClicks( &pos2 ) );
+}
+
+void testDifferenceReverseOnSameLap()
+{ 
+    RotationPositionWithLaps pos1( 2000, 0 );        
+    RotationPositionWithLaps pos2( 2500, 0 );   
+    TEST_ASSERT_EQUAL( -500, pos1.getDifferenceInClicks( &pos2 ) );
+}
+
+
+
 void testMakeCopy()
 { 
     //Test the implicit copy constructor
@@ -136,4 +160,8 @@ void runAllTestsRotationPositionWithLap()
     RUN_TEST( testCompareDiffInLaps );
     RUN_TEST( testCompareDiffInClicks );
     RUN_TEST( testConvertToLongInt );
+    RUN_TEST( testDifferenceSimpleOnSameLap );
+    RUN_TEST( testDifferenceSimpleTenLapDifference );
+    RUN_TEST( testDifferenceReverseOnSameLap );
+    
 };
