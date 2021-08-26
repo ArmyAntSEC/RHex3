@@ -17,7 +17,7 @@
 #define ENCODER_2 11
 #define ENCODER_1 12
 
-HomingEncoderState* encoder;
+HomingEncoder* encoder;
 EncoderWrapperComputeSpeedTask encoderWrapperComputeSpeed;
 MotorDriver driver;
 MotorSpeedRegulator regulator;
@@ -32,7 +32,7 @@ void initOneLeg()
 
     driver.config( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM );        
     
-    encoder = HomingEncoder::config<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );    
+    encoder = HomingEncoderFactory::config<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );    
 
     encoderWrapperComputeSpeed.configure( encoder );
              

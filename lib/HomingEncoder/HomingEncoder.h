@@ -30,7 +30,7 @@
 
 #define MAX_ENCODERS_SUPPORTED 6
 
-struct HomingEncoderState
+struct HomingEncoder
 {
   static const SQ15x16 clicksPerRevolution;
   const int speedTimeConstant = 10;
@@ -213,17 +213,17 @@ struct HomingEncoderState
 
 };
 
-class HomingEncoder
+class HomingEncoderFactory
 {
 public:    
-  static HomingEncoderState stateList[MAX_ENCODERS_SUPPORTED];  
+  static HomingEncoder stateList[MAX_ENCODERS_SUPPORTED];  
 
-  template <int N> static HomingEncoderState* config(
+  template <int N> static HomingEncoder* config(
     unsigned int encoderPin1, unsigned int encoderPin2, 
     unsigned int homingPin, int offset )
   {
     static_assert(N < MAX_ENCODERS_SUPPORTED);    
-    HomingEncoderState* state = &stateList[N];
+    HomingEncoder* state = &stateList[N];
          
     state->config( encoderPin1, encoderPin2, homingPin, offset );
 
@@ -238,13 +238,13 @@ public:
   
   template <int N> static void isr_encoder(void)
   {    
-    HomingEncoderState *state = &stateList[N];
+    HomingEncoder *state = &stateList[N];
     state->raw_position++;   
   }
 
   template <int N> static void isr_homing(void)
   {
-    HomingEncoderState *state = &stateList[N];
+    HomingEncoder *state = &stateList[N];
     if (!state->is_homed && state->raw_position > 200) //Do some debouncing
     { 
       state->is_homed = true;

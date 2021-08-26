@@ -27,7 +27,7 @@ private:
 
     boolean hardBreakMode = false;
 
-    HomingEncoderState *encoder;
+    HomingEncoder *encoder;
     MotorDriver *driver;
     SpeedToPowerConverterProduction *converter;
 
@@ -40,7 +40,7 @@ public:
         integratorCumulativeValue = clampOutput( driver->getMotorPWM() );
     }
 
-    virtual void config(HomingEncoderState *_encoder, MotorDriver *_driver,
+    virtual void config(HomingEncoder *_encoder, MotorDriver *_driver,
                         SpeedToPowerConverterProduction *_converter, float _P, float _D, float _I, float _filter)
     {
         this->encoder = _encoder;

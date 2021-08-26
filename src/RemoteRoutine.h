@@ -12,11 +12,11 @@ class RemoteRoutine: public RecurringTaskBase
         LOGGABLE( "RemoteRoutine" );
     protected:
         const unsigned int numArguments;                            
-        HomingEncoder* encoder;
+        HomingEncoderFactory* encoder;
         MotorDriver* driver;
 
     public:
-        RemoteRoutine(int _numArguments, HomingEncoder* _encoder, MotorDriver* _driver ): 
+        RemoteRoutine(int _numArguments, HomingEncoderFactory* _encoder, MotorDriver* _driver ): 
             numArguments(_numArguments), encoder(_encoder), driver(_driver)            
         {
             stop(); //Remote routines do not start in a running state.

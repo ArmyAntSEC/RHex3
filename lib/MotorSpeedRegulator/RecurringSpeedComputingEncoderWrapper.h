@@ -8,10 +8,10 @@
 class EncoderWrapperComputeSpeedTask: public Task
 {
     private:
-        HomingEncoderState* encoder;
+        HomingEncoder* encoder;
     public:
 
-        void configure ( HomingEncoderState* _encoder )
+        void configure ( HomingEncoder* _encoder )
         {
             encoder = _encoder;
         }
