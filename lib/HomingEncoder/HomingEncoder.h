@@ -39,8 +39,9 @@ struct HomingEncoder
   int encoderPin2;
   int homingPin;
 
+  //TODO: Turn all of this into an isr-safe object
   volatile long int raw_position;
-  long int laps;
+  volatile long int laps;
   SQ1x14 position_remainder;
 
   volatile bool is_homed;
@@ -193,9 +194,9 @@ struct HomingEncoder
   bool isHomed()
   {
     noInterrupts();
-    bool is_homed = is_homed;
+    bool _is_homed = is_homed;
     interrupts();
-    return is_homed;
+    return _is_homed;
   }
 
   int getPosAtLastHome()
@@ -206,7 +207,7 @@ struct HomingEncoder
     return rValue;
   }
 
-  unsigned int getBreakerVal()
+  unsigned int getHomingPinValue()
   {
     return digitalRead( homingPin );
   }
@@ -243,16 +244,15 @@ public:
   }
 
   template <int N> static void isr_homing(void)
-  {
-    HomingEncoder *state = &stateList[N];
-    if (!state->is_homed && state->raw_position > 200) //Do some debouncing
-    { 
+  {    
+    HomingEncoder *state = &stateList[N];    
+    if ( !(state->is_homed) && state->raw_position > 200 ) {  //Do some debouncing.
       state->is_homed = true;
       state->pos_at_last_home = state->raw_position;
       state->raw_position = 0;
+      state->laps = 0;
     }
-  }
-  
+  }  
 };
 
 #endif

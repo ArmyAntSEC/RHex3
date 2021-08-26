@@ -29,8 +29,7 @@ void testSimpleMove() {
     
 }
 
-void testSimpleHoming() {
-    TEST_IGNORE();
+void testSimpleHoming() {    
     unsigned long int maxTimeToMove = 5000;  
     unsigned long int endTime = millis() + maxTimeToMove;    
 
@@ -38,7 +37,7 @@ void testSimpleHoming() {
     encoder->unHome(); //And reset the homing flag.    
 
     boolean firstRound = true;
-    while ( millis() < endTime ) {        
+    while ( millis() < endTime ) {   
         if ( encoder->isHomed() ) {
             if ( firstRound ) {
                 unsigned long int endPos = encoder->getPosAtLastHome();
