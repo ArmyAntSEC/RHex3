@@ -36,7 +36,7 @@ void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {
     while ( millis() < endTime ) {                                    
         if ( millis() > nextRun ) {
             nextRun+=10;
-            unsigned long int speed = encoder.getSpeedCPS();                        
+            unsigned long int speed = encoder->getSpeedCPS();                        
             long int speedRel = speed - speedToMoveAt;
             
             //Compute STD        
@@ -47,7 +47,7 @@ void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {
         }
     }
 
-    unsigned long int speed = encoder.getSpeedCPS();                                    
+    unsigned long int speed = encoder->getSpeedCPS();                                    
     //Log << "Speed: " << speed << " SetPoint: " << speedToMoveAt << endl;
     TEST_ASSERT_INT_WITHIN( 200, speedToMoveAt, speed );            
     
@@ -75,6 +75,7 @@ void testSimpleMoveAtConstantSpeed500() {
 
 void testRegulatorHardBreak()
 {
+    TEST_IGNORE();
     unsigned long int timeToSettle = 100;      
     int speedToMoveAt = 3000;
     
@@ -85,7 +86,7 @@ void testRegulatorHardBreak()
     while ( millis() < endTime ) {
         sched.run();        
     }
-    TEST_ASSERT_GREATER_THAN_INT( 0.9*speedToMoveAt, encoder.getSpeedCPS() );            
+    TEST_ASSERT_GREATER_THAN_INT( 0.9*speedToMoveAt, encoder->getSpeedCPS() );            
 
     regulator.setSetPoint( speedToMoveAt/2 );
     regulator.useHardBreaks();
@@ -94,7 +95,7 @@ void testRegulatorHardBreak()
     while ( millis() < endTime ) {
         sched.run();                
     }
-    TEST_ASSERT_LESS_THAN_INT( 1.1*speedToMoveAt/2, encoder.getSpeedCPS() );
+    TEST_ASSERT_LESS_THAN_INT( 1.1*speedToMoveAt/2, encoder->getSpeedCPS() );
 
 }
 

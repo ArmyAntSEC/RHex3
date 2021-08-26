@@ -13,7 +13,7 @@ RecurringTaskGroup<16> recurring10ms( 10 );
 
 
 void setUp(void) {
-    encoder.forceHomed();    
+    encoder->forceHomed();    
 }
 
 void tearDown(void) {

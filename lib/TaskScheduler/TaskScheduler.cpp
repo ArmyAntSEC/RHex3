@@ -28,28 +28,16 @@ void TaskScheduler::add(Task* task) {
 void TaskScheduler::run() {	
 	
 	unsigned long int nowU = micros();		
-	unsigned long int now = millis();	
+	unsigned long int now = millis();		
 	for (int i = 0; i < numTasks; i++) {
 		//DEBUG(F("Checking task ") << i << " of " << numTasks << F(" at time ") << now );
-		Task* thisTask = this->tasks[i];		
-		if (thisTask->canRun(now)) {							
+		Task* thisTask = this->tasks[i];				
+		if (thisTask->canRun(now)) {													
 			thisTask->run(now);											
 		} 
 		//DEBUG(F("Done with task ") << i << " of " << numTasks << F(" at time ") << now );				
 	}
 	//ERROR(F("----- Done with run") );
-	unsigned long totalTime = micros() - nowU;
-	if ( this->averageLoopTime == 0 ) {
-		this->averageLoopTime = totalTime;
-	} else {
-		this->averageLoopTime = 
-			(this->averageLoopTime*(TaskScheduler::filterFactor-1) +
-			totalTime) / TaskScheduler::filterFactor;
-	}
-	if ( now > this->nextRunTime ) {
-		DEBUG(F("Loop time: ") << this->averageLoopTime << "\u03BCs." );
-		this->nextRunTime += 5000;
-	}
 }
 
 void TaskScheduler::delayWithScheduler( unsigned long timeToWait )

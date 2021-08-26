@@ -28,32 +28,35 @@ void setup()
   while (!Serial) {}    
   Serial.println("Hello World!");
 
-  DEBUG( F("Setup started") );  
+  //randomSeed(analogRead(UNCONNECTED_ANALOG));
+  //pinMode ( UNCONNECTED_ANALOG, INPUT );  
   
-  randomSeed(analogRead(UNCONNECTED_ANALOG));
-  pinMode ( UNCONNECTED_ANALOG, INPUT );  
-  
+  Serial.println( "About to init the leg." );
+  return;
+  /*
   initOneLeg();
   
-  /*
+  Serial.println( "Leg initialized" );
+  
   //Start the motors just to test
   driver.setMotorPWM(64);
   delay(1000);
-  driver.setMotorPWM(0);
-  */
+  driver.setMotorPWM(0);  
+  
+  
+
+  driver.setMotorPWM(64);
 
   //Test the encoder
   while ( true ) {
     Serial.print( "Breaker: " );
-    Serial.print( encoder.isHomed() );
+    Serial.print( encoder->isHomed() );
     Serial.print( " Encoder: " );
-    Serial.print( encoder.getPosition().getSerialPosition() );
+    Serial.print( encoder->getPosition().getSerialPosition() );
     Serial.println();
     delay(100);
   }
-
-
-  /*
+  
   //Initalize the driver
   driver.config( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, MOTOR_CS );  
   driver.setMotorPWM(0);   

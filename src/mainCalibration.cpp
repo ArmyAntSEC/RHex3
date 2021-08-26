@@ -27,24 +27,22 @@ void setup()
     while (!Serial)
     {
     }
-    Serial.println("Hello World!");
-
-    DEBUG(F("Setup started"));
+    Serial.println("Hello World!");    
 
     randomSeed(analogRead(UNCONNECTED_ANALOG));
     pinMode(UNCONNECTED_ANALOG, INPUT);
-
+    
     initOneLeg();
-
-    //Register all leg features with the scheduler.
+    
+    //Register all leg features with the scheduler.    
     recurring10ms.add(&encoderWrapperComputeSpeed);
     recurring10ms.add(&regulator);
     recurring10ms.add(&commander);
     recurring10ms.init(millis());
     sched.add(&recurring10ms);
-
+    
     //storeManuallyMeasuredValuesToEEPROM();
-    measurePowerVsSpeedForOneLeg();        
+    //measurePowerVsSpeedForOneLeg();        
 }
 
 void storeManuallyMeasuredValuesToEEPROM()
@@ -87,7 +85,7 @@ void measurePowerVsSpeedForOneLeg()
         sched.delayWithScheduler(1000);
 
         //Measure the speed
-        int speed = encoder.getSpeedCPS(); //Filtered();
+        int speed = encoder->getSpeedCPS(); //Filtered();
         
         converter.setPowerAndSpeedPair(i, power[i], speed);
         

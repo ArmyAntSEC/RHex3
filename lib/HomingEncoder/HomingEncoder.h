@@ -28,10 +28,6 @@
 #include <LevelLogger.h>
 #include "RotationPositionWithLaps.h"
 
-#define PIN_TO_BASEREG(pin) (portInputRegister(digitalPinToPort(pin)))
-#define PIN_TO_BITMASK(pin) (digitalPinToBitMask(pin))
-#define DIRECT_PIN_READ(base, mask) (((*(base)) & (mask)) ? 1 : 0)
-
 #define MAX_ENCODERS_SUPPORTED 6
 
 struct HomingEncoderState
@@ -41,7 +37,7 @@ struct HomingEncoderState
 
   int encoderPin1;
   int encoderPin2;
-  int breakerPin;
+  int homingPin;
 
   volatile long int raw_position;
   long int laps;
@@ -55,6 +51,29 @@ struct HomingEncoderState
   SQ15x16 speed_cps;
   SQ15x16 speed_cps_filtered;
 
+  void config( unsigned int _encoderPin1,
+              unsigned int _encoderPin2, unsigned int _breakerPin,
+              int _offset )
+  {
+    pinMode(encoderPin1, INPUT_PULLUP);
+    pinMode(encoderPin2, INPUT_PULLUP);
+    pinMode(homingPin, INPUT_PULLUP);
+
+    encoderPin1 = _encoderPin1;
+    encoderPin2 = _encoderPin2;
+    homingPin = _breakerPin;
+
+    raw_position = 0;
+    laps = 0;
+    position_remainder = 0;
+
+    is_homed = false;
+    pos_at_last_home = 0;
+    last_position = 0;
+    last_position_timestamp_micros = 0;
+    speed_cps = 0;    
+  }
+
   long int getRawPos()
   {
     long int r;
@@ -66,7 +85,8 @@ struct HomingEncoderState
 
   RotationPositionWithLaps getPosition()
   {
-    return RotationPositionWithLaps(this->getRawPos(), this->laps, this->position_remainder );
+    return RotationPositionWithLaps(
+      this->getRawPos(), this->laps, this->position_remainder );
   }
 
   void handleOverflow()
@@ -77,7 +97,8 @@ struct HomingEncoderState
     noInterrupts();
     if (raw_position > clicksPerRevInt)
     {
-      precise_position = SQ15x16((long int)raw_position) + SQ15x16(position_remainder) - clicksPerRevolution;
+      precise_position = SQ15x16((long int)raw_position) + 
+        SQ15x16(position_remainder) - clicksPerRevolution;
       raw_position = floorFixed(precise_position).getInteger();
       position_remainder = SQ1x14(precise_position - floorFixed(precise_position));
       laps++;
@@ -88,7 +109,7 @@ struct HomingEncoderState
   //Should be called once every 10ms to compute the speed.
   virtual void run()
   {
-
+    
     //Calculate the max range for values:
     //Max rpm: 3
     //Max clicks per second: 3*3500 = 10000
@@ -187,116 +208,43 @@ struct HomingEncoderState
 
   unsigned int getBreakerVal()
   {
-    return digitalRead( breakerPin );
+    return digitalRead( homingPin );
   }
 
 };
 
-//TODO: Convert HomingEncoder to a factory class that generates state objects.
 class HomingEncoder
 {
+public:    
+  static HomingEncoderState stateList[MAX_ENCODERS_SUPPORTED];  
 
-private:
-
-public:
-  HomingEncoderState state;
-  static const SQ15x16 clicksPerRevolution;
-  static HomingEncoderState *stateList[MAX_ENCODERS_SUPPORTED];
-  const int speedTimeConstant = 10;
-
-  template <int N>
-  void config(unsigned int encoderPin1,
-              unsigned int encoderPin2, unsigned int breakerPin,
-              int offset)
+  template <int N> static HomingEncoderState* config(
+    unsigned int encoderPin1, unsigned int encoderPin2, 
+    unsigned int homingPin, int offset )
   {
-    pinMode(encoderPin1, INPUT_PULLUP);
-    pinMode(encoderPin2, INPUT_PULLUP);
-    pinMode(breakerPin, INPUT_PULLUP);
+    static_assert(N < MAX_ENCODERS_SUPPORTED);    
+    HomingEncoderState* state = &stateList[N];
+         
+    state->config( encoderPin1, encoderPin2, homingPin, offset );
 
-    state.encoderPin1 = encoderPin1;
-    state.encoderPin2 = encoderPin2;
-    state.breakerPin = breakerPin;
-
-    state.raw_position = 0;
-
-    state.is_homed = false;
-    state.pos_at_last_home = 0;
-    state.last_position = 0;
-    state.last_position_timestamp_micros = 0;
-    state.speed_cps = 0;
-
-    // allow time for a passive R-C filter to charge
-    // through the pullup resistors, before reading
-    // the initial state
-    delayMicroseconds(2000);
-
-    static_assert(N < MAX_ENCODERS_SUPPORTED);
-
-    stateList[N] = &state;
-
+    
+    //Only trigger homing on rising or we home twice per rotation
+    attachInterrupt(digitalPinToInterrupt(homingPin), isr_homing<N>, RISING); 
     attachInterrupt(digitalPinToInterrupt(encoderPin1), isr_encoder<N>, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encoderPin2), isr_encoder<N>, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(breakerPin), isr_homing<N>, RISING); //Only trigger on rising or we home twice per rotation
+        
+    return state;
+  }
+  
+  template <int N> static void isr_encoder(void)
+  {    
+    HomingEncoderState *state = &stateList[N];
+    state->raw_position++;   
   }
 
-  //Should be called once every 10ms to compute the speed.
-  virtual void run()
+  template <int N> static void isr_homing(void)
   {
-    state.run();
-  }
-
-  long int getSpeedCPS()
-  {
-    return state.getSpeedCPS();
-  }
-
-  long int getSpeedCPSFiltered()
-  {
-    return state.getSpeedCPSFiltered();
-  }
-
-  RotationPositionWithLaps getPosition()
-  {
-    return state.getPosition();
-  }
-
-  void unHome()
-  {
-    state.unHome();
-  }
-
-  void forceHomed()
-  {
-    state.forceHomed();
-  }
-
-  bool isHomed()
-  {
-    return state.isHomed();
-  }
-
-  int getPosAtLastHome()
-  {
-    return state.getPosAtLastHome();
-  }
-
-  unsigned int getBreakerVal()
-  {
-    return state.getBreakerVal();
-  }
-
-public:
-  template <int N>
-  static void isr_encoder(void)
-  {
-    HomingEncoderState *state = stateList[N];
-    state->raw_position++;
-  }
-
-  template <int N>
-  static void isr_homing(void)
-  {
-    HomingEncoderState *state = stateList[N];
+    HomingEncoderState *state = &stateList[N];
     if (!state->is_homed && state->raw_position > 200) //Do some debouncing
     { 
       state->is_homed = true;

@@ -20,9 +20,6 @@ private:
     const static int MaxTasks = 16;
     Task *tasks[MaxTasks];
     int numTasks;
-    unsigned long int averageLoopTime;
-    static const unsigned int filterFactor = 100;       
-    unsigned long int nextRunTime = 0;  
 };
 
 #endif /* TASKSCHEDULER_H_ */

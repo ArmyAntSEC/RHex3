@@ -55,7 +55,7 @@ void testSimpleMoveToAPositionAtTime()
     unsigned long int posToMoveTo = 1500;
 
     regulator.init();
-    encoder.forceHomed();
+    encoder->forceHomed();
 
     unsigned long int endTime = millis() + timeToMove;
     commander.init(endTime, posToMoveTo);
@@ -71,7 +71,7 @@ void testSimpleMoveToAPositionAtTime()
         }
         else if (commander.hasArrived())
         {
-            unsigned long int pos = encoder.getPosition().getClickPosition();
+            unsigned long int pos = encoder->getPosition().getClickPosition();
             TEST_ASSERT_INT_WITHIN(100, posToMoveTo, pos);
             TEST_ASSERT_INT_WITHIN(100, endTime, millis());
             hasArrived = true;
@@ -97,7 +97,7 @@ void testSimpleMoveToAPositionAtTime()
         }
         if (commander.hasArrived())
         {
-            unsigned long int pos = encoder.getPosition().getClickPosition();
+            unsigned long int pos = encoder->getPosition().getClickPosition();
             TEST_ASSERT_INT_WITHIN(100, posToMoveTo, pos);
             TEST_ASSERT_INT_WITHIN(100, endTime, millis());
             hasArrived = true;

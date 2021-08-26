@@ -8,13 +8,16 @@
 class EncoderWrapperComputeSpeedTask: public Task
 {
     private:
-        HomingEncoder* encoder;
+        HomingEncoderState* encoder;
     public:
-        EncoderWrapperComputeSpeedTask( HomingEncoder* _encoder ): encoder(_encoder)
-        {}
 
-        virtual void run( unsigned long int _now ) {            
-            this->encoder->run();
+        void configure ( HomingEncoderState* _encoder )
+        {
+            encoder = _encoder;
+        }
+
+        virtual void run( unsigned long int _now ) {                        
+            this->encoder->run();            
         }
 };
 

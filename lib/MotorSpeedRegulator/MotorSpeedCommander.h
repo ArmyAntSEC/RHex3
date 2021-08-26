@@ -15,7 +15,7 @@ private:
     unsigned long int timeToArrive;
     boolean hasArrivedAtPos = false;    
 
-    HomingEncoder *encoder;
+    HomingEncoderState *encoder;
     MotorDriver *driver;
 
     MotorSpeedRegulator *regulator;
@@ -68,7 +68,7 @@ public:
         this->regulator->useHardBreaks();
     }
 
-    virtual void config(HomingEncoder *_encoder, MotorDriver *_driver,
+    virtual void config(HomingEncoderState *_encoder, MotorDriver *_driver,
                         MotorSpeedRegulator *_regulator)
     {
         this->encoder = _encoder;
@@ -107,7 +107,7 @@ public:
         regulator->stop();
     }
 
-    HomingEncoder *getEncoder()
+    HomingEncoderState *getEncoder()
     {
         return this->encoder;
     }
