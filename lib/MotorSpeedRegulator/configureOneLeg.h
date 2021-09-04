@@ -9,6 +9,20 @@
 #include "LegController.h"
 #include "SpeedToPowerConverter.h"
 
+#define MOTOR1 1
+
+#ifdef MOTOR1
+
+#define MOTOR_EN1 3
+#define MOTOR_EN2 4
+#define MOTOR_PWM 5
+
+#define OPTO      16
+#define ENCODER_2 15
+#define ENCODER_1 14
+
+#else
+
 #define MOTOR_EN1 7
 #define MOTOR_EN2 8
 #define MOTOR_PWM 9
@@ -16,6 +30,8 @@
 #define OPTO      10
 #define ENCODER_2 11
 #define ENCODER_1 12
+
+#endif
 
 HomingEncoder* encoder;
 EncoderWrapperComputeSpeedTask encoderWrapperComputeSpeed;

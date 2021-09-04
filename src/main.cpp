@@ -33,14 +33,21 @@ void setup()
   
   initOneLeg();
 
-  driver.setMotorPWM(64);
+  driver.setMotorPWM(255);
 
   //Test the encoder
-  long endTime = millis() + 2000;
+  long endTime = millis() + 10000;
   
+  pinMode( 13, OUTPUT );
+
   while ( endTime > millis() ) {
-    Log << "Breaker: " << encoder->getHomingPinValue() << " is homed: " << encoder->is_homed;
-    Log << " Encoder: " << encoder->getPosition().getSerialPosition() << " Raw pos: " << encoder->raw_position << endl;
+    
+    Log << "[" << millis() << "] Breaker: " << encoder->getHomingPinValue() << " is homed: " << encoder->is_homed;
+    Log << " Encoder: " << encoder->getPosition().getSerialPosition() << " Raw pos: " << encoder->raw_position;
+    Log << " Post at last home click: " << encoder->getPosAtLastHomeClick() << endl;
+    
+    digitalWrite( 13, encoder->getHomingPinValue() ); //Blink the onboard LED as the homing breaker moves.  
+    
     delay(10);        
   }
 

@@ -42,7 +42,7 @@ void setup()
     sched.add(&recurring10ms);
     
     //storeManuallyMeasuredValuesToEEPROM();
-    //measurePowerVsSpeedForOneLeg();        
+    measurePowerVsSpeedForOneLeg();        
 }
 
 void storeManuallyMeasuredValuesToEEPROM()
@@ -73,6 +73,7 @@ void measurePowerVsSpeedForOneLeg()
 
     SpeedToPowerConverterTest converter;
     converter.setEEPROMStartIndex(0);
+    Log << "Storing to EEPROM index 0." << endl;
 
     for (int i = 0; i < powerLen; i++)
     {        
@@ -93,6 +94,7 @@ void measurePowerVsSpeedForOneLeg()
     }
     converter.saveToEEPROM();
     driver.setMotorPWM(0);
+    Log << "Values stored to EEPROM" << endl;
 }
 
 void loop()

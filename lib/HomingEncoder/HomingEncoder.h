@@ -46,6 +46,7 @@ struct HomingEncoder
 
   volatile bool is_homed;
   volatile long int pos_at_last_home;
+  volatile long int pos_at_last_home_click;
 
   long int last_position;
   unsigned long int last_position_timestamp_micros;
@@ -207,6 +208,14 @@ struct HomingEncoder
     return rValue;
   }
 
+  int getPosAtLastHomeClick()
+  {
+    noInterrupts();
+    int rValue = pos_at_last_home_click;
+    interrupts();
+    return rValue;
+  }
+
   unsigned int getHomingPinValue()
   {
     return digitalRead( homingPin );
@@ -230,7 +239,7 @@ public:
 
     
     //Only trigger homing on rising or we home twice per rotation
-    attachInterrupt(digitalPinToInterrupt(homingPin), isr_homing<N>, RISING); 
+    attachInterrupt(digitalPinToInterrupt(homingPin), isr_homing<N>, FALLING); 
     attachInterrupt(digitalPinToInterrupt(encoderPin1), isr_encoder<N>, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encoderPin2), isr_encoder<N>, CHANGE);
         
@@ -246,6 +255,9 @@ public:
   template <int N> static void isr_homing(void)
   {    
     HomingEncoder *state = &stateList[N];    
+    
+    state->pos_at_last_home_click = state->raw_position;
+
     if ( !(state->is_homed) && state->raw_position > 200 ) {  //Do some debouncing.
       state->is_homed = true;
       state->pos_at_last_home = state->raw_position;

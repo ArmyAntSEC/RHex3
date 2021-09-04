@@ -25,7 +25,7 @@ void testSimpleMove() {
     
     long int endPos = encoder->getPosition().getSerialPosition();                        
     long int endPosTarget = 3250; //Aproximately how far it should move in 1 second        
-    TEST_ASSERT_INT_WITHIN( 300, endPosTarget, endPos );                             
+    TEST_ASSERT_INT_WITHIN( 600, endPosTarget, endPos ); //rather generous tolerances as we are just testing basic functionality here.
     
 }
 
@@ -48,6 +48,7 @@ void testSimpleHoming() {
             } else {
                 driver.setMotorPWM(0);
                 unsigned long int endPos = encoder->getPosAtLastHome();
+                Log << "Serial position: " << encoder->getPosition().getSerialPosition() << endl;
                 TEST_ASSERT_INT_WITHIN( 10, 1796, endPos ); //Make sure we have gone exactly 1 round            
                 //Log << "Second homing" << endl;
                 return;
@@ -94,7 +95,7 @@ void testSimpleMoveWithSpeed() {
 
     //Measure the speed
     int speed = encoder->getSpeedCPSFiltered();    
-    TEST_ASSERT_INT_WITHIN( 150, 3252, speed );                    
+    TEST_ASSERT_INT_WITHIN( 600, 3252, speed ); //very loose tolerances as we are just sanity checking the system here.
 
     //Compute the distance to move
     timeToMove = 1000;          
