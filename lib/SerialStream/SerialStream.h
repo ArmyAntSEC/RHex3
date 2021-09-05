@@ -1,6 +1,8 @@
 #ifndef _SERIALSTREAM_H_
 #define _SERIALSTREAM_H_
 
+#ifdef ARDUINO
+
 #include <Arduino.h>
 
 enum _EndlCode { endl };
@@ -60,5 +62,12 @@ public:
 };
   
 extern SerialStream Log;
+
+#else
+
+#include <iostream>
+#define Log std::cout
+
+#endif
 
 #endif

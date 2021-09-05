@@ -1,3 +1,4 @@
+#ifdef ARDUINO
 #include <Arduino.h>
 #include "LevelLogger.h"
 #include "dataLogger.h"
@@ -87,5 +88,10 @@ void loop()
   //sched.run();
 }
 
+#endif
 
+int main()
+{
+
+}
 

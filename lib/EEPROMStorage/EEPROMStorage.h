@@ -1,6 +1,8 @@
 #ifndef _EEPROMSTORAGE_H_
 #define _EEPROMSTORAGE_H_
 
+#ifdef ARDUINO
+
 #include <EEPROM.h>
 
 class EEPROMStorage
@@ -50,5 +52,6 @@ class EEPROMStorage
             }
         }
 };
+#endif
 
 #endif
