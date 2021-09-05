@@ -23,44 +23,16 @@
 #ifndef _HOMINGENCODER_H_
 #define _HOMINGENCODER_H_
 
-#include <Arduino.h>
 #include <FixedPointsCommon.h>
 #include <LevelLogger.h>
 #include "RotationPositionWithLaps.h"
-
+#include "HomingEncoderHardwareInterface.h"
 #define MAX_ENCODERS_SUPPORTED 6
 
-class HomingEncoderNativeInterface
-{
-  public:
-  enum TriggerModes { _FALLING, _CHANGE };
-
-  void configurePins ( unsigned int encoderPin1, unsigned int encoderPin2, 
-    unsigned int homingPin )
-  {
-    pinMode(encoderPin1, INPUT_PULLUP);
-    pinMode(encoderPin2, INPUT_PULLUP);
-    pinMode(homingPin, INPUT_PULLUP);
-  }
-
-  void attachAnInterrupt(unsigned int pin, void(*isr)(), TriggerModes mode )
-  {            
-    PinStatus triggerMode = CHANGE;
-    switch ( mode ) {
-      case _FALLING:
-        triggerMode = FALLING;
-        break;
-      case _CHANGE:  
-        triggerMode = CHANGE;
-        break;        
-    }
-    attachInterrupt(digitalPinToInterrupt(pin), isr, triggerMode);    
-  }
-};
 
 struct HomingEncoder
 {
-  HomingEncoderNativeInterface nativeInterface;
+  HomingEncoderHardwareInterface nativeInterface;
 
   static const SQ15x16 clicksPerRevolution;
   const int speedTimeConstant = 10;
@@ -256,7 +228,7 @@ struct HomingEncoder
 class HomingEncoderFactory
 {
 private:
-  HomingEncoderNativeInterface nativeInterface;
+  HomingEncoderHardwareInterface nativeInterface;
 
 public:    
   static HomingEncoder stateList[MAX_ENCODERS_SUPPORTED];  
@@ -271,8 +243,8 @@ public:
     state->config( encoderPin1, encoderPin2, homingPin, offset );
     
     //Only trigger homing on rising or we home twice per rotation
-    nativeInterface.attachAnInterrupt( homingPin, isr_homing<N>, HomingEncoderNativeInterface::TriggerModes::_FALLING );
-    nativeInterface.attachAnInterrupt( encoderPin1, isr_encoder<N>, HomingEncoderNativeInterface::TriggerModes::_CHANGE );
+    nativeInterface.attachAnInterrupt( homingPin, isr_homing<N>, HomingEncoderHardwareInterface::TriggerModes::_FALLING );
+    nativeInterface.attachAnInterrupt( encoderPin1, isr_encoder<N>, HomingEncoderHardwareInterface::TriggerModes::_CHANGE );
         
     return state;
   }
