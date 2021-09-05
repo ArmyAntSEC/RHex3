@@ -81,9 +81,9 @@ struct HomingEncoder
   long int getRawPos()
   {
     long int r;
-    noInterrupts();
+    nativeInterface.disableInterrupts();
     r = raw_position;
-    interrupts();
+    nativeInterface.enableInterrupts();
     return r;
   }
 
@@ -98,7 +98,7 @@ struct HomingEncoder
     int clicksPerRevInt = clicksPerRevolution.getInteger();
     SQ15x16 precise_position = 0;
 
-    noInterrupts();
+    nativeInterface.disableInterrupts();
     if (raw_position > clicksPerRevInt)
     {
       precise_position = SQ15x16((long int)raw_position) + 
@@ -107,7 +107,7 @@ struct HomingEncoder
       position_remainder = SQ1x14(precise_position - floorFixed(precise_position));
       laps++;
     }
-    interrupts();
+    nativeInterface.enableInterrupts();
   }
 
   //Should be called once every 10ms to compute the speed.
@@ -122,7 +122,7 @@ struct HomingEncoder
     //Min clicks per second 4700
     //Min clicks per 0.01s = 47
 
-    unsigned long int nowU = micros();
+    unsigned long int nowU = nativeInterface.getMicrosecondsSinceBoot();
 
     int thisPos = this->getRawPos();    
     int lastPos = last_position;
@@ -178,49 +178,49 @@ struct HomingEncoder
   
   void unHome()
   {
-    noInterrupts();
+    nativeInterface.disableInterrupts();
     is_homed = false;    
-    interrupts();
+    nativeInterface.enableInterrupts();
   }
 
   void forceHomed()
   {
-    noInterrupts();
+    nativeInterface.disableInterrupts();
     is_homed = true;
     pos_at_last_home = raw_position;
     laps_at_last_home = laps;
     raw_position = 0;    
     laps = 0;
-    interrupts();  
+    nativeInterface.enableInterrupts();  
   }
 
   bool isHomed()
   {
-    noInterrupts();
+    nativeInterface.disableInterrupts();
     bool _is_homed = is_homed;
-    interrupts();
+    nativeInterface.enableInterrupts();
     return _is_homed;
   }
 
   int getPosAtLastHome()
   {
-    noInterrupts();
+    nativeInterface.disableInterrupts();
     int rValue = pos_at_last_home;
-    interrupts();
+    nativeInterface.enableInterrupts();
     return rValue;
   }
 
   int getLapsAtLastHome()
   {
-    noInterrupts();
+    nativeInterface.disableInterrupts();
     int rValue = laps_at_last_home;
-    interrupts();
+    nativeInterface.enableInterrupts();
     return rValue;
   }
 
   unsigned int getHomingPinValue()
   {
-    return digitalRead( homingPin );
+    return nativeInterface.getDigitalValueFromPin( homingPin );
   }
 
 };

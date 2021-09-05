@@ -34,4 +34,36 @@ class HomingEncoderHardwareInterface
     attachInterrupt(digitalPinToInterrupt(pin), isr, triggerMode);    
     #endif //Ignore this if we have no hardware
   }
+
+  void disableInterrupts()
+  {
+    #ifdef ARDUINO
+    noInterrupts();
+    #endif
+  }
+
+  void enableInterrupts()
+  {
+    #ifdef ARDUINO
+    interrupts();
+    #endif
+  }
+
+  unsigned long int getMicrosecondsSinceBoot()
+  {
+    #ifdef ARDUINO
+    return micros();
+    #else
+    return 0;
+    #endif
+  }
+
+  int getDigitalValueFromPin(int pin )
+  {
+    #ifdef ARDUINO
+    return digitalRead( pin );
+    #else
+    return 0;
+    #endif
+  }
 };
