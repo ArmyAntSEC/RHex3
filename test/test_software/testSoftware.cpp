@@ -2,6 +2,7 @@
 
 #include "testSpeedVsPowerConverter.h"
 #include "testRotationPositionWithLaps.h"
+#include "testVolatileRotationPositionWithLaps.h"
 #include "testEEPROMStorage.h"
 
 void setup() {
@@ -14,6 +15,7 @@ void setup() {
     runAllEEPROMStorageTests();
     runAllTestsSpeedVsPowerConverter();
     runAllTestsRotationPositionWithLap();
+    runAllTestsVolatileRotationPositionWithLap();
     
     
     UNITY_END();
