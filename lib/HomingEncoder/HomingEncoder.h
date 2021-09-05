@@ -30,8 +30,38 @@
 
 #define MAX_ENCODERS_SUPPORTED 6
 
+class HomingEncoderNativeInterface
+{
+  public:
+  enum TriggerModes { _FALLING, _CHANGE };
+
+  void configurePins ( unsigned int encoderPin1, unsigned int encoderPin2, 
+    unsigned int homingPin )
+  {
+    pinMode(encoderPin1, INPUT_PULLUP);
+    pinMode(encoderPin2, INPUT_PULLUP);
+    pinMode(homingPin, INPUT_PULLUP);
+  }
+
+  void attachAnInterrupt(unsigned int pin, void(*isr)(), TriggerModes mode )
+  {            
+    PinStatus triggerMode = CHANGE;
+    switch ( mode ) {
+      case _FALLING:
+        triggerMode = FALLING;
+        break;
+      case _CHANGE:  
+        triggerMode = CHANGE;
+        break;        
+    }
+    attachInterrupt(digitalPinToInterrupt(pin), isr, triggerMode);    
+  }
+};
+
 struct HomingEncoder
 {
+  HomingEncoderNativeInterface nativeInterface;
+
   static const SQ15x16 clicksPerRevolution;
   const int speedTimeConstant = 10;
 
@@ -58,14 +88,12 @@ struct HomingEncoder
   void config( unsigned int _encoderPin1,
               unsigned int _encoderPin2, unsigned int _breakerPin,
               int _offset )
-  {
-    pinMode(encoderPin1, INPUT_PULLUP);
-    pinMode(encoderPin2, INPUT_PULLUP);
-    pinMode(homingPin, INPUT_PULLUP);
-
+  {      
     encoderPin1 = _encoderPin1;
     encoderPin2 = _encoderPin2;
     homingPin = _breakerPin;
+    
+    nativeInterface.configurePins( encoderPin1, encoderPin2, homingPin );
 
     raw_position = 0;
     laps = 0;
@@ -227,10 +255,13 @@ struct HomingEncoder
 
 class HomingEncoderFactory
 {
+private:
+  HomingEncoderNativeInterface nativeInterface;
+
 public:    
   static HomingEncoder stateList[MAX_ENCODERS_SUPPORTED];  
 
-  template <int N> static HomingEncoder* config(
+  template <int N> HomingEncoder* config(
     unsigned int encoderPin1, unsigned int encoderPin2, 
     unsigned int homingPin, int offset )
   {
@@ -238,12 +269,10 @@ public:
     HomingEncoder* state = &stateList[N];
          
     state->config( encoderPin1, encoderPin2, homingPin, offset );
-
     
     //Only trigger homing on rising or we home twice per rotation
-    attachInterrupt(digitalPinToInterrupt(homingPin), isr_homing<N>, FALLING); 
-    attachInterrupt(digitalPinToInterrupt(encoderPin1), isr_encoder<N>, CHANGE);
-    //attachInterrupt(digitalPinToInterrupt(encoderPin2), isr_encoder<N>, CHANGE);
+    nativeInterface.attachAnInterrupt( homingPin, isr_homing<N>, HomingEncoderNativeInterface::TriggerModes::_FALLING );
+    nativeInterface.attachAnInterrupt( encoderPin1, isr_encoder<N>, HomingEncoderNativeInterface::TriggerModes::_CHANGE );
         
     return state;
   }

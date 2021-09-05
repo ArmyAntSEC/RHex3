@@ -48,7 +48,8 @@ void initOneLeg()
 
     driver.config( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM );        
     
-    encoder = HomingEncoderFactory::config<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );    
+    HomingEncoderFactory homingEncoderFactory;
+    encoder = homingEncoderFactory.config<0> ( ENCODER_1, ENCODER_2, OPTO, 0 );    
 
     encoderWrapperComputeSpeed.configure( encoder );
              
