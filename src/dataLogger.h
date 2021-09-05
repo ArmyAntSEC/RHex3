@@ -1,9 +1,11 @@
 #ifndef _DATALOGGER_H_
 #define _DATALOGGER_H_
 
-#include "LevelLogger.h"
+
 #include "RecurringTaskBase.h"
 
+/*
+//This function is probably overly complicated.
 class DataLogger: public RecurringTaskBase
 {
     private:
@@ -56,7 +58,7 @@ class DataLogger: public RecurringTaskBase
                         Log << thisRow[i] << ", ";
                     }
                     Log << endl;                    
-                */
+                * /
                 
                 memset( thisRow, 0, MaxColumns*sizeof(float) );     
                 thisRowWrittenTo = false;     
@@ -79,7 +81,7 @@ class DataLogger: public RecurringTaskBase
         }
         
 };
-
+*/
 
 
 #endif

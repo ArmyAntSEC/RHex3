@@ -6,7 +6,7 @@
  */
 
 #include "TaskScheduler.h"
-#include <LevelLogger.h>
+#include <SerialStream.h>
 #include <stdio.h> //For memset
 
 TaskScheduler::TaskScheduler() :
@@ -20,8 +20,8 @@ void TaskScheduler::add(Task* task) {
 		tasks[numTasks] = task;
 		numTasks++;
 	} else {
-		ERROR( F("More than ") << TaskScheduler::MaxTasks << 
-			F(" tasks cannot be allocated.") );
+		//ERROR( F("More than ") << TaskScheduler::MaxTasks << 
+		//	F(" tasks cannot be allocated.") );
 	}
 }
 

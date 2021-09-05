@@ -1,12 +1,10 @@
 #ifdef ARDUINO
 #include <Arduino.h>
-#include "LevelLogger.h"
 #include "dataLogger.h"
 #include <configureOneLeg.h>
 
 #include "HomingEncoder.h"
 #include <TaskScheduler.h>
-#include <LevelLogger.h>
 
 #include "getFreeMemory.h"
 #include "RecurringTaskGroup.h"
@@ -21,7 +19,7 @@ RecurringTaskGroup<16> recurring10ms( 10 );
 
 
 
-DataLogger dataLogger;
+//DataLogger dataLogger;
 
 void setup()
 {

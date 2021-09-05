@@ -2,7 +2,6 @@
 #define _ROTATIONPOSITIONWITHLAP_H_
 
 #include <FixedPointsCommon.h>
-#include <LevelLogger.h>
 
 class RotationPositionWithLaps
 {

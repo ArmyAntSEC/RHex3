@@ -9,13 +9,11 @@
 #define RECURRINGTASK_H_
 
 #include "RecurringTaskBase.h"
-#include <LevelLogger.h>
 
 class RecurringTask: public RecurringTaskBase { 
 protected:
     unsigned long int runTime;
-    unsigned int rate;    
-    LOGGABLE( "RecTask" );
+    unsigned int rate;        
 public:
 	RecurringTask( ): RecurringTask(1000)
     {}
@@ -35,8 +33,7 @@ public:
     }
 
     virtual void init( unsigned long int _now )
-    {                
-    	DEBUG(F("Init with rate: ") << this->rate << F(" at time ") << _now );
+    {                    	
         this->start(_now);                
     }
 

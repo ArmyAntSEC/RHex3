@@ -7,10 +7,15 @@
 class HardwareInterface
 {
   public:
+  #ifdef ARDUINO
   enum PinStatus { LOW = ::LOW, HIGH = ::HIGH, CHANGE = ::CHANGE, 
     FALLING = ::FALLING, RISING = ::RISING };
   enum PinMode { INPUT = ::INPUT, OUTPUT = ::OUTPUT, INPUT_PULLUP = ::INPUT_PULLUP, 
     INPUT_PULLDOWN  = ::INPUT_PULLDOWN } ;
+  #else
+  enum PinStatus { LOW, HIGH, CHANGE, FALLING, RISING };
+  enum PinMode { INPUT, OUTPUT, INPUT_PULLUP, INPUT_PULLDOWN } ;
+  #endif
   
   static void configurePin ( unsigned int pin, HardwareInterface::PinMode mode )
   {
@@ -44,6 +49,15 @@ class HardwareInterface
   {
     #ifdef ARDUINO
     return micros();
+    #else
+    return 0;
+    #endif
+  }
+
+  static unsigned long int getMillisecondsSinceBoot()
+  {
+    #ifdef ARDUINO
+    return millis();
     #else
     return 0;
     #endif

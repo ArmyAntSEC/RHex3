@@ -2,8 +2,8 @@
 #define _SERIALSTREAM_H_
 
 #ifdef ARDUINO
-
 #include <Arduino.h>
+#endif
 
 enum _EndlCode { endl };
 
@@ -12,7 +12,7 @@ class SerialStream
   
 public:
   SerialStream& operator<< ( char const * str )
-  {
+  {    
     Serial.print ( str );
     return *this;
   }
@@ -63,11 +63,5 @@ public:
   
 extern SerialStream Log;
 
-#else
-
-#include <iostream>
-#define Log std::cout
-
-#endif
 
 #endif

@@ -21,7 +21,7 @@ template <int MaxTasks> class RecurringTaskGroup: public RecurringTask
                 taskList[numTasks] = task;
                 numTasks++;
             } else {
-                ERROR(F("Too many tasks allocated: ") << numTasks << "/" << MaxTasks );
+                //ERROR(F("Too many tasks allocated: ") << numTasks << "/" << MaxTasks );
             }
         }
     

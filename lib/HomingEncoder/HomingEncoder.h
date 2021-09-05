@@ -24,7 +24,6 @@
 #define _HOMINGENCODER_H_
 
 #include <FixedPointsCommon.h>
-#include <LevelLogger.h>
 #include "RotationPositionWithLaps.h"
 #include <HardwareInterface.h>
 #define MAX_ENCODERS_SUPPORTED 6

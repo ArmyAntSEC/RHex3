@@ -3,7 +3,7 @@
 
 #include <FixedPointsCommon.h>
 #include <EEPROMStorage.h>
-#include <LevelLogger.h>
+#include <SerialStream.h>
 
 /* Measured values on the test motor
 Power: 32 Speed: 977
