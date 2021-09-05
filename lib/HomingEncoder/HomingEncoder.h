@@ -26,14 +26,12 @@
 #include <FixedPointsCommon.h>
 #include <LevelLogger.h>
 #include "RotationPositionWithLaps.h"
-#include "HomingEncoderHardwareInterface.h"
+#include <HardwareInterface.h>
 #define MAX_ENCODERS_SUPPORTED 6
 
 
 struct HomingEncoder
-{
-  HomingEncoderHardwareInterface nativeInterface;
-
+{  
   static const SQ15x16 clicksPerRevolution;
   const int speedTimeConstant = 10;
 
@@ -65,7 +63,9 @@ struct HomingEncoder
     encoderPin2 = _encoderPin2;
     homingPin = _breakerPin;
     
-    nativeInterface.configurePins( encoderPin1, encoderPin2, homingPin );
+    HardwareInterface::configurePin( encoderPin1, HardwareInterface::INPUT_PULLUP );
+    HardwareInterface::configurePin( encoderPin2, HardwareInterface::INPUT_PULLUP );
+    HardwareInterface::configurePin( homingPin, HardwareInterface::INPUT_PULLUP );    
 
     raw_position = 0;
     laps = 0;
@@ -81,9 +81,9 @@ struct HomingEncoder
   long int getRawPos()
   {
     long int r;
-    nativeInterface.disableInterrupts();
+    HardwareInterface::disableInterrupts();
     r = raw_position;
-    nativeInterface.enableInterrupts();
+    HardwareInterface::enableInterrupts();
     return r;
   }
 
@@ -98,7 +98,7 @@ struct HomingEncoder
     int clicksPerRevInt = clicksPerRevolution.getInteger();
     SQ15x16 precise_position = 0;
 
-    nativeInterface.disableInterrupts();
+    HardwareInterface::disableInterrupts();
     if (raw_position > clicksPerRevInt)
     {
       precise_position = SQ15x16((long int)raw_position) + 
@@ -107,7 +107,7 @@ struct HomingEncoder
       position_remainder = SQ1x14(precise_position - floorFixed(precise_position));
       laps++;
     }
-    nativeInterface.enableInterrupts();
+    HardwareInterface::enableInterrupts();
   }
 
   //Should be called once every 10ms to compute the speed.
@@ -122,7 +122,7 @@ struct HomingEncoder
     //Min clicks per second 4700
     //Min clicks per 0.01s = 47
 
-    unsigned long int nowU = nativeInterface.getMicrosecondsSinceBoot();
+    unsigned long int nowU = HardwareInterface::getMicrosecondsSinceBoot();
 
     int thisPos = this->getRawPos();    
     int lastPos = last_position;
@@ -178,58 +178,55 @@ struct HomingEncoder
   
   void unHome()
   {
-    nativeInterface.disableInterrupts();
+    HardwareInterface::disableInterrupts();
     is_homed = false;    
-    nativeInterface.enableInterrupts();
+    HardwareInterface::enableInterrupts();
   }
 
   void forceHomed()
   {
-    nativeInterface.disableInterrupts();
+    HardwareInterface::disableInterrupts();
     is_homed = true;
     pos_at_last_home = raw_position;
     laps_at_last_home = laps;
     raw_position = 0;    
     laps = 0;
-    nativeInterface.enableInterrupts();  
+    HardwareInterface::enableInterrupts();  
   }
 
   bool isHomed()
   {
-    nativeInterface.disableInterrupts();
+    HardwareInterface::disableInterrupts();
     bool _is_homed = is_homed;
-    nativeInterface.enableInterrupts();
+    HardwareInterface::enableInterrupts();
     return _is_homed;
   }
 
   int getPosAtLastHome()
   {
-    nativeInterface.disableInterrupts();
+    HardwareInterface::disableInterrupts();
     int rValue = pos_at_last_home;
-    nativeInterface.enableInterrupts();
+    HardwareInterface::enableInterrupts();
     return rValue;
   }
 
   int getLapsAtLastHome()
   {
-    nativeInterface.disableInterrupts();
+    HardwareInterface::disableInterrupts();
     int rValue = laps_at_last_home;
-    nativeInterface.enableInterrupts();
+    HardwareInterface::enableInterrupts();
     return rValue;
   }
 
   unsigned int getHomingPinValue()
   {
-    return nativeInterface.getDigitalValueFromPin( homingPin );
+    return HardwareInterface::getDigitalValueFromPin( homingPin );
   }
 
 };
 
 class HomingEncoderFactory
-{
-private:
-  HomingEncoderHardwareInterface nativeInterface;
-
+{  
 public:    
   static HomingEncoder stateList[MAX_ENCODERS_SUPPORTED];  
 
@@ -243,8 +240,8 @@ public:
     state->config( encoderPin1, encoderPin2, homingPin, offset );
     
     //Only trigger homing on rising or we home twice per rotation
-    nativeInterface.attachAnInterrupt( homingPin, isr_homing<N>, HomingEncoderHardwareInterface::TriggerModes::_FALLING );
-    nativeInterface.attachAnInterrupt( encoderPin1, isr_encoder<N>, HomingEncoderHardwareInterface::TriggerModes::_CHANGE );
+    HardwareInterface::attachAnInterrupt( homingPin, isr_homing<N>, HardwareInterface::FALLING );
+    HardwareInterface::attachAnInterrupt( encoderPin1, isr_encoder<N>, HardwareInterface::CHANGE );
         
     return state;
   }

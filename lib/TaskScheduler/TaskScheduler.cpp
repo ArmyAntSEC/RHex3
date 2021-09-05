@@ -6,8 +6,8 @@
  */
 
 #include "TaskScheduler.h"
-
 #include <LevelLogger.h>
+#include <stdio.h> //For memset
 
 TaskScheduler::TaskScheduler() :
   numTasks(0)
