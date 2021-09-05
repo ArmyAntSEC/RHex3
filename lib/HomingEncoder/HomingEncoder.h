@@ -39,15 +39,17 @@ struct HomingEncoder
   int encoderPin2;
   int homingPin;
 
-  //TODO: Turn all of this into an isr-safe object
+  //TODO: Convert this to an object with volatile members that can atomically generate a copy of itself.
   volatile long int raw_position;
   volatile long int laps;
   SQ1x14 position_remainder;
 
   volatile bool is_homed;
+  //TODO: Use the above isr-safe object to also handle these things to that we can handle pos at last home in a more robust manner.
   volatile long int pos_at_last_home;
-  volatile long int pos_at_last_home_click;
+  volatile long int laps_at_last_home;
 
+  //Also use the above object here as well.
   long int last_position;
   unsigned long int last_position_timestamp_micros;
   SQ15x16 speed_cps;
@@ -177,8 +179,7 @@ struct HomingEncoder
   void unHome()
   {
     noInterrupts();
-    is_homed = false;
-    pos_at_last_home = 0;
+    is_homed = false;    
     interrupts();
   }
 
@@ -187,6 +188,7 @@ struct HomingEncoder
     noInterrupts();
     is_homed = true;
     pos_at_last_home = raw_position;
+    laps_at_last_home = laps;
     raw_position = 0;    
     laps = 0;
     interrupts();  
@@ -208,10 +210,10 @@ struct HomingEncoder
     return rValue;
   }
 
-  int getPosAtLastHomeClick()
+  int getLapsAtLastHome()
   {
     noInterrupts();
-    int rValue = pos_at_last_home_click;
+    int rValue = laps_at_last_home;
     interrupts();
     return rValue;
   }
@@ -241,7 +243,7 @@ public:
     //Only trigger homing on rising or we home twice per rotation
     attachInterrupt(digitalPinToInterrupt(homingPin), isr_homing<N>, FALLING); 
     attachInterrupt(digitalPinToInterrupt(encoderPin1), isr_encoder<N>, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(encoderPin2), isr_encoder<N>, CHANGE);
+    //attachInterrupt(digitalPinToInterrupt(encoderPin2), isr_encoder<N>, CHANGE);
         
     return state;
   }
@@ -254,13 +256,12 @@ public:
 
   template <int N> static void isr_homing(void)
   {    
-    HomingEncoder *state = &stateList[N];    
-    
-    state->pos_at_last_home_click = state->raw_position;
+    HomingEncoder *state = &stateList[N];        
 
     if ( !(state->is_homed) && state->raw_position > 200 ) {  //Do some debouncing.
       state->is_homed = true;
       state->pos_at_last_home = state->raw_position;
+      state->laps_at_last_home = state->laps;
       state->raw_position = 0;
       state->laps = 0;
     }

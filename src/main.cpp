@@ -44,7 +44,7 @@ void setup()
     
     Log << "[" << millis() << "] Breaker: " << encoder->getHomingPinValue() << " is homed: " << encoder->is_homed;
     Log << " Encoder: " << encoder->getPosition().getSerialPosition() << " Raw pos: " << encoder->raw_position;
-    Log << " Post at last home click: " << encoder->getPosAtLastHomeClick() << endl;
+    Log << endl;
     
     digitalWrite( 13, encoder->getHomingPinValue() ); //Blink the onboard LED as the homing breaker moves.  
     

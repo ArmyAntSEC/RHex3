@@ -9,7 +9,7 @@
 #include "LegController.h"
 #include "SpeedToPowerConverter.h"
 
-#define MOTOR1 1
+//#define MOTOR1 1
 
 #ifdef MOTOR1
 
