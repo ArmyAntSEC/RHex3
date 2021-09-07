@@ -63,6 +63,13 @@ class HardwareInterface
     #endif
   }
 
+  static void delayForMilliseconds( unsigned long int milliseconds )
+  {
+    #ifdef ARDUINO
+    delay(2000);
+    #endif
+  }
+
   static int getDigitalValueFromPin(int pin )
   {
     #ifdef ARDUINO

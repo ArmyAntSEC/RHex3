@@ -7,7 +7,13 @@
 
 #include "TaskScheduler.h"
 #include <SerialStream.h>
+#include <HardwareInterface.h>
+
+#ifdef ARDUINO
 #include <stdio.h> //For memset
+#else
+#include <cstring>
+#endif
 
 TaskScheduler::TaskScheduler() :
   numTasks(0)
@@ -26,25 +32,21 @@ void TaskScheduler::add(Task* task) {
 }
 
 void TaskScheduler::run() {	
-	
-	unsigned long int nowU = micros();		
-	unsigned long int now = millis();		
-	for (int i = 0; i < numTasks; i++) {
-		//DEBUG(F("Checking task ") << i << " of " << numTasks << F(" at time ") << now );
+	unsigned long int nowU = HardwareInterface::getMicrosecondsSinceBoot();		
+	unsigned long int now = HardwareInterface::getMillisecondsSinceBoot();		
+	for (int i = 0; i < numTasks; i++) {		
 		Task* thisTask = this->tasks[i];				
 		if (thisTask->canRun(now)) {													
 			thisTask->run(now);											
-		} 
-		//DEBUG(F("Done with task ") << i << " of " << numTasks << F(" at time ") << now );				
-	}
-	//ERROR(F("----- Done with run") );
+		} 		
+	}	
 }
 
 void TaskScheduler::delayWithScheduler( unsigned long timeToWait )
 {
-    unsigned long startTime = millis();
+    unsigned long startTime = HardwareInterface::getMillisecondsSinceBoot();
     unsigned long endTime = startTime + timeToWait;
-    while ( millis() < endTime ) {
+    while ( HardwareInterface::getMillisecondsSinceBoot() < endTime ) {
         run();
     }
 }

@@ -9,7 +9,6 @@ void testSetAndReadPostion()
 
     TEST_ASSERT_EQUAL( clickPosition, pos.getClickPosition() );
     TEST_ASSERT_EQUAL( laps, pos.getLaps() );
-
 }
 
 void testGetClicksPerRotation()

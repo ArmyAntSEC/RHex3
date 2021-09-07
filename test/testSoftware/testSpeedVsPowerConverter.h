@@ -40,6 +40,9 @@ void testGetFreeSpeedForPowerInterpolate (void)
 
 void testInitSpeedToPowerConverterFromEEPROM()
 {
+    #ifndef ARDUINO
+    TEST_IGNORE();
+    #endif
 
     SpeedToPowerConverterTest converter;
     TEST_ASSERT_EQUAL( 0, converter.speedVsPower[0][0] );
@@ -53,6 +56,10 @@ void testInitSpeedToPowerConverterFromEEPROM()
 
 void testSaveSpeedToPowerConverterToEEPROM()
 {
+    #ifndef ARDUINO
+    TEST_IGNORE();
+    #endif
+    
     const int converterEEPROMStartIndex = 96;
     EEPROMStorage eeprom;
     eeprom.writeIntToIndex( converterEEPROMStartIndex, 56 );  //Overwrite the first value of the default storage location

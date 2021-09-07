@@ -3,6 +3,8 @@
 
 #ifdef ARDUINO
 #include <Arduino.h>
+#else
+#include <iostream>
 #endif
 
 enum _EndlCode { endl };
@@ -11,51 +13,26 @@ class SerialStream
 {
   
 public:
-  SerialStream& operator<< ( char const * str )
+  template<class T>
+  SerialStream& operator<< ( T arg )
   {    
-    Serial.print ( str );
+    #ifdef ARDUINO
+    Serial.print ( arg );
+    #else
+    std::cout << arg;
+    #endif
+    
     return *this;
   }
-  
-  SerialStream& operator<< ( String str )
-  {
-    Serial.print ( str );
-    return *this;
-  }
-  
-  SerialStream& operator<< ( long int num )
-  {
-    Serial.print ( num );
-    return *this;
-  }
-  
-  SerialStream& operator<< ( long unsigned int num )
-  {
-    Serial.print ( num );
-    return *this;
-  }
-  
-  SerialStream& operator<< ( int num )
-  {
-    Serial.print ( num );
-    return *this;
-  }
-  
-  SerialStream& operator<< ( unsigned int num )
-  {
-    Serial.print ( num );
-    return *this;
-  }
-  
-  SerialStream& operator<< ( double num )
-  {
-    Serial.print ( num );
-    return *this;
-  }
-  
+    
   SerialStream& operator<< (  _EndlCode )
   {
+    #ifdef ARDUINO
     Serial.println ();
+    #else
+    std::cout << endl;
+    #endif
+
     return *this;
   }
   
