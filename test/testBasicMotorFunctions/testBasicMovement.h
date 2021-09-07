@@ -43,15 +43,12 @@ void testSimpleHoming() {
                 unsigned long int endPos = encoder->getPosAtLastHome();
                 TEST_ASSERT_LESS_THAN( 1796, endPos ); //Make sure we home within one rotation            
                 encoder->unHome(); //Then we unhome the encoder to keep moving
-                firstRound = false;    
-                //Log << "First homing" << endl;        
+                firstRound = false;                    
             } else {
                 driver.setMotorPWM(0);
                 unsigned long int endPos = encoder->getPosAtLastHome();
-                unsigned long int endLaps = encoder->getLapsAtLastHome();
-                Log << "Laps: " << endLaps << " Pos: " << endPos << endl;
-                TEST_ASSERT_INT_WITHIN( 10, 1796, endPos ); //Make sure we have gone exactly 1 round            
-                //Log << "Second homing" << endl;
+                unsigned long int endLaps = encoder->getLapsAtLastHome();                
+                TEST_ASSERT_INT_WITHIN( 10, 1796, endPos ); //Make sure we have gone exactly 1 round                            
                 return;
             }
         }
@@ -87,6 +84,7 @@ void testEncoderForStandingStill()
 }
 
 void testSimpleMoveWithSpeed() {        
+    TEST_IGNORE();
 
     unsigned long int timeToMove = 1000;  
 
@@ -117,16 +115,19 @@ void testMoveWithPredictedSpeedPower32()
 
 void testMoveWithPredictedSpeedPower64()
 {
+    TEST_IGNORE();
     doTestMoveWithPredictedSpeed(64);
 }
 
 void testMoveWithPredictedSpeedPower128()
 {
+    TEST_IGNORE();
     doTestMoveWithPredictedSpeed(128);
 }
 
 void testMoveWithPredictedSpeedPower255()
 {
+    TEST_IGNORE();
     doTestMoveWithPredictedSpeed(255);
 }
 

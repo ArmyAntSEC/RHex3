@@ -26,6 +26,7 @@
 #include <FixedPointsCommon.h>
 #include "RotationPositionWithLaps.h"
 #include <HardwareInterface.h>
+#include <VolatileRotationPositionWithLaps.h>
 #define MAX_ENCODERS_SUPPORTED 6
 
 class HomingEncoder
@@ -39,9 +40,7 @@ private:
   int homingPin;
 
   //TODO: Convert this to an object with volatile members that can atomically generate a copy of itself.
-  volatile long int raw_position;
-  volatile long int laps;
-  SQ1x14 position_remainder;
+  VolatileRotationPositionWithLaps position;
 
   volatile bool is_homed;
   //TODO: Use the above isr-safe object to also handle these things to that we can handle pos at last home in a more robust manner.
@@ -67,9 +66,7 @@ public:
     HardwareInterface::configurePin(encoderPin2, HardwareInterface::INPUT_PULLUP);
     HardwareInterface::configurePin(homingPin, HardwareInterface::INPUT_PULLUP);
 
-    raw_position = 0;
-    laps = 0;
-    position_remainder = 0;
+    position = VolatileRotationPositionWithLaps();
 
     is_homed = false;
     pos_at_last_home = 0;
@@ -81,35 +78,28 @@ public:
     speed_cps_filtered = 0;
   }
 
-  long int getRawPos()
-  {
-    long int r;
-    HardwareInterface::disableInterrupts();
-    r = raw_position;
-    HardwareInterface::enableInterrupts();
-    return r;
-  }
-
   RotationPositionWithLaps getPosition()
   {
-    return RotationPositionWithLaps(
-        this->getRawPos(), this->laps, this->position_remainder);
+    return position.getNonVolatileCopy();
+  }
+
+  long int getRawPos()
+  {
+    HardwareInterface::disableInterrupts();
+    long int pos = position.getClickPosition();    
+    HardwareInterface::enableInterrupts();
+    return pos;
+  }
+
+  long int getRawPosISR()
+  {
+    return position.getClickPosition();
   }
 
   void handleOverflow()
-  {
-    int clicksPerRevInt = clicksPerRevolution.getInteger();
-    SQ15x16 precise_position = 0;
-
+  {    
     HardwareInterface::disableInterrupts();
-    if (raw_position > clicksPerRevInt)
-    {
-      precise_position = SQ15x16((long int)raw_position) +
-                         SQ15x16(position_remainder) - clicksPerRevolution;
-      raw_position = floorFixed(precise_position).getInteger();
-      position_remainder = SQ1x14(precise_position - floorFixed(precise_position));
-      laps++;
-    }
+    position.reduceToMinimalForm();
     HardwareInterface::enableInterrupts();
   }
 
@@ -196,10 +186,9 @@ public:
   void forceHomedISR()
   {
     is_homed = true;
-    pos_at_last_home = raw_position;
-    laps_at_last_home = laps;
-    raw_position = 0;
-    laps = 0;
+    pos_at_last_home = position.getClickPosition();
+    laps_at_last_home = position.getLaps();
+    position = VolatileRotationPositionWithLaps();
   }
 
   bool isHomed()
@@ -233,12 +222,7 @@ public:
 
   void incrementRawPosISR()
   {
-    raw_position++;
-  }
-
-  long int getRawPosISR()
-  {
-    return raw_position;
+    position.incrementMe();
   }
 
   unsigned int getHomingPinValue()

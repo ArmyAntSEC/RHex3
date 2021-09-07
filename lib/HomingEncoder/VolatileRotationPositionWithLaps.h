@@ -14,7 +14,7 @@ private:
     static const long int clicksPerRotationMicroClickFractionPart;
 
 public:
-    VolatileRotationPositionWithLaps(int _clickPosition, long int _laps, long int _remainder = 0) : 
+    VolatileRotationPositionWithLaps(int _clickPosition=0, long int _laps=0, long int _remainder = 0) : 
         clickPosition(_clickPosition), laps(_laps), remainderInMicroClick(_remainder)
     {
         reduceToMinimalForm();
@@ -54,6 +54,16 @@ public:
     long int getRemainderMicroClicks()
     {
         return remainderInMicroClick;
+    }
+
+    void incrementMe()
+    {
+        clickPosition++;        
+    }
+    
+    RotationPositionWithLaps getNonVolatileCopy()
+    {
+        return RotationPositionWithLaps( clickPosition, laps, 0 );
     }
 };
 

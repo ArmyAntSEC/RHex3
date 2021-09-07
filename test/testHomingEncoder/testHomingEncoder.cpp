@@ -2,11 +2,13 @@
 
 #include <HardwareInterface.h>
 #include "testHomingEncoderISRs.h"
+#include "testHomingEncoderOverflow.h"
 
 void process()
 {
     UNITY_BEGIN();  
     runAllTestsHomingEncoderISR();      
+    runAllTestsHomingEncoderOverflow();
     UNITY_END();
 }
 
