@@ -28,9 +28,9 @@
 #include <HardwareInterface.h>
 #define MAX_ENCODERS_SUPPORTED 6
 
-
-struct HomingEncoder
-{  
+class HomingEncoder
+{
+private:
   static const SQ15x16 clicksPerRevolution;
   const int speedTimeConstant = 10;
 
@@ -54,17 +54,18 @@ struct HomingEncoder
   SQ15x16 speed_cps;
   SQ15x16 speed_cps_filtered;
 
-  void config( unsigned int _encoderPin1,
+public:
+  void config(unsigned int _encoderPin1,
               unsigned int _encoderPin2, unsigned int _breakerPin,
-              int _offset )
-  {      
+              int _offset)
+  {
     encoderPin1 = _encoderPin1;
     encoderPin2 = _encoderPin2;
     homingPin = _breakerPin;
-    
-    HardwareInterface::configurePin( encoderPin1, HardwareInterface::INPUT_PULLUP );
-    HardwareInterface::configurePin( encoderPin2, HardwareInterface::INPUT_PULLUP );
-    HardwareInterface::configurePin( homingPin, HardwareInterface::INPUT_PULLUP );    
+
+    HardwareInterface::configurePin(encoderPin1, HardwareInterface::INPUT_PULLUP);
+    HardwareInterface::configurePin(encoderPin2, HardwareInterface::INPUT_PULLUP);
+    HardwareInterface::configurePin(homingPin, HardwareInterface::INPUT_PULLUP);
 
     raw_position = 0;
     laps = 0;
@@ -72,9 +73,12 @@ struct HomingEncoder
 
     is_homed = false;
     pos_at_last_home = 0;
+    laps_at_last_home = 0;
+
     last_position = 0;
     last_position_timestamp_micros = 0;
-    speed_cps = 0;    
+    speed_cps = 0;
+    speed_cps_filtered = 0;
   }
 
   long int getRawPos()
@@ -89,7 +93,7 @@ struct HomingEncoder
   RotationPositionWithLaps getPosition()
   {
     return RotationPositionWithLaps(
-      this->getRawPos(), this->laps, this->position_remainder );
+        this->getRawPos(), this->laps, this->position_remainder);
   }
 
   void handleOverflow()
@@ -100,8 +104,8 @@ struct HomingEncoder
     HardwareInterface::disableInterrupts();
     if (raw_position > clicksPerRevInt)
     {
-      precise_position = SQ15x16((long int)raw_position) + 
-        SQ15x16(position_remainder) - clicksPerRevolution;
+      precise_position = SQ15x16((long int)raw_position) +
+                         SQ15x16(position_remainder) - clicksPerRevolution;
       raw_position = floorFixed(precise_position).getInteger();
       position_remainder = SQ1x14(precise_position - floorFixed(precise_position));
       laps++;
@@ -112,7 +116,7 @@ struct HomingEncoder
   //Should be called once every 10ms to compute the speed.
   virtual void run()
   {
-    
+
     //Calculate the max range for values:
     //Max rpm: 3
     //Max clicks per second: 3*3500 = 10000
@@ -123,9 +127,9 @@ struct HomingEncoder
 
     unsigned long int nowU = HardwareInterface::getMicrosecondsSinceBoot();
 
-    int thisPos = this->getRawPos();    
+    int thisPos = this->getRawPos();
     int lastPos = last_position;
-    unsigned long int lastTimeU = last_position_timestamp_micros;    
+    unsigned long int lastTimeU = last_position_timestamp_micros;
 
     SQ15x16 posDelta = positionPositiveDifference(thisPos, lastPos);
     last_position = thisPos;
@@ -153,19 +157,19 @@ struct HomingEncoder
          this->speedTimeConstant) *
         (this->speedTimeConstant - 1);
 
-    //Make sure that we handle any overflows.    
-    handleOverflow();    
+    //Make sure that we handle any overflows.
+    handleOverflow();
   }
-  
+
   static long int positionPositiveDifference(long int pos1, long int pos2)
   {
     if (pos1 >= pos2)
       return pos1 - pos2;
     else
       return clicksPerRevolution.getInteger() + pos1 - pos2;
-  }  
+  }
 
-   long int getSpeedCPS()
+  long int getSpeedCPS()
   {
     return speed_cps.getInteger();
   }
@@ -174,23 +178,28 @@ struct HomingEncoder
   {
     return speed_cps_filtered.getInteger();
   }
-  
+
   void unHome()
   {
     HardwareInterface::disableInterrupts();
-    is_homed = false;    
+    is_homed = false;
     HardwareInterface::enableInterrupts();
   }
 
   void forceHomed()
   {
     HardwareInterface::disableInterrupts();
+    forceHomedISR();
+    HardwareInterface::enableInterrupts();
+  }
+
+  void forceHomedISR()
+  {
     is_homed = true;
     pos_at_last_home = raw_position;
     laps_at_last_home = laps;
-    raw_position = 0;    
+    raw_position = 0;
     laps = 0;
-    HardwareInterface::enableInterrupts();  
   }
 
   bool isHomed()
@@ -199,6 +208,11 @@ struct HomingEncoder
     bool _is_homed = is_homed;
     HardwareInterface::enableInterrupts();
     return _is_homed;
+  }
+
+  bool isHomedISR()
+  {    
+    return is_homed;
   }
 
   int getPosAtLastHome()
@@ -217,52 +231,62 @@ struct HomingEncoder
     return rValue;
   }
 
-  unsigned int getHomingPinValue()
+  void incrementRawPosISR()
   {
-    return HardwareInterface::getDigitalValueFromPin( homingPin );
+    raw_position++;
   }
 
+  long int getRawPosISR()
+  {
+    return raw_position;
+  }
+
+  unsigned int getHomingPinValue()
+  {
+    return HardwareInterface::getDigitalValueFromPin(homingPin);
+  }
 };
 
 class HomingEncoderFactory
-{  
-public:    
-  static HomingEncoder stateList[MAX_ENCODERS_SUPPORTED];  
+{
+public:
+  static HomingEncoder stateList[MAX_ENCODERS_SUPPORTED];
 
-  template <int N> HomingEncoder* config(
-    unsigned int encoderPin1, unsigned int encoderPin2, 
-    unsigned int homingPin, int offset )
+  template <int N>
+  static HomingEncoder *config(
+      unsigned int encoderPin1, unsigned int encoderPin2,
+      unsigned int homingPin, int offset)
   {
-    static_assert(N < MAX_ENCODERS_SUPPORTED);    
-    HomingEncoder* state = &stateList[N];
-         
-    state->config( encoderPin1, encoderPin2, homingPin, offset );
-    
+    static_assert(N < MAX_ENCODERS_SUPPORTED);
+    HomingEncoder *state = &stateList[N];
+
+    state->config(encoderPin1, encoderPin2, homingPin, offset);
+
     //Only trigger homing on rising or we home twice per rotation
-    HardwareInterface::attachAnInterrupt( homingPin, isr_homing<N>, HardwareInterface::FALLING );
-    HardwareInterface::attachAnInterrupt( encoderPin1, isr_encoder<N>, HardwareInterface::CHANGE );
-        
+    HardwareInterface::attachAnInterrupt(homingPin, isr_homing<N>, HardwareInterface::FALLING);
+    HardwareInterface::attachAnInterrupt(encoderPin1, isr_encoder<N>, HardwareInterface::CHANGE);
+
     return state;
   }
-  
-  template <int N> static void isr_encoder(void)
-  {    
+
+  template <int N>
+  static void isr_encoder(void)
+  {
     HomingEncoder *state = &stateList[N];
-    state->raw_position++;   
+    state->incrementRawPosISR();
   }
 
-  template <int N> static void isr_homing(void)
-  {    
-    HomingEncoder *state = &stateList[N];        
+  template <int N>
+  static void isr_homing(void)
+  {
+    HomingEncoder *state = &stateList[N];
 
-    if ( !(state->is_homed) && state->raw_position > 200 ) {  //Do some debouncing.
-      state->is_homed = true;
-      state->pos_at_last_home = state->raw_position;
-      state->laps_at_last_home = state->laps;
-      state->raw_position = 0;
-      state->laps = 0;
+    
+    if (!state->isHomed() && state->getRawPosISR() > 200)
+    { //Do some debouncing.
+      state->forceHomedISR();
     }
-  }  
+  }
 };
 
 #endif

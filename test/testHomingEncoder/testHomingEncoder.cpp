@@ -1,19 +1,13 @@
 #include <unity.h>
 
-#include "testSpeedVsPowerConverter.h"
-#include "testRotationPositionWithLaps.h"
-#include "testVolatileRotationPositionWithLaps.h"
 #include <HardwareInterface.h>
+#include "testHomingEncoderISRs.h"
 
 void process()
 {
-    UNITY_BEGIN();        
-    runAllTestsSpeedVsPowerConverter();
-    runAllTestsRotationPositionWithLap();
-    runAllTestsVolatileRotationPositionWithLap();        
+    UNITY_BEGIN();  
+    runAllTestsHomingEncoderISR();      
     UNITY_END();
-    
-
 }
 
 #ifdef ARDUINO
