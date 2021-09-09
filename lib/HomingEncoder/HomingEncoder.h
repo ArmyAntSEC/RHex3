@@ -183,20 +183,9 @@ public:
     return is_homed;
   }
 
-  int getPosAtLastHome()
+  RotationPositionWithLaps getPosAtLastHome()
   {
-    HardwareInterface::disableInterrupts();
-    int rValue = positionAtLastHome.getClickPositionISR();
-    HardwareInterface::enableInterrupts();
-    return rValue;
-  }
-
-  int getLapsAtLastHome()
-  {
-    HardwareInterface::disableInterrupts();
-    int rValue = positionAtLastHome.getLapsISR();
-    HardwareInterface::enableInterrupts();
-    return rValue;
+    return positionAtLastHome.getNonVolatileCopy();
   }
 
   void incrementRawPosISR()

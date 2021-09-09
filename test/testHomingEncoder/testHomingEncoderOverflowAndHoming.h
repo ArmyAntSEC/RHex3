@@ -49,8 +49,8 @@ void doTestForceHomed()
     //Do the forced homing.
     encoder->forceHomed();
     
-    TEST_ASSERT_EQUAL( 2000-1796, encoder->getPosAtLastHome() );
-    TEST_ASSERT_EQUAL( 1, encoder->getLapsAtLastHome() );
+    TEST_ASSERT_EQUAL( 2000-1796, encoder->getPosAtLastHome().getClickPosition() );
+    TEST_ASSERT_EQUAL( 1, encoder->getPosAtLastHome().getLaps() );
 
     TEST_ASSERT_EQUAL( 0, encoder->getPosition().getClickPosition() );
     TEST_ASSERT_EQUAL( 0, encoder->getPosition().getLaps() );

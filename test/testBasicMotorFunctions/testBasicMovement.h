@@ -40,14 +40,13 @@ void testSimpleHoming() {
     while ( millis() < endTime ) {   
         if ( encoder->isHomed() ) {
             if ( firstRound ) {
-                unsigned long int endPos = encoder->getPosAtLastHome();
+                unsigned long int endPos = encoder->getPosAtLastHome().getClickPosition();
                 TEST_ASSERT_LESS_THAN( 1796, endPos ); //Make sure we home within one rotation            
                 encoder->unHome(); //Then we unhome the encoder to keep moving
                 firstRound = false;                    
             } else {
                 driver.setMotorPWM(0);
-                unsigned long int endPos = encoder->getPosAtLastHome();
-                unsigned long int endLaps = encoder->getLapsAtLastHome();                                                
+                unsigned long int endPos = encoder->getPosAtLastHome().getClickPosition();                
                 TEST_ASSERT_INT_WITHIN( 10, 1796, endPos ); //Make sure we have gone exactly 1 round                                            
                 return;
             }
