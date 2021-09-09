@@ -32,9 +32,22 @@ void testVolatileConvertClicksToPrecisePosition2Laps()
     TEST_ASSERT_EQUAL( 74668, pos.getRemainderMicroClicks() );
 }
 
+void testVolatileConvertToNonVolatileCopy()
+{
+
+    VolatileRotationPositionWithLaps volatilePos( 1234, 1, 54321 );
+    RotationPositionWithLaps nonVolatilePos = volatilePos.getNonVolatileCopy();
+
+    TEST_ASSERT_EQUAL ( 1234, nonVolatilePos.getClickPosition()  );
+    TEST_ASSERT_EQUAL ( 1, nonVolatilePos.getLaps()  );
+    TEST_ASSERT_DOUBLE_WITHIN( 1e-4, 0.054321, nonVolatilePos.getRemainder() );
+    TEST_ASSERT_INT_WITHIN( 100, 54321, nonVolatilePos.getRemainderMicroClicks() );
+}
+
 void runAllTestsVolatileRotationPositionWithLap()
 {        
     RUN_TEST( testVolatileSetAndReadPostion );    
     RUN_TEST( testVolatileConvertClicksToPrecisePosition );
     RUN_TEST( testVolatileConvertClicksToPrecisePosition2Laps );
+    RUN_TEST( testVolatileConvertToNonVolatileCopy );
 };

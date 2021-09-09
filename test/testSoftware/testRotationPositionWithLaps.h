@@ -28,6 +28,7 @@ void testConvertClicksToPrecisePosition()
     TEST_ASSERT_DOUBLE_WITHIN ( 1e-5, 3156 - 1796, (double)pos.getClickPosition()  );
     TEST_ASSERT_EQUAL ( 1, pos.getLaps()  );
     TEST_ASSERT_DOUBLE_WITHIN( 1e-4, 1-0.9626665, (double)pos.getRemainder() );
+    TEST_ASSERT_INT_WITHIN( 100, 1e6-962666, pos.getRemainderMicroClicks() );
 }
 
 void testConvertClicksToPrecisePosition2Laps()

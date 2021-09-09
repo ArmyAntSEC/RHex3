@@ -30,7 +30,7 @@ public:
     #ifdef ARDUINO
     Serial.println ();
     #else
-    std::cout << endl;
+    std::cout << std::endl;
     #endif
 
     return *this;

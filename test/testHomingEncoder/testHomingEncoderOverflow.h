@@ -15,8 +15,8 @@ void testDoOverflow()
     encoder->handleOverflow();
 
     TEST_ASSERT_EQUAL( 1, encoder->getPosition().getLaps() );
-    TEST_ASSERT_EQUAL( 2000-1796, encoder->getPosition().getClickPosition() );        
-    TEST_MESSAGE( "TODO: Check the remainder as well.");
+    TEST_ASSERT_EQUAL( 2000-1796, encoder->getPosition().getClickPosition() );         
+    TEST_ASSERT_INT_WITHIN( 100, 1e6-962666, encoder->getPosition().getRemainderMicroClicks() );    
 }
 
 

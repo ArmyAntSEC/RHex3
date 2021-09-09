@@ -78,6 +78,12 @@ public:
         return this->remainder;
     }
 
+    long int getRemainderMicroClicks()
+    {
+        return (long int)(((double)this->remainder)*1e6);
+    }
+
+
     SQ15x16 getClicksPerRotation()
     {
         return this->clicksPerRotation;

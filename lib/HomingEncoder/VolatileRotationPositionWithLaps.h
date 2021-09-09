@@ -2,6 +2,7 @@
 #define _VOLATILEROTATIONPOSITIONWITHLAPS_H_
 
 #include <RotationPositionWithLaps.h>
+#include <SerialStream.h>
 
 class VolatileRotationPositionWithLaps
 {
@@ -63,7 +64,9 @@ public:
     
     RotationPositionWithLaps getNonVolatileCopy()
     {
-        return RotationPositionWithLaps( clickPosition, laps, 0 );
+        double fractionalRemainder = ((double)remainderInMicroClick)/1e6;
+        Log << "Fractional remainder: " << fractionalRemainder << endl;
+        return RotationPositionWithLaps( clickPosition, laps, fractionalRemainder );
     }
 };
 
