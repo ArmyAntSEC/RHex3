@@ -14,16 +14,7 @@ private:
     
 
 public:
-    RotationPositionWithLaps(): 
-        clickPosition(0), laps(0), remainder(0)
-    {}
-
-    RotationPositionWithLaps(int _clickPosition, long int _laps) : clickPosition(_clickPosition), laps(_laps)
-    {    
-        this->reduceToMinimalFormWithRecursion();
-    }
-
-    RotationPositionWithLaps(int _clickPosition, long int _laps, SQ1x14 _remainder) : 
+    RotationPositionWithLaps(int _clickPosition = 0, long int _laps = 0, SQ1x14 _remainder = 0) : 
         clickPosition(_clickPosition), laps(_laps), remainder(_remainder)
     {    
         this->reduceToMinimalFormWithRecursion();
@@ -63,33 +54,33 @@ public:
         this->laps++;            
     }
 
-    int getClickPosition()
+    int getClickPosition() const
     {
         return this->clickPosition;
     }
 
-    int getLaps()
+    int getLaps() const
     {
         return this->laps;
     }
 
-    SQ1x14 getRemainder()
+    SQ1x14 getRemainder() const
     {
         return this->remainder;
     }
 
-    long int getRemainderMicroClicks()
+    long int getRemainderMicroClicks() const
     {
         return (long int)(((double)this->remainder)*1e6);
     }
 
 
-    SQ15x16 getClicksPerRotation()
+    SQ15x16 getClicksPerRotation() const
     {
         return this->clicksPerRotation;
     }
 
-    int getShortestPositiveDifferenceInt( RotationPositionWithLaps* pos2 )
+    long getShortestPositiveDifferenceInt( RotationPositionWithLaps const * const pos2 )
     {
         long clicksDifference = this->getClickPosition() - pos2->getClickPosition();
         if ( clicksDifference < 0 ) {                    
@@ -99,7 +90,7 @@ public:
         return  clicksDifference;
     }
 
-    long getDifferenceInClicks( RotationPositionWithLaps* pos2 )
+    long getDifferenceInClicks( RotationPositionWithLaps const * const pos2 ) const
     {        
         long clicksDifference = this->getClickPosition() - pos2->getClickPosition();
         long lapDifference = this->getLaps() - pos2->getLaps();        

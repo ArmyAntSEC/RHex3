@@ -15,6 +15,7 @@ class HardwareInterface
   #else
   enum PinStatus { LOW, HIGH, CHANGE, FALLING, RISING };
   enum PinMode { INPUT, OUTPUT, INPUT_PULLUP, INPUT_PULLDOWN } ;
+  static long int microsSinceBoot;
   #endif
   
   static void configurePin ( unsigned int pin, HardwareInterface::PinMode mode )
@@ -45,25 +46,34 @@ class HardwareInterface
     #endif
   }
 
-  static unsigned long int getMicrosecondsSinceBoot()
+  static void resetMicrosecondsSinceBoot()
+  {
+    #ifdef ARDUINO
+    //Do nothing
+    #else
+    HardwareInterface::microsSinceBoot = 0;
+    #endif
+  }
+
+  static unsigned long getMicrosecondsSinceBoot()
   {
     #ifdef ARDUINO
     return micros();
     #else
-    return 0;
+    return HardwareInterface::microsSinceBoot+=10;
     #endif
   }
 
-  static unsigned long int getMillisecondsSinceBoot()
+  static unsigned long getMillisecondsSinceBoot()
   {
     #ifdef ARDUINO
     return millis();
-    #else
-    return 0;
+    #else    
+    return HardwareInterface::microsSinceBoot+=10000;
     #endif
   }
 
-  static void delayForMilliseconds( unsigned long int milliseconds )
+  static void delayForMilliseconds( unsigned long milliseconds )
   {
     #ifdef ARDUINO
     delay(2000);

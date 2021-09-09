@@ -3,12 +3,18 @@
 #include <HardwareInterface.h>
 #include "testHomingEncoderISRs.h"
 #include "testHomingEncoderOverflowAndHoming.h"
+#include "testHomingEncoderComputeSpeed.h"
+
+void setUp(void) {
+    HardwareInterface::resetMicrosecondsSinceBoot();
+}
 
 void process()
 {
     UNITY_BEGIN();  
     runAllTestsHomingEncoderISR();      
     runAllTestsHomingEncoderOverflowAndHoming();
+    runAllTestsHomingEncoderComputeSpeed();
     UNITY_END();
 }
 

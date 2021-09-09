@@ -9,7 +9,7 @@
 
 class HomingEncoder
 {
-private:
+public:
   static const SQ15x16 clicksPerRevolution;
   const int speedTimeConstant = 10;
 
@@ -20,14 +20,11 @@ private:
   VolatileRotationPositionWithLaps position;
 
   volatile bool is_homed;
-  //TODO: Use the above isr-safe object to also handle these things to that we can handle pos at last home in a more robust manner.
-  //volatile long int pos_at_last_home;
-  //volatile long int laps_at_last_home;
   VolatileRotationPositionWithLaps positionAtLastHome;
 
   //Also use the above object here as well.
-  long int last_position;
-  unsigned long int last_position_timestamp_micros;
+  RotationPositionWithLaps positionAtLastSpeedMeasurement;  
+  unsigned long int timestampMicrosAtLastSpeedMeasurement;
   SQ15x16 speed_cps;
   SQ15x16 speed_cps_filtered;
 
@@ -50,8 +47,8 @@ public:
     is_homed = false;
     positionAtLastHome = VolatileRotationPositionWithLaps();
 
-    last_position = 0;
-    last_position_timestamp_micros = 0;
+    positionAtLastSpeedMeasurement = RotationPositionWithLaps();
+    timestampMicrosAtLastSpeedMeasurement = 0;
     speed_cps = 0;
     speed_cps_filtered = 0;
     
@@ -97,15 +94,11 @@ public:
 
     unsigned long int nowU = HardwareInterface::getMicrosecondsSinceBoot();
 
-    int thisPos = this->getRawPos();
-    int lastPos = last_position;
-    unsigned long int lastTimeU = last_position_timestamp_micros;
-
-    SQ15x16 posDelta = positionPositiveDifference(thisPos, lastPos);
-    last_position = thisPos;
-
-    SQ15x16 timeDelta = nowU - lastTimeU;
-    last_position_timestamp_micros = nowU;
+    RotationPositionWithLaps thisPos = this->getPosition();
+        
+    SQ15x16 posDelta = thisPos.getShortestPositiveDifferenceInt( 
+      &(this->positionAtLastSpeedMeasurement) );        
+    SQ15x16 timeDelta = nowU - timestampMicrosAtLastSpeedMeasurement;            
 
     SQ15x16 speedCPS;
     if (timeDelta == 0)
@@ -118,8 +111,8 @@ public:
       speedCPS = 10000 * ((100 * posDelta) / timeDelta);
     }
 
-    last_position = thisPos;
-    last_position_timestamp_micros = nowU;
+    this->positionAtLastSpeedMeasurement = thisPos;
+    timestampMicrosAtLastSpeedMeasurement = nowU;
     speed_cps = speedCPS;
     speed_cps_filtered =
         ((speed_cps_filtered +
