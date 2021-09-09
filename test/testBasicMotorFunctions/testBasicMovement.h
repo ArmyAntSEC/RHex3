@@ -47,8 +47,8 @@ void testSimpleHoming() {
             } else {
                 driver.setMotorPWM(0);
                 unsigned long int endPos = encoder->getPosAtLastHome();
-                unsigned long int endLaps = encoder->getLapsAtLastHome();                
-                TEST_ASSERT_INT_WITHIN( 10, 1796, endPos ); //Make sure we have gone exactly 1 round                            
+                unsigned long int endLaps = encoder->getLapsAtLastHome();                                                
+                TEST_ASSERT_INT_WITHIN( 10, 1796, endPos ); //Make sure we have gone exactly 1 round                                            
                 return;
             }
         }

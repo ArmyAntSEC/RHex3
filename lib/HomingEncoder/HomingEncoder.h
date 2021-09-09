@@ -1,25 +1,3 @@
-/* Homing Encoder Library for Arduino Due
- * Copyright 2020 Daniel Armyr
- * 
- * The core algorithm, some macros and lines of code were taken from:
- * Encoder Library, for measuring quadrature encoded signals
- * http://www.pjrc.com/teensy/td_libs_Encoder.html
- * Copyright (c) 2011,2013 PJRC.COM, LLC - Paul Stoffregen <paul@pjrc.com>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
 #ifndef _HOMINGENCODER_H_
 #define _HOMINGENCODER_H_
 
@@ -38,14 +16,14 @@ private:
   int encoderPin1;
   int encoderPin2;
   int homingPin;
-
-  //TODO: Convert this to an object with volatile members that can atomically generate a copy of itself.
+  
   VolatileRotationPositionWithLaps position;
 
   volatile bool is_homed;
   //TODO: Use the above isr-safe object to also handle these things to that we can handle pos at last home in a more robust manner.
-  volatile long int pos_at_last_home;
-  volatile long int laps_at_last_home;
+  //volatile long int pos_at_last_home;
+  //volatile long int laps_at_last_home;
+  VolatileRotationPositionWithLaps positionAtLastHome;
 
   //Also use the above object here as well.
   long int last_position;
@@ -57,7 +35,7 @@ public:
   void config(unsigned int _encoderPin1,
               unsigned int _encoderPin2, unsigned int _breakerPin,
               int _offset)
-  {
+  {    
     encoderPin1 = _encoderPin1;
     encoderPin2 = _encoderPin2;
     homingPin = _breakerPin;
@@ -66,16 +44,18 @@ public:
     HardwareInterface::configurePin(encoderPin2, HardwareInterface::INPUT_PULLUP);
     HardwareInterface::configurePin(homingPin, HardwareInterface::INPUT_PULLUP);
 
+    HardwareInterface::disableInterrupts();
     position = VolatileRotationPositionWithLaps();
 
     is_homed = false;
-    pos_at_last_home = 0;
-    laps_at_last_home = 0;
+    positionAtLastHome = VolatileRotationPositionWithLaps();
 
     last_position = 0;
     last_position_timestamp_micros = 0;
     speed_cps = 0;
     speed_cps_filtered = 0;
+    
+    HardwareInterface::enableInterrupts();
   }
 
   RotationPositionWithLaps getPosition()
@@ -86,14 +66,14 @@ public:
   long int getRawPos()
   {
     HardwareInterface::disableInterrupts();
-    long int pos = position.getClickPosition();    
+    long int pos = getRawPosISR();
     HardwareInterface::enableInterrupts();
     return pos;
   }
 
   long int getRawPosISR()
   {
-    return position.getClickPosition();
+    return position.getClickPositionISR();
   }
 
   void handleOverflow()
@@ -186,15 +166,14 @@ public:
   void forceHomedISR()
   {
     is_homed = true;
-    pos_at_last_home = position.getClickPosition();
-    laps_at_last_home = position.getLaps();
+    positionAtLastHome = position;
     position = VolatileRotationPositionWithLaps();
   }
 
   bool isHomed()
   {
     HardwareInterface::disableInterrupts();
-    bool _is_homed = is_homed;
+    bool _is_homed = isHomedISR();
     HardwareInterface::enableInterrupts();
     return _is_homed;
   }
@@ -207,7 +186,7 @@ public:
   int getPosAtLastHome()
   {
     HardwareInterface::disableInterrupts();
-    int rValue = pos_at_last_home;
+    int rValue = positionAtLastHome.getClickPositionISR();
     HardwareInterface::enableInterrupts();
     return rValue;
   }
@@ -215,7 +194,7 @@ public:
   int getLapsAtLastHome()
   {
     HardwareInterface::disableInterrupts();
-    int rValue = laps_at_last_home;
+    int rValue = positionAtLastHome.getLapsISR();
     HardwareInterface::enableInterrupts();
     return rValue;
   }
@@ -266,7 +245,7 @@ public:
     HomingEncoder *state = &stateList[N];
 
     
-    if (!state->isHomed() && state->getRawPosISR() > 200)
+    if (!state->isHomedISR() && state->getRawPosISR() > 200)
     { //Do some debouncing.
       state->forceHomedISR();
     }

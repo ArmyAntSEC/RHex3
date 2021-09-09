@@ -3,6 +3,7 @@
 
 #include <RotationPositionWithLaps.h>
 #include <SerialStream.h>
+#include <HardwareInterface.h>
 
 class VolatileRotationPositionWithLaps
 {
@@ -23,14 +24,21 @@ public:
 
     void reduceToMinimalForm()
     {
-        if (clickPosition > clicksPerRotationIntPart)
-        {
-            removeOneLap();
-            reduceToMinimalForm();
-        }
+        HardwareInterface::disableInterrupts();
+        reduceToMinimalFormISR();
+        HardwareInterface::enableInterrupts();
     }
 
-    void removeOneLap()
+    void reduceToMinimalFormISR()
+    {        
+        if (clickPosition > clicksPerRotationIntPart)
+        {
+            removeOneLapISR();
+            reduceToMinimalForm();
+        }        
+    }
+
+    void removeOneLapISR()
     {
         clickPosition -= clicksPerRotationIntPart;
         laps++;
@@ -42,31 +50,35 @@ public:
         }
     }
 
-    long int getClickPosition()
-    {
-        return clickPosition;
+    long int getClickPositionISR()
+    {        
+        return clickPosition;     
     }
 
-    long int getLaps()
-    {
-        return laps;
+    long int getLapsISR()
+    {        
+        return laps;     
     }
 
-    long int getRemainderMicroClicks()
-    {
-        return remainderInMicroClick;
+    long int getRemainderMicroClicksISR()
+    {        
+        return remainderInMicroClick;     
     }
 
     void incrementMe()
     {
+        HardwareInterface::disableInterrupts();        
         clickPosition++;        
+        HardwareInterface::enableInterrupts();
     }
     
     RotationPositionWithLaps getNonVolatileCopy()
     {
-        double fractionalRemainder = ((double)remainderInMicroClick)/1e6;
-        Log << "Fractional remainder: " << fractionalRemainder << endl;
-        return RotationPositionWithLaps( clickPosition, laps, fractionalRemainder );
+        HardwareInterface::disableInterrupts();
+        double fractionalRemainder = ((double)remainderInMicroClick)/1e6;        
+        RotationPositionWithLaps rValue = RotationPositionWithLaps( clickPosition, laps, fractionalRemainder );
+        HardwareInterface::enableInterrupts();
+        return rValue;
     }
 };
 
