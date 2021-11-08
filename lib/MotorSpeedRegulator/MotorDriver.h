@@ -8,7 +8,7 @@
 #ifndef MOTORDRIVER_H_
 #define MOTORDRIVER_H_
 
-#include <Arduino.h>
+#include <HardwareInterface.h>
 
 class MotorDriver {
 private:
@@ -23,9 +23,9 @@ public:
       this->driverPinTwo = _driverPinTwo;
       this->driverPinPWM = _driverPinPWM;      
 		
-      pinMode(this->driverPinOne, OUTPUT);
-      pinMode(this->driverPinTwo, OUTPUT);	      	
-      pinMode(this->driverPinPWM, OUTPUT );
+      HardwareInterface::configurePin ( this->driverPinOne, HardwareInterface::OUTPUT );
+      HardwareInterface::configurePin ( this->driverPinTwo, HardwareInterface::OUTPUT );
+      HardwareInterface::configurePin ( this->driverPinPWM, HardwareInterface::OUTPUT );
 
       this->setMotorPWM(0); 
   }
@@ -34,27 +34,20 @@ public:
     if ( motorPWM < 0 || 
       (motorPWM == 0 && lastMotorPWM > 0) ) //Actively break when setting the speed to 0
     {
-      digitalWrite ( this->driverPinTwo, LOW);
-      digitalWrite ( this->driverPinOne, HIGH);			
+      HardwareInterface::setDigitalValueForPin( this->driverPinOne, HardwareInterface::HIGH );
+      HardwareInterface::setDigitalValueForPin( this->driverPinTwo, HardwareInterface::LOW );            
     } else if ( motorPWM > 0 || 
       (motorPWM == 0 && lastMotorPWM < 0) ) //Actively break when setting the speed to 0
     {        
-      digitalWrite ( this->driverPinTwo, HIGH);
-      digitalWrite ( this->driverPinOne, LOW);		
+      HardwareInterface::setDigitalValueForPin( this->driverPinOne, HardwareInterface::LOW );
+      HardwareInterface::setDigitalValueForPin( this->driverPinTwo, HardwareInterface::HIGH );
     } else {
-      digitalWrite ( this->driverPinTwo, LOW);
-      digitalWrite ( this->driverPinOne, LOW);		
+      HardwareInterface::setDigitalValueForPin( this->driverPinOne, HardwareInterface::LOW );
+      HardwareInterface::setDigitalValueForPin( this->driverPinTwo, HardwareInterface::LOW );
     }
     
-    analogWrite ( this->driverPinPWM, abs(motorPWM) );
+    HardwareInterface::setAnalogValueForPin( this->driverPinPWM, abs(motorPWM) );    
     this->lastMotorPWM = motorPWM;
-
-    //Log << "Set motor pwm: " << motorPWM << endl;
-  }
-  
-  float getCurrentInMilliVolt() {
-    
-    return -1; //Depricated
   }
 
   int getMotorPWM()

@@ -2,6 +2,8 @@
 
 #ifdef ARDUINO
 #include <Arduino.h>
+#else
+#include <cstdlib>
 #endif
 
 class HardwareInterface
@@ -88,4 +90,23 @@ class HardwareInterface
     return 0;
     #endif
   }
+
+  static void setDigitalValueForPin( int pin, PinStatus value )
+  {
+    #ifdef ARDUINO
+    return digitalWrite( pin, (uint8_t)value );
+    #else
+    //Do nothing.
+    #endif
+  }
+
+  static void setAnalogValueForPin( int pin, int value )
+  {
+    #ifdef ARDUINO
+    return analogWrite( pin, value );
+    #else
+    //Do nothing.
+    #endif
+  }
+
 };
