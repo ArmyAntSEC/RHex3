@@ -37,13 +37,11 @@ public:
       HardwareInterface::setDigitalValueForPin( this->driverPinOne, HardwareInterface::HIGH );
       HardwareInterface::setDigitalValueForPin( this->driverPinTwo, HardwareInterface::LOW );            
     } else if ( motorPWM > 0 || 
-      (motorPWM == 0 && lastMotorPWM < 0) ) //Actively break when setting the speed to 0
+      (motorPWM == 0 && lastMotorPWM <= 0) ) //Actively break when setting the speed to 0. 
+      //Also captures when motorPWM == 0 && lastMotorPWM == 0 for completeness sake.
     {        
       HardwareInterface::setDigitalValueForPin( this->driverPinOne, HardwareInterface::LOW );
       HardwareInterface::setDigitalValueForPin( this->driverPinTwo, HardwareInterface::HIGH );
-    } else {
-      HardwareInterface::setDigitalValueForPin( this->driverPinOne, HardwareInterface::LOW );
-      HardwareInterface::setDigitalValueForPin( this->driverPinTwo, HardwareInterface::LOW );
     }
     
     HardwareInterface::setAnalogValueForPin( this->driverPinPWM, abs(motorPWM) );    

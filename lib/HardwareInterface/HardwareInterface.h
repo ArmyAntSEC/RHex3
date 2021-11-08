@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #else
 #include <cstdlib>
+#include <cstring>
 #endif
 
 class HardwareInterface
@@ -17,17 +18,33 @@ class HardwareInterface
   #else
   enum PinStatus { LOW, HIGH, CHANGE, FALLING, RISING };
   enum PinMode { INPUT, OUTPUT, INPUT_PULLUP, INPUT_PULLDOWN } ;
+  
   static long int microsSinceBoot;
+  static const int pinMaxCount = 128;
+  static PinMode pinModes[pinMaxCount];
+  static int pinStatuses[pinMaxCount];
   #endif
   
-  static void configurePin ( unsigned int pin, HardwareInterface::PinMode mode )
+  #ifndef ARDUINO
+  static void resetPins()
+  {
+    memset(pinModes, 0, pinMaxCount*sizeof(PinMode) );
+    memset(pinStatuses, 0, pinMaxCount*sizeof(PinStatus) );
+  }
+  #endif
+
+  static void configurePin ( unsigned int pin, PinMode mode )
   {
     #ifdef ARDUINO
     pinMode(pin, (uint8_t)mode );    
+    #else
+    if ( pin < pinMaxCount ) {
+      pinModes[pin] = mode;
+    }
     #endif //Ignore this if we have no hardware.
   }
 
-  static void attachAnInterrupt(unsigned int pin, void(*isr)(), HardwareInterface::PinStatus status )
+  static void attachAnInterrupt(unsigned int pin, void(*isr)(), PinStatus status )
   {            
     #ifdef ARDUINO
     attachInterrupt(digitalPinToInterrupt(pin), isr, ::PinStatus(status) );    
@@ -53,7 +70,7 @@ class HardwareInterface
     #ifdef ARDUINO
     //Do nothing
     #else
-    HardwareInterface::microsSinceBoot = 0;
+    microsSinceBoot = 0;
     #endif
   }
 
@@ -62,7 +79,7 @@ class HardwareInterface
     #ifdef ARDUINO
     return micros();
     #else
-    return HardwareInterface::microsSinceBoot+=10;
+    return microsSinceBoot+=10;
     #endif
   }
 
@@ -71,7 +88,7 @@ class HardwareInterface
     #ifdef ARDUINO
     return millis();
     #else    
-    return HardwareInterface::microsSinceBoot+=10000;
+    return microsSinceBoot+=10000;
     #endif
   }
 
@@ -87,7 +104,9 @@ class HardwareInterface
     #ifdef ARDUINO
     return digitalRead( pin );
     #else
-    return 0;
+    if ( pin < pinMaxCount ) {
+      return pinStatuses[pin];
+    }
     #endif
   }
 
@@ -96,7 +115,9 @@ class HardwareInterface
     #ifdef ARDUINO
     return digitalWrite( pin, (uint8_t)value );
     #else
-    //Do nothing.
+    if ( pin < pinMaxCount ) {
+      pinStatuses[pin] = value;
+    }
     #endif
   }
 
