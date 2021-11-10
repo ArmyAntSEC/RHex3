@@ -39,10 +39,10 @@ void testSetMotorPWMHardStopFromForward()
     motorDriver.setMotorPWM(0);
 
     //Check the results
-    HardwareInterface::pinStatuses[3] == HardwareInterface::HIGH;
-    HardwareInterface::pinStatuses[5] == HardwareInterface::LOW;
-    HardwareInterface::pinStatuses[0] == 0;
-    motorDriver.lastMotorPWM == 0;
+    TEST_ASSERT_EQUAL( HardwareInterface::HIGH, HardwareInterface::pinStatuses[3] );
+    TEST_ASSERT_EQUAL( HardwareInterface::LOW, HardwareInterface::pinStatuses[5] );
+    TEST_ASSERT_EQUAL( 0, HardwareInterface::pinStatuses[0] );
+    TEST_ASSERT_EQUAL( 0, motorDriver.lastMotorPWM );
 }
 
 void testSetMotorPWMHardStopFromBackwards()
@@ -56,10 +56,10 @@ void testSetMotorPWMHardStopFromBackwards()
     motorDriver.setMotorPWM(0);
 
     //Check the results
-    HardwareInterface::pinStatuses[3] == HardwareInterface::LOW;
-    HardwareInterface::pinStatuses[5] == HardwareInterface::HIGH;
-    HardwareInterface::pinStatuses[0] == 0;
-    motorDriver.lastMotorPWM == 0;
+    TEST_ASSERT_EQUAL( HardwareInterface::LOW, HardwareInterface::pinStatuses[3] );
+    TEST_ASSERT_EQUAL( HardwareInterface::HIGH, HardwareInterface::pinStatuses[5] );
+    TEST_ASSERT_EQUAL( 0, HardwareInterface::pinStatuses[0] );
+    TEST_ASSERT_EQUAL( 0, motorDriver.lastMotorPWM );
 }
 
 void testSetMotorPWMForward()
@@ -73,10 +73,10 @@ void testSetMotorPWMForward()
     motorDriver.setMotorPWM(10);
 
     //Check the results
-    HardwareInterface::pinStatuses[3] == HardwareInterface::LOW;
-    HardwareInterface::pinStatuses[5] == HardwareInterface::HIGH;
-    HardwareInterface::pinStatuses[0] == 10;
-    motorDriver.lastMotorPWM == 10;
+    TEST_ASSERT_EQUAL( HardwareInterface::LOW, HardwareInterface::pinStatuses[3] );
+    TEST_ASSERT_EQUAL( HardwareInterface::HIGH, HardwareInterface::pinStatuses[5] );
+    TEST_ASSERT_EQUAL( 10, HardwareInterface::pinStatuses[7] );
+    TEST_ASSERT_EQUAL( 10, motorDriver.lastMotorPWM );
 }
 
 void testSetMotorPWMBackward()
@@ -90,10 +90,10 @@ void testSetMotorPWMBackward()
     motorDriver.setMotorPWM(-10);
 
     //Check the results
-    HardwareInterface::pinStatuses[3] == HardwareInterface::HIGH;
-    HardwareInterface::pinStatuses[5] == HardwareInterface::LOW;
-    HardwareInterface::pinStatuses[0] == 10;
-    motorDriver.lastMotorPWM == -10;
+    TEST_ASSERT_EQUAL( HardwareInterface::HIGH, HardwareInterface::pinStatuses[3] );
+    TEST_ASSERT_EQUAL(  HardwareInterface::LOW, HardwareInterface::pinStatuses[5] );
+    TEST_ASSERT_EQUAL( 10, HardwareInterface::pinStatuses[7] );
+    TEST_ASSERT_EQUAL( -10, motorDriver.lastMotorPWM );
 }
 
 void process()

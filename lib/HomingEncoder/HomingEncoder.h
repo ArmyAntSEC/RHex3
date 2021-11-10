@@ -5,9 +5,10 @@
 #include "RotationPositionWithLaps.h"
 #include <HardwareInterface.h>
 #include <VolatileRotationPositionWithLaps.h>
+#include <SpeedometerInterface.h>
 #define MAX_ENCODERS_SUPPORTED 6
 
-class HomingEncoder
+class HomingEncoder: public SpeedometerInterface
 {
 public:
   static const SQ15x16 clicksPerRevolution;

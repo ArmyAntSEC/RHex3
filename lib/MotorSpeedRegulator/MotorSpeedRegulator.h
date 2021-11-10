@@ -1,8 +1,8 @@
 #ifndef _MOTORSPEEDCONTROLLER_H_
 #define _MOTORSPEEDCONTROLLER_H_
 
-#include "HomingEncoder.h"
-#include "MotorDriver.h"
+#include "SpeedometerInterface.h"
+#include "MotorDriverInterface.h"
 #include <RecurringTaskBase.h>
 #include <SpeedToPowerConverter.h>
 #include <SerialStream.h>
@@ -25,25 +25,25 @@ private:
 
     bool isOn = false;
 
-    boolean hardBreakMode = false;
+    bool hardBreakMode = false;
 
-    HomingEncoder *encoder;
-    MotorDriver *driver;
+    SpeedometerInterface *speedometer;
+    MotorDriverInterface *driver;
     SpeedToPowerConverterProduction *converter;
 
 public:
     virtual void init()
     {
         RecurringTaskBase::init();
-        input = encoder->getSpeedCPS();
+        input = speedometer->getSpeedCPS();
         lastInput = input;
         integratorCumulativeValue = clampOutput( driver->getMotorPWM() );
     }
 
-    virtual void config(HomingEncoder *_encoder, MotorDriver *_driver,
+    virtual void config(SpeedometerInterface *_speedometer, MotorDriverInterface *_driver,
                         SpeedToPowerConverterProduction *_converter, float _P, float _D, float _I, float _filter)
     {
-        this->encoder = _encoder;
+        this->speedometer = _speedometer;
         this->driver = _driver;
         this->converter = _converter;
         this->proportionalTerm = _P;
@@ -56,7 +56,7 @@ public:
     {
         RecurringTaskBase::start();
         this->isOn = true;
-        this->lastInput = encoder->getSpeedCPS(); //No derivative kick on first iteration
+        this->lastInput = speedometer->getSpeedCPS(); //No derivative kick on first iteration
         this->integratorCumulativeValue = 0;
     }
 
@@ -111,7 +111,7 @@ public:
 
     void doCorePIDAlgorithmStepClampedForSpeed()
     {
-        input = encoder->getSpeedCPSFiltered();
+        input = speedometer->getSpeedCPSFiltered();
 
         int errorTerm = setPoint - input;
         integratorCumulativeValue += integratorTerm * errorTerm;

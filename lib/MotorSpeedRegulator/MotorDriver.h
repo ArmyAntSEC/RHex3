@@ -9,8 +9,10 @@
 #define MOTORDRIVER_H_
 
 #include <HardwareInterface.h>
+#include <MotorDriverInterface.h>
 
-class MotorDriver {
+class MotorDriver: public MotorDriverInterface
+{
 private:
   int driverPinOne;
   int driverPinTwo;	  
@@ -30,7 +32,7 @@ public:
       this->setMotorPWM(0); 
   }
   
-  void setMotorPWM( int motorPWM ) {			  
+  virtual void setMotorPWM( int motorPWM ) {			  
     if ( motorPWM < 0 || 
       (motorPWM == 0 && lastMotorPWM > 0) ) //Actively break when setting the speed to 0
     {
@@ -48,7 +50,7 @@ public:
     this->lastMotorPWM = motorPWM;
   }
 
-  int getMotorPWM()
+  virtual int getMotorPWM()
   {
     return this->lastMotorPWM;
   }

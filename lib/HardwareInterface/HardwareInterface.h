@@ -126,7 +126,9 @@ class HardwareInterface
     #ifdef ARDUINO
     return analogWrite( pin, value );
     #else
-    //Do nothing.
+    if ( pin < pinMaxCount ) {
+      pinStatuses[pin] = value;
+    }    
     #endif
   }
 
