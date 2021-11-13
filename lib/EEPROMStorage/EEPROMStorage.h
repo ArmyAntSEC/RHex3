@@ -1,9 +1,7 @@
 #ifndef _EEPROMSTORAGE_H_
 #define _EEPROMSTORAGE_H_
 
-#ifdef ARDUINO
-#include <EEPROM.h>
-#endif
+#include <HardwareInterface.h>
 
 class EEPROMStorage
 {
@@ -17,31 +15,25 @@ class EEPROMStorage
         }
 
         static void writeIntToIndex( int index, int value )
-        {                      
-            #ifdef ARDUINO
+        {                                  
             int address1 = convertIndexToFirstAddress(index);
             uint8_t value1 = value & 0xFF;
-            EEPROM.update(address1, value1 );
+            HardwareInterface::UpdateEEPROM( address1, value1 );
             
             int address2 = convertIndexToSecondAddress(index);
             uint8_t value2 = (value >> 8) & 0xFF;
-            EEPROM.update(address2, value2 );            
-            #endif
+            HardwareInterface::UpdateEEPROM( address2, value2 );                        
         }
 
         static int readIntFromIndex( int index )
-        {
-            #ifdef ARDUINO
+        {            
             int address1 = convertIndexToFirstAddress(index);
-            int value1 = EEPROM.read(address1 );
+            int value1 = HardwareInterface::ReadEEPROM(address1 );
             
             int address2 = convertIndexToSecondAddress(index);
-            int value2 = EEPROM.read (address2 );
+            int value2 = HardwareInterface::ReadEEPROM (address2 );
 
-            return value1 + (value2 << 8);
-            #else
-            return 0;
-            #endif
+            return value1 + (value2 << 8);         
         }
 
         static void writeIntArrayToAddress( int index, int values[], int length )

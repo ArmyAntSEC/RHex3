@@ -2,9 +2,11 @@
 
 #ifdef ARDUINO
 #include <Arduino.h>
+#include <EEPROM.h>
 #else
 #include <cstdlib>
 #include <cstring>
+#include <cstdint>
 #endif
 
 class HardwareInterface
@@ -23,6 +25,9 @@ class HardwareInterface
   static const int pinMaxCount = 128;
   static PinMode pinModes[pinMaxCount];
   static int pinStatuses[pinMaxCount];
+  
+  static const int EEPROMSize = 256;
+  static unsigned int EEPROMData[EEPROMSize];
   #endif
   
   #ifndef ARDUINO
@@ -129,6 +134,30 @@ class HardwareInterface
     if ( pin < pinMaxCount ) {
       pinStatuses[pin] = value;
     }    
+    #endif
+  }
+
+  static void UpdateEEPROM( unsigned address, unsigned value )
+  {
+    #ifdef ARDUINO
+      EEPROM.update(address, value );
+    #else    
+      if ( address < EEPROMSize ) {
+        EEPROMData[address] = value&&0xFF;
+      }
+    #endif
+  }
+
+  static unsigned int ReadEEPROM( unsigned address )
+  {
+    #ifdef ARDUINO
+      return EEPROM.read( address );
+    #else    
+      if ( address < EEPROMSize ) {
+        return EEPROMData[address];
+      } else {
+        return 0;
+      }
     #endif
   }
 
