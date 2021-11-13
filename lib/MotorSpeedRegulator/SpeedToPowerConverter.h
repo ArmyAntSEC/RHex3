@@ -5,16 +5,6 @@
 #include <EEPROMStorage.h>
 #include <SerialStream.h>
 
-/* Measured values on the test motor
-Power: 32 Speed: 977
-Power: 48 Speed: 1631
-Power: 64 Speed: 2142
-Power: 96 Speed: 2844
-Power: 128 Speed: 3252
-Power: 192 Speed: 3652
-Power: 255 Speed: 3994
-*/
-
 class SpeedToPowerConverterTest
 {
 
@@ -27,6 +17,7 @@ public:
     unsigned int eepromStorageStartIndex = 96; 
     unsigned int speedVsPower[tableWidth][tableLength] = {{0, 20, 24, 32, 48, 64, 128, 255}, {0, 789, 1363, 2145, 3472, 4507, 6509, 7735}};
 
+    
     void setEEPROMStartIndex( int startIndex )
     {
         this->eepromStorageStartIndex = startIndex;
@@ -54,7 +45,7 @@ public:
             Log << endl;
         }
     }
-    
+
     unsigned int doInterpolation(unsigned int x, unsigned int xList[], unsigned int yList[] )
     {        
         //Check if we are out of range
@@ -85,14 +76,6 @@ public:
         SQ15x16 yRem = xRem * factor;
 
         int y = roundFixed(yRem).getInteger() + yLow;
-        
-        /*
-        Log << "Interpolating to: " << x << endl;
-        Log << xLow << ", " << xHigh << ", " << yLow << ", " << yHigh << endl;
-        Log << xSpan.getInteger() << ", " << ySpan.getInteger() << endl;
-        Log << (double)xRem << ", " << (double)factor << ", " << (double)yRem << endl; 
-        Log << y << endl;            
-        */
 
         return y;
     }

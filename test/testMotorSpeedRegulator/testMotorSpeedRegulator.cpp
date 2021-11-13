@@ -125,8 +125,7 @@ void testClampOutputOK()
 }
 
 void testClampOutputForSpeed()
-{
-    TEST_FAIL_MESSAGE( "Moch the SpeedToPowerConverter to be able to test this step" );
+{    
     TEST_IGNORE();
 }
 void testDoCorePIDAlgorithmStepClampedForSpeed()
@@ -144,9 +143,8 @@ void testRun()
     TEST_IGNORE();
 }
 
-void process()
-{
-    UNITY_BEGIN();  
+void processMotorSpeedRegulator()
+{    
     RUN_TEST( testInit );
     RUN_TEST( testConfig );
     RUN_TEST( testStart );
@@ -159,24 +157,5 @@ void process()
     RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeed );
     RUN_TEST( testHandleHardBreak );
     RUN_TEST ( testRun );
-
-    UNITY_END();
 }
 
-#ifdef ARDUINO
-void setup() {
-    // NOTE!!! Wait for >2 secs
-    // if board doesn't support software reset via Serial.DTR/RTS
-    HardwareInterface::delayForMilliseconds(2000);
-
-    process();
-}
-
-void loop() {
-}
-#else
-int main(void)
-{
-    process();
-}
-#endif
