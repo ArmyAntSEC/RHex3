@@ -16,7 +16,7 @@ void testInit()
     MotorSpeedRegulator regulator;
     MockSpeedometer speedometer;
     MockMotorDriver driver;
-    SpeedToPowerConverterProduction* converter = (SpeedToPowerConverterProduction*)3;
+    SpeedToPowerConverterProduction* converter = 0;
     float P = 4;
     float D = 5;
     float I = 6;
@@ -36,9 +36,9 @@ void testInit()
 void testConfig()
 {
     MotorSpeedRegulator regulator;
-    SpeedometerInterface* speedometer = (SpeedometerInterface*)1;
+    SpeedometerInterface* speedometer = 0;
     MockMotorDriver driver;
-    SpeedToPowerConverterProduction* converter = (SpeedToPowerConverterProduction*)3;
+    SpeedToPowerConverterProduction* converter = 0;
     float P = 4;
     float D = 5;
     float I = 6;
@@ -58,21 +58,75 @@ void testConfig()
 
 void testStart()
 {
-    TEST_IGNORE();
+    MotorSpeedRegulator regulator;
+    MockSpeedometer speedometer;
+    MotorDriverInterface* driver = 0;
+    SpeedToPowerConverterProduction* converter = 0;
+    float P = 4;
+    float D = 5;
+    float I = 6;
+    float filter = 7;
+    regulator.integratorCumulativeValue = 5;
+    
+    regulator.config(&speedometer, driver, converter, P, D, I, filter );
+
+    regulator.start();
+
+    TEST_ASSERT_TRUE( regulator.isOn );
+    TEST_ASSERT_TRUE( regulator.running );
+    TEST_ASSERT_EQUAL( speedometer.getSpeedCPS(), regulator.lastInput );
+    TEST_ASSERT_EQUAL( 0, regulator.integratorCumulativeValue );
 }
 
 void testStop()
 {
-    TEST_IGNORE();
+    MotorSpeedRegulator regulator;
+    SpeedometerInterface* speedometer = 0;
+    MockMotorDriver driver;
+    SpeedToPowerConverterProduction* converter = 0;
+    float P = 4;
+    float D = 5;
+    float I = 6;
+    float filter = 7;
+    driver.setMotorPWM(5);
+    
+    regulator.config(speedometer, &driver, converter, P, D, I, filter );
+
+    regulator.stop();
+
+    TEST_ASSERT_FALSE( regulator.isOn );
+    TEST_ASSERT_FALSE( regulator.running );
+    TEST_ASSERT_EQUAL( 0, driver.getMotorPWM() );
+    TEST_ASSERT_EQUAL( 0, regulator.integratorCumulativeValue );
 }
 
-void testClampOutput()
+void testClampOutputHigh()
 {
-    TEST_IGNORE();
+    MotorSpeedRegulator regulator;   
+    TEST_ASSERT_EQUAL( regulator.maxOutput, regulator.clampOutput(regulator.maxOutput*2) );
 }
-    
+
+void testClampOutputLow()
+{
+    MotorSpeedRegulator regulator;   
+    TEST_ASSERT_EQUAL( 1, regulator.clampOutput(-regulator.maxOutput*2) );
+}
+
+void testClampOutputZero()
+{
+    MotorSpeedRegulator regulator;   
+    TEST_ASSERT_EQUAL( 0, regulator.clampOutput(0) );
+}
+
+void testClampOutputOK()
+{
+    MotorSpeedRegulator regulator;   
+    TEST_ASSERT_EQUAL( regulator.maxOutput/2, regulator.clampOutput(regulator.maxOutput/2) );
+}
+
 void testClampOutputForSpeed()
 {
+    TEST_FAIL_MESSAGE( "Moch the SpeedToPowerConverter to be able to test this step" );
     TEST_IGNORE();
 }
 void testDoCorePIDAlgorithmStepClampedForSpeed()
@@ -97,7 +151,10 @@ void process()
     RUN_TEST( testConfig );
     RUN_TEST( testStart );
     RUN_TEST( testStop );
-    RUN_TEST( testClampOutput );
+    RUN_TEST( testClampOutputHigh );
+    RUN_TEST( testClampOutputLow );
+    RUN_TEST( testClampOutputOK );
+    RUN_TEST( testClampOutputZero );
     RUN_TEST( testClampOutputForSpeed );
     RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeed );
     RUN_TEST( testHandleHardBreak );
