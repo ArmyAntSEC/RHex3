@@ -7,16 +7,33 @@
 #include "Interpolator.h"
 #include <EEPROMBackedArray.h>
 
-template<int startIndex>
-class SpeedToPowerConverter: public InterpolatorInterfacer
+class SpeedToPowerConverter
 {
     private:
-        EEPROMBackedArray<startIndex,2,8> data;        
+        EEPROMBackedArrayInterface<8,2>* data;   
+        InterpolatorInterface* interpolator;     
 
     public:
-        
-        
-    
+        SpeedToPowerConverter( EEPROMBackedArrayInterface<8,2>* _data, 
+            InterpolatorInterface* _interpolator ):
+            data(_data), interpolator(_interpolator)
+        {}
+
+        unsigned int GetPowerForFreeSpeed(unsigned int speed) {
+            int const * speedData = data->getSubArray(0);
+            int const * powerData = data->getSubArray(1);
+            
+            //return interpolator->doInterpolation(speed, speedVsPower[1], 
+            //    speedVsPower[0], tableLength );
+            return 0;
+        }  
+
+        unsigned int GetFreeSpeedForPower(unsigned int power) {
+            //return interpolator->doInterpolation(power, speedVsPower[0], 
+            //    speedVsPower[1], tableLength );
+            return 0;
+        }  
+
 
 };
 

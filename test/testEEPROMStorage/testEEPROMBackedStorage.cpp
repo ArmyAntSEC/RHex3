@@ -7,7 +7,8 @@
 
 void testConstructEEPROMStorage()
 {
-    EEPROMBackedArray<0,10,2> array;
+    MockEEPROMStorage eeprom;
+    EEPROMBackedArray<10,2> array( &eeprom, 0 );
     TEST_ASSERT_EACH_EQUAL_INT( 0, array.values,10*2 );
 }
 
@@ -17,8 +18,7 @@ void testLoadFromEEPROM()
     MockEEPROMStorage eeprom;
     eeprom.rawData = (int*)expected;
 
-    EEPROMBackedArray<0,2,2> array;
-    array.setEEPROMStorageInterface( &eeprom );
+    EEPROMBackedArray<2,2> array(&eeprom, 0);    
     array.loadFromEEPROM();
     
     TEST_ASSERT_EQUAL_INT_ARRAY( expected, array.values, 2*2 );
@@ -26,7 +26,8 @@ void testLoadFromEEPROM()
 
 void testSetValue()
 {
-    EEPROMBackedArray<0,2,2> array;
+    MockEEPROMStorage eeprom;
+    EEPROMBackedArray<2,2> array(&eeprom, 0);
     array.setValue(1,0,42);
     TEST_ASSERT_EQUAL_INT( 42, array.values[1][0] );
 }
@@ -36,8 +37,7 @@ void testStoreToEEPROM()
     int expected[2][2] = {{0, 0}, {0, 0}};
     MockEEPROMStorage eeprom;
     eeprom.rawData = (int*)expected;
-    EEPROMBackedArray<0,2,2> array;
-    array.setEEPROMStorageInterface( &eeprom );    
+    EEPROMBackedArray<2,2> array(&eeprom, 0);    
     array.setValue(1,0,42);
     
     array.storeToEEPROM();
@@ -51,8 +51,7 @@ void testGetSubArray()
     MockEEPROMStorage eeprom;
     eeprom.rawData = (int*)expected;
 
-    EEPROMBackedArray<0,2,2> array;
-    array.setEEPROMStorageInterface( &eeprom );
+    EEPROMBackedArray<2,2> array(&eeprom, 0);    
     array.loadFromEEPROM();
 
     int const * subArray = array.getSubArray(1);

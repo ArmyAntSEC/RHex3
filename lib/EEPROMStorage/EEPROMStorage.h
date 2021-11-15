@@ -60,21 +60,4 @@ class EEPROMStorage: public EEPROMStorageInterface
         }
 };
 
-class EEPROMStorageInterfacer
-{
-    protected:
-        EEPROMStorageInterface* eeprom;
-    
-    public:
-        EEPROMStorageInterfacer()
-        {
-            static EEPROMStorage _eeprom;
-            eeprom = &_eeprom;    
-        }
-
-        void setEEPROMStorageInterface( EEPROMStorageInterface* _eeprom)
-        {
-            eeprom = _eeprom;
-        }
-};
 #endif

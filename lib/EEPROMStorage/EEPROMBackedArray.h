@@ -1,16 +1,27 @@
 #pragma once
 
 #include "EEPROMStorage.h"
+template <int N, int M >
+class EEPROMBackedArrayInterface
+{
+    public:        
+    virtual int const * getSubArray( int n ) = 0;
+};
 
-template <int startIndex, int N, int M >
-class EEPROMBackedArray: public EEPROMStorageInterfacer
+template <int N, int M >
+class EEPROMBackedArray: public EEPROMBackedArrayInterface<N,M>
 {
     private:
-        int values[N][M];        
+        EEPROMStorageInterface* eeprom;
+        int values[N][M];   
+        const int startIndex;     
     
     public:
-        EEPROMBackedArray()
+        EEPROMBackedArray( EEPROMStorageInterface* _eeprom, int _startIndex ):
+            startIndex(_startIndex)
         {
+            eeprom = _eeprom;
+
             #ifndef ARDUINO
             memset(values,0,N*M*sizeof(int));
             #endif
@@ -18,7 +29,9 @@ class EEPROMBackedArray: public EEPROMStorageInterfacer
 
         void setValue( int n, int m, int value )
         {
-            values[n][m] = value;
+            if ( n < N && m < M )
+                values[n][m] = value;
+
         }
 
         void loadFromEEPROM()
@@ -30,10 +43,10 @@ class EEPROMBackedArray: public EEPROMStorageInterfacer
         {
             eeprom->writeIntArrayToAddress(startIndex,(int*)values,N*M);
         }
-
-        int const * getSubArray( int index )
-        {
-            return values[index];
+        
+        virtual int const * getSubArray( int n )
+        {            
+            return values[n];            
         }
 
 };
