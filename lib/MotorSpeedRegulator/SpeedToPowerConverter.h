@@ -4,6 +4,7 @@
 #include <FixedPointsCommon.h>
 #include <EEPROMStorage.h>
 #include <SerialStream.h>
+#include "Interpolator.h"
 
 class SpeedToPowerConverterTest
 {
@@ -11,13 +12,21 @@ class SpeedToPowerConverterTest
 public:
     static const int tableLength = 8;
     static const int tableWidth = 2;
+
+    InterpolatorInterface* interpolator;
+    EEPROMStorage eeprom;
+
     
     //We default to the end of the EEPROM which we use for testing to not accidentally
     //overwrite the measured values at the start of the EEPROM array.
     unsigned int eepromStorageStartIndex = 96; 
     unsigned int speedVsPower[tableWidth][tableLength] = {{0, 20, 24, 32, 48, 64, 128, 255}, {0, 789, 1363, 2145, 3472, 4507, 6509, 7735}};
 
-    
+    SpeedToPowerConverterTest()
+    {
+        interpolator = Interpolator::getInterpolator();
+    }
+
     void setEEPROMStartIndex( int startIndex )
     {
         this->eepromStorageStartIndex = startIndex;
@@ -26,13 +35,13 @@ public:
     void initFromEEPROM()
     {                        
         int* speedVsPowerAddress = (int*)speedVsPower;
-        EEPROMStorage::readIntArrayFromAddress( eepromStorageStartIndex, speedVsPowerAddress, tableLength*tableWidth );        
+        eeprom.readIntArrayFromAddress( eepromStorageStartIndex, speedVsPowerAddress, tableLength*tableWidth );        
     }
 
     void saveToEEPROM()
     {                        
         int* speedVsPowerAddress = (int*)speedVsPower;
-        EEPROMStorage::writeIntArrayToAddress( eepromStorageStartIndex, speedVsPowerAddress, tableLength*tableWidth );        
+        eeprom.writeIntArrayToAddress( eepromStorageStartIndex, speedVsPowerAddress, tableLength*tableWidth );        
     }
 
     void printContent()
@@ -46,46 +55,14 @@ public:
         }
     }
 
-    unsigned int doInterpolation(unsigned int x, unsigned int xList[], unsigned int yList[] )
-    {        
-        //Check if we are out of range
-        if (x <= xList[0])
-        {
-            return yList[0];
-        }
-        else if (x >= xList[tableLength-1])
-        {
-            return yList[tableLength-1];
-        }
-
-        int xIdx = 0;
-        while (xList[xIdx] < x)
-        {
-            xIdx++;
-        }
-
-        int xLow = xList[xIdx - 1];
-        int xHigh = xList[xIdx];
-        SQ15x16 xSpan = xHigh - xLow;
-        int yLow = yList[xIdx - 1];
-        int yHigh = yList[xIdx];
-        SQ15x16 ySpan = yHigh - yLow;
-
-        SQ15x16 xRem = x - xLow;
-        SQ15x16 factor = ySpan / xSpan;
-        SQ15x16 yRem = xRem * factor;
-
-        int y = roundFixed(yRem).getInteger() + yLow;
-
-        return y;
-    }
-
     unsigned int GetPowerForFreeSpeed(unsigned int speed) {
-        return doInterpolation(speed, speedVsPower[1], speedVsPower[0] );
+        return interpolator->doInterpolation(speed, speedVsPower[1], 
+            speedVsPower[0], tableLength );
     }  
 
     unsigned int GetFreeSpeedForPower(unsigned int power) {
-        return doInterpolation(power, speedVsPower[0], speedVsPower[1] );
+        return interpolator->doInterpolation(power, speedVsPower[0], 
+            speedVsPower[1], tableLength );
     }  
 
     void setPowerAndSpeedPair( int index, int power, int speed )

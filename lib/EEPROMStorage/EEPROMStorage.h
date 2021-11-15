@@ -3,18 +3,27 @@
 
 #include <HardwareInterface.h>
 
-class EEPROMStorage
+class EEPROMStorageInterface
 {
     public:
-        static int convertIndexToFirstAddress( int index ) {
+    virtual void writeIntToIndex( int index, int value ) = 0;
+    virtual int readIntFromIndex( int index ) = 0;
+    virtual void writeIntArrayToAddress( int index, int values[], int length ) = 0;
+    virtual void readIntArrayFromAddress( int index, int values[], int length ) = 0;
+};
+
+class EEPROMStorage: public EEPROMStorageInterface
+{
+    private:
+        virtual int convertIndexToFirstAddress( int index ) {
             return index * 2;
         }
         
-        static int convertIndexToSecondAddress( int index ) {
+        virtual int convertIndexToSecondAddress( int index ) {
             return convertIndexToFirstAddress(index) + 1;
         }
-
-        static void writeIntToIndex( int index, int value )
+    public:
+        virtual void writeIntToIndex( int index, int value )
         {                                  
             int address1 = convertIndexToFirstAddress(index);
             uint8_t value1 = value & 0xFF;
@@ -25,7 +34,7 @@ class EEPROMStorage
             HardwareInterface::UpdateEEPROM( address2, value2 );                        
         }
 
-        static int readIntFromIndex( int index )
+        virtual int readIntFromIndex( int index )
         {            
             int address1 = convertIndexToFirstAddress(index);
             int value1 = HardwareInterface::ReadEEPROM(address1 );
@@ -35,20 +44,37 @@ class EEPROMStorage
 
             return value1 + (value2 << 8);         
         }
-
-        static void writeIntArrayToAddress( int index, int values[], int length )
+    
+        virtual void writeIntArrayToAddress( int index, int values[], int length )
         {            
             for ( int i = 0; i < length; i++ ) {
-                EEPROMStorage::writeIntToIndex( index + i, values[i] );
+                this->writeIntToIndex( index + i, values[i] );
             }         
         }
 
-        static void readIntArrayFromAddress( int index, int values[], int length )
+        virtual void readIntArrayFromAddress( int index, int values[], int length )
         {
             for ( int i = 0; i < length; i++ ) {
-                values[i] = EEPROMStorage::readIntFromIndex( index + i );
+                values[i] = this->readIntFromIndex( index + i );
             }
         }
 };
 
+class EEPROMStorageInterfacer
+{
+    protected:
+        EEPROMStorageInterface* eeprom;
+    
+    public:
+        EEPROMStorageInterfacer()
+        {
+            static EEPROMStorage _eeprom;
+            eeprom = &_eeprom;    
+        }
+
+        void setEEPROMStorageInterface( EEPROMStorageInterface* _eeprom)
+        {
+            eeprom = _eeprom;
+        }
+};
 #endif

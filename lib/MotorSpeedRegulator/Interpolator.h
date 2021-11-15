@@ -1,19 +1,26 @@
 #ifndef _INTERPOLATOR_H_
 #define _INTERPOLATOR_H_
 
-#include <unity.h>
+#include <FixedPointsCommon.h>
 
 class InterpolatorInterface
 {
-    virtual unsigned int doInterpolation(unsigned int x, unsigned int xList[], unsigned int yList[] ) = 0;
+    public:
+    
+    virtual unsigned doInterpolation(unsigned x, unsigned xList[], unsigned yList[], unsigned tableLength ) = 0;
 };
 
-#include <FixedPointsCommon.h>
-
-class Interpolator
+class Interpolator: public InterpolatorInterface
 {
     public:
-    unsigned int doInterpolation(unsigned int x, unsigned int xList[], unsigned int yList[], int tableLength )
+
+    static InterpolatorInterface* getInterpolator()
+    {
+        static Interpolator interpolator;
+        return &interpolator;
+    }
+
+    virtual unsigned doInterpolation(unsigned x, unsigned xList[], unsigned yList[], unsigned tableLength )
     {        
         //Check if we are out of range
         if (x <= xList[0])
