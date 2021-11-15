@@ -5,6 +5,20 @@
 #include <EEPROMStorage.h>
 #include <SerialStream.h>
 #include "Interpolator.h"
+#include <EEPROMBackedArray.h>
+
+template<int startIndex>
+class SpeedToPowerConverter: public InterpolatorInterfacer
+{
+    private:
+        EEPROMBackedArray<startIndex,2,8> data;        
+
+    public:
+        
+        
+    
+
+};
 
 class SpeedToPowerConverterTest
 {

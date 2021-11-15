@@ -56,5 +56,21 @@ class Interpolator: public InterpolatorInterface
 
 };
 
+class InterpolatorInterfacer
+{
+    protected:
+        InterpolatorInterface* interpolator;
 
+    public:
+        InterpolatorInterfacer()
+        {
+            static Interpolator _interpolator;
+            interpolator = &_interpolator;
+        }
+
+        void setInterpolator( InterpolatorInterface* _interpolator )
+        {
+            interpolator = _interpolator;
+        }
+};
 #endif
