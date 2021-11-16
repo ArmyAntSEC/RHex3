@@ -6,6 +6,7 @@ class EEPROMBackedArrayInterface
 {
     public:        
     virtual int const * getSubArray( int n ) = 0;
+    int getArrayLength() { return M; }
 };
 
 template <int N, int M >
@@ -48,5 +49,4 @@ class EEPROMBackedArray: public EEPROMBackedArrayInterface<N,M>
         {            
             return values[n];            
         }
-
 };

@@ -10,22 +10,22 @@
 class SpeedToPowerConverter
 {
     private:
-        EEPROMBackedArrayInterface<8,2>* data;   
+        EEPROMBackedArrayInterface<2,8>* data;   
         InterpolatorInterface* interpolator;     
 
     public:
-        SpeedToPowerConverter( EEPROMBackedArrayInterface<8,2>* _data, 
+        SpeedToPowerConverter( EEPROMBackedArrayInterface<2,8>* _data, 
             InterpolatorInterface* _interpolator ):
             data(_data), interpolator(_interpolator)
         {}
 
         unsigned int GetPowerForFreeSpeed(unsigned int speed) {
             int const * speedData = data->getSubArray(0);
-            int const * powerData = data->getSubArray(1);
+            int const * powerData = data->getSubArray(1);            
+            int len = data->getArrayLength();
             
-            //return interpolator->doInterpolation(speed, speedVsPower[1], 
-            //    speedVsPower[0], tableLength );
-            return 0;
+            return interpolator->doInterpolation(speed, speedData, 
+                powerData, len );                        
         }  
 
         unsigned int GetFreeSpeedForPower(unsigned int power) {
@@ -87,13 +87,13 @@ public:
     }
 
     unsigned int GetPowerForFreeSpeed(unsigned int speed) {
-        return interpolator->doInterpolation(speed, speedVsPower[1], 
-            speedVsPower[0], tableLength );
+        return 0; //interpolator->doInterpolation(speed, speedVsPower[1], 
+            //speedVsPower[0], tableLength );
     }  
 
     unsigned int GetFreeSpeedForPower(unsigned int power) {
-        return interpolator->doInterpolation(power, speedVsPower[0], 
-            speedVsPower[1], tableLength );
+        return 0; //interpolator->doInterpolation(power, speedVsPower[0], 
+           // speedVsPower[1], tableLength );
     }  
 
     void setPowerAndSpeedPair( int index, int power, int speed )

@@ -7,7 +7,7 @@ class InterpolatorInterface
 {
     public:
     
-    virtual unsigned doInterpolation(unsigned x, unsigned xList[], unsigned yList[], unsigned tableLength ) = 0;
+    virtual int doInterpolation(int x, int const * xList, int const * yList, int tableLength ) = 0;
 };
 
 class Interpolator: public InterpolatorInterface
@@ -20,7 +20,7 @@ class Interpolator: public InterpolatorInterface
         return &interpolator;
     }
 
-    virtual unsigned doInterpolation(unsigned x, unsigned xList[], unsigned yList[], unsigned tableLength )
+    virtual int doInterpolation(int x, int const * xList, int const * yList, int tableLength )
     {        
         //Check if we are out of range
         if (x <= xList[0])

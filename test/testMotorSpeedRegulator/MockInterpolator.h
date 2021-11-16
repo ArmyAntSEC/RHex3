@@ -7,7 +7,7 @@ class MockInterpolator: public InterpolatorInterface
     unsigned argumentLog[256];
     unsigned argumentPointer = 0;
 
-    virtual unsigned doInterpolation(unsigned x, unsigned xList[], unsigned yList[], unsigned tableLength )
+    virtual int doInterpolation(int x, int const * xList, int const * yList, int tableLength )
     {
         argumentLog[argumentPointer++] = x;
         argumentLog[argumentPointer++] = (int)reinterpret_cast<std::uintptr_t>(xList);

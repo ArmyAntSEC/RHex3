@@ -8,7 +8,7 @@
 
 void testCreate()
 {
-    MockEEPROMBackedArray<8,2> array;
+    MockEEPROMBackedArray<2,8> array;
     MockInterpolator interpolator;
     SpeedToPowerConverter converter( &array, &interpolator );
     
@@ -17,13 +17,13 @@ void testCreate()
 
 void testGetPowerForFreeSpeed()
 {
-    MockEEPROMBackedArray<8,2> array;
+    MockEEPROMBackedArray<2,8> array;
     MockInterpolator interpolator;
     SpeedToPowerConverter converter( &array, &interpolator );
 
-    int result = converter.GetPowerForFreeSpeed( 32 );
+    int result = converter.GetPowerForFreeSpeed( 2 );
 
-    TEST_ASSERT_EQUAL ( 42, result );
+    TEST_ASSERT_EQUAL ( 4, result );
 }
 
 

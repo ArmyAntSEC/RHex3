@@ -59,6 +59,15 @@ void testGetSubArray()
     TEST_ASSERT_EQUAL_INT_ARRAY( expected[1], subArray, 2 );           
 }
 
+void testGetArrayLength()
+{
+    EEPROMBackedArray<2,5> array(0, 0);    
+    int len = array.getArrayLength();
+    
+    TEST_ASSERT_EQUAL_INT( 5, len );
+}
+
+
 void processEEPROMBackedArrayStorage()
 {
     RUN_TEST(testConstructEEPROMStorage);
@@ -66,4 +75,5 @@ void processEEPROMBackedArrayStorage()
     RUN_TEST(testSetValue);
     RUN_TEST(testStoreToEEPROM);
     RUN_TEST(testGetSubArray);
+    RUN_TEST(testGetArrayLength);
 }

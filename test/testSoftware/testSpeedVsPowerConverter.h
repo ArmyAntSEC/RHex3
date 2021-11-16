@@ -4,6 +4,7 @@
 
 void testGetPowerforFreeSpeedOnStep (void) 
 {
+    TEST_IGNORE();
     SpeedToPowerConverterTest converter;
     //Power 0 == Speed 0, or else the logic is broken. So make this test pass.
     TEST_ASSERT_EQUAL( 0, converter.GetPowerForFreeSpeed(0) );    
@@ -18,6 +19,7 @@ void testGetPowerforFreeSpeedOnStep (void)
 
 void testGetPowerforFreeSpeedExtrapolate (void) 
 {
+    TEST_IGNORE();
     SpeedToPowerConverterTest converter;
     //The standard dataset foes to 0 so extrapolation downwards isn't possible.    
     TEST_ASSERT_EQUAL( 255, converter.GetPowerForFreeSpeed(8000) );
@@ -25,6 +27,7 @@ void testGetPowerforFreeSpeedExtrapolate (void)
 
 void testGetPowerforFreeSpeedInterpolate (void) 
 {    
+    TEST_IGNORE();
     SpeedToPowerConverterTest converter;
     TEST_ASSERT_INT_WITHIN( 1, 30, converter.GetPowerForFreeSpeed(2000) );
     TEST_ASSERT_INT_WITHIN( 1, 111, converter.GetPowerForFreeSpeed(6000) );    
@@ -32,6 +35,7 @@ void testGetPowerforFreeSpeedInterpolate (void)
 
 void testGetFreeSpeedForPowerInterpolate (void) 
 {    
+    TEST_IGNORE();
     SpeedToPowerConverterTest converter;
     TEST_ASSERT_INT_WITHIN( 100, 2000, converter.GetFreeSpeedForPower(30) );
     TEST_ASSERT_INT_WITHIN( 100, 6000, converter.GetFreeSpeedForPower(111) );    
