@@ -11,12 +11,11 @@ class SpeedToPowerConverter
 {
     private:
         EEPROMBackedArrayInterface<2,8>* data;   
-        InterpolatorInterface* interpolator;     
+        Interpolator interpolator;     
 
     public:
-        SpeedToPowerConverter( EEPROMBackedArrayInterface<2,8>* _data, 
-            InterpolatorInterface* _interpolator ):
-            data(_data), interpolator(_interpolator)
+        SpeedToPowerConverter( EEPROMBackedArrayInterface<2,8>* _data ):
+            data(_data)
         {}
 
         unsigned int GetPowerForFreeSpeed(unsigned int speed) {
@@ -24,19 +23,24 @@ class SpeedToPowerConverter
             int const * powerData = data->getSubArray(1);            
             int len = data->getArrayLength();
             
-            return interpolator->doInterpolation(speed, speedData, 
+            return interpolator.doInterpolation(speed, speedData, 
                 powerData, len );                        
         }  
 
         unsigned int GetFreeSpeedForPower(unsigned int power) {
-            //return interpolator->doInterpolation(power, speedVsPower[0], 
-            //    speedVsPower[1], tableLength );
-            return 0;
+            int const * speedData = data->getSubArray(0);
+            int const * powerData = data->getSubArray(1);            
+            int len = data->getArrayLength();
+            
+            return interpolator.doInterpolation(power, powerData, 
+                speedData, len );                        
+
         }  
 
 
 };
 
+/*
 class SpeedToPowerConverterTest
 {
 
@@ -44,7 +48,7 @@ public:
     static const int tableLength = 8;
     static const int tableWidth = 2;
 
-    InterpolatorInterface* interpolator;
+    Interpolator interpolator;
     EEPROMStorage eeprom;
 
     
@@ -54,8 +58,7 @@ public:
     unsigned int speedVsPower[tableWidth][tableLength] = {{0, 20, 24, 32, 48, 64, 128, 255}, {0, 789, 1363, 2145, 3472, 4507, 6509, 7735}};
 
     SpeedToPowerConverterTest()
-    {
-        interpolator = Interpolator::getInterpolator();
+    {        
     }
 
     void setEEPROMStartIndex( int startIndex )
@@ -111,5 +114,5 @@ class SpeedToPowerConverterProduction: public SpeedToPowerConverterTest
             this->setEEPROMStartIndex( 0 );
         }
 };
-
+*/
 #endif

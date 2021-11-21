@@ -1,9 +1,6 @@
 #include <unity.h>
 
-void processEEPROMStorage()
-{
-    TEST_IGNORE();
-}
+void processEEPROMStorage();
 
 void processEEPROMBackedArrayStorage();
 

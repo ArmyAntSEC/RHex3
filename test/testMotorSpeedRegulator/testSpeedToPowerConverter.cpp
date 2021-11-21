@@ -1,16 +1,14 @@
 #include <unity.h>
 
 #include "MockEEPROMBackedArray.h"
-#include "MockInterpolator.h"
 
 #define private public
 #include <SpeedToPowerConverter.h>
 
 void testCreate()
 {
-    MockEEPROMBackedArray<2,8> array;
-    MockInterpolator interpolator;
-    SpeedToPowerConverter converter( &array, &interpolator );
+    MockEEPROMBackedArray<2,8> array;    
+    SpeedToPowerConverter converter( &array );
     
     TEST_ASSERT_EQUAL( &array, converter.data );
 }
@@ -18,8 +16,8 @@ void testCreate()
 void testGetPowerForFreeSpeed()
 {
     MockEEPROMBackedArray<2,8> array;
-    MockInterpolator interpolator;
-    SpeedToPowerConverter converter( &array, &interpolator );
+    Interpolator interpolator;
+    SpeedToPowerConverter converter( &array );
 
     int result = converter.GetPowerForFreeSpeed( 2 );
 
@@ -27,8 +25,20 @@ void testGetPowerForFreeSpeed()
 }
 
 
+void testFreeSpeedForPower()
+{
+    MockEEPROMBackedArray<2,8> array;
+    Interpolator interpolator;
+    SpeedToPowerConverter converter( &array );
+
+    int result = converter.GetFreeSpeedForPower( 4 );
+
+    TEST_ASSERT_EQUAL ( 2, result );
+}
+
 void processSpeedToPowerConverter()
 {
     RUN_TEST( testCreate );   
     RUN_TEST( testGetPowerForFreeSpeed ); 
+    RUN_TEST( testFreeSpeedForPower );     
 }

@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdint>
+#include <iostream>
 #endif
 
 class HardwareInterface
@@ -27,14 +28,15 @@ class HardwareInterface
   static int pinStatuses[pinMaxCount];
   
   static const int EEPROMSize = 256;
-  static unsigned int EEPROMData[EEPROMSize];
+  static uint8_t EEPROMData[EEPROMSize];
   #endif
   
   #ifndef ARDUINO
-  static void resetPins()
+  static void resetValues()
   {
     memset(pinModes, 0, pinMaxCount*sizeof(PinMode) );
     memset(pinStatuses, 0, pinMaxCount*sizeof(PinStatus) );
+    memset(EEPROMData, 0, EEPROMSize*sizeof(uint8_t) );
   }
   #endif
 
@@ -142,8 +144,9 @@ class HardwareInterface
     #ifdef ARDUINO
       EEPROM.update(address, value );
     #else    
-      if ( address < EEPROMSize ) {
-        EEPROMData[address] = value&&0xFF;
+      if ( address < EEPROMSize ) {        
+        int valueCapped = value & 0xFF;
+        EEPROMData[address] = valueCapped;        
       }
     #endif
   }

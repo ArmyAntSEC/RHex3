@@ -3,24 +3,11 @@
 
 #include <FixedPointsCommon.h>
 
-class InterpolatorInterface
-{
-    public:
-    
-    virtual int doInterpolation(int x, int const * xList, int const * yList, int tableLength ) = 0;
-};
-
-class Interpolator: public InterpolatorInterface
+class Interpolator
 {
     public:
 
-    static InterpolatorInterface* getInterpolator()
-    {
-        static Interpolator interpolator;
-        return &interpolator;
-    }
-
-    virtual int doInterpolation(int x, int const * xList, int const * yList, int tableLength )
+    int doInterpolation(int x, int const * xList, int const * yList, int tableLength )
     {        
         //Check if we are out of range
         if (x <= xList[0])

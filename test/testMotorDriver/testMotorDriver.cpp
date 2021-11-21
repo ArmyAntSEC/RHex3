@@ -6,7 +6,7 @@
 
 void setUp(void) {
     HardwareInterface::resetMicrosecondsSinceBoot();
-    HardwareInterface::resetPins();
+    HardwareInterface::resetValues();
     
 }
 

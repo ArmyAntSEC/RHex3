@@ -4,6 +4,6 @@
 long int HardwareInterface::microsSinceBoot = 0;
 HardwareInterface::PinMode HardwareInterface::pinModes[];
 int HardwareInterface::pinStatuses[];
-unsigned int HardwareInterface::EEPROMData[];
+uint8_t HardwareInterface::EEPROMData[];
 
 #endif

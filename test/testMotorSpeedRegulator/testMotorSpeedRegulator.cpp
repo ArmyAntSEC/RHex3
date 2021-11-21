@@ -8,7 +8,7 @@
 
 void setUp(void) {
     HardwareInterface::resetMicrosecondsSinceBoot();
-    HardwareInterface::resetPins();
+    HardwareInterface::resetValues();
 }
 
 void testInit()
@@ -16,7 +16,7 @@ void testInit()
     MotorSpeedRegulator regulator;
     MockSpeedometer speedometer;
     MockMotorDriver driver;
-    SpeedToPowerConverterProduction* converter = 0;
+    SpeedToPowerConverter* converter = 0;
     float P = 4;
     float D = 5;
     float I = 6;
@@ -38,7 +38,7 @@ void testConfig()
     MotorSpeedRegulator regulator;
     SpeedometerInterface* speedometer = 0;
     MockMotorDriver driver;
-    SpeedToPowerConverterProduction* converter = 0;
+    SpeedToPowerConverter* converter = 0;
     float P = 4;
     float D = 5;
     float I = 6;
@@ -61,7 +61,7 @@ void testStart()
     MotorSpeedRegulator regulator;
     MockSpeedometer speedometer;
     MotorDriverInterface* driver = 0;
-    SpeedToPowerConverterProduction* converter = 0;
+    SpeedToPowerConverter* converter = 0;
     float P = 4;
     float D = 5;
     float I = 6;
@@ -83,7 +83,7 @@ void testStop()
     MotorSpeedRegulator regulator;
     SpeedometerInterface* speedometer = 0;
     MockMotorDriver driver;
-    SpeedToPowerConverterProduction* converter = 0;
+    SpeedToPowerConverter* converter = 0;
     float P = 4;
     float D = 5;
     float I = 6;

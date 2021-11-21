@@ -1,14 +1,12 @@
 #include <unity.h>
 
-#include "testSpeedVsPowerConverter.h"
 #include "testRotationPositionWithLaps.h"
 #include "testVolatileRotationPositionWithLaps.h"
 #include <HardwareInterface.h>
 
 void process()
 {
-    UNITY_BEGIN();        
-    runAllTestsSpeedVsPowerConverter();
+    UNITY_BEGIN();            
     runAllTestsRotationPositionWithLap();
     runAllTestsVolatileRotationPositionWithLap();        
     UNITY_END();

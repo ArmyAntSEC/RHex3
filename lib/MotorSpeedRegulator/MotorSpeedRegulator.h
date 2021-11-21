@@ -29,7 +29,7 @@ private:
 
     SpeedometerInterface *speedometer;
     MotorDriverInterface *driver;
-    SpeedToPowerConverterProduction *converter;
+    SpeedToPowerConverter *converter;
 
 public:
     virtual void init()
@@ -41,7 +41,7 @@ public:
     }
 
     virtual void config(SpeedometerInterface *_speedometer, MotorDriverInterface *_driver,
-                        SpeedToPowerConverterProduction *_converter, float _P, float _D, float _I, float _filter)
+                        SpeedToPowerConverter *_converter, float _P, float _D, float _I, float _filter)
     {
         this->speedometer = _speedometer;
         this->driver = _driver;
