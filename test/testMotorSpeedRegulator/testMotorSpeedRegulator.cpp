@@ -5,6 +5,7 @@
 #include <MotorSpeedRegulator.h>
 #include "MockSpeedometer.h"
 #include "MockMotorDriver.h"
+#include "MockEEPROMBackedArray.h"
 
 void setUp(void) {
     HardwareInterface::resetMicrosecondsSinceBoot();
@@ -126,8 +127,24 @@ void testClampOutputOK()
 
 void testClampOutputForSpeed()
 {    
-    TEST_IGNORE();
+    MotorSpeedRegulator regulator;
+    SpeedometerInterface* speedometer = 0;
+    MockMotorDriver* driver = 0;
+    MockEEPROMBackedArray<2,8> array;    
+    SpeedToPowerConverter converter( &array );
+
+    float P = 4;
+    float D = 5;
+    float I = 6;
+    float filter = 7;
+    
+    regulator.config(speedometer, driver, &converter, P, D, I, filter );
+
+    TEST_ASSERT_EQUAL( regulator.maxOutput/2, regulator.clampOutputForSpeed(regulator.maxOutput/2, 13) );
+    TEST_ASSERT_EQUAL( regulator.maxOutput, regulator.clampOutputForSpeed(regulator.maxOutput*2, 13) );
+    TEST_ASSERT_EQUAL( 13*0.6, regulator.clampOutputForSpeed(1, 11) );
 }
+
 void testDoCorePIDAlgorithmStepClampedForSpeed()
 {
     TEST_IGNORE();
