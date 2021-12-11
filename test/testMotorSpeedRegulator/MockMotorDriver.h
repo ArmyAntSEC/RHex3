@@ -2,7 +2,7 @@
 
 struct MockMotorDriver: public MotorDriverInterface
 {
-    int motorPWM = 5;
+    int motorPWM = 128;
 
     virtual void setMotorPWM( int _motorPWM )
     {

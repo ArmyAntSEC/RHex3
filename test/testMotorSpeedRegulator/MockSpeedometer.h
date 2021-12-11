@@ -2,6 +2,8 @@
 
 struct MockSpeedometer: public SpeedometerInterface
 {    
-    virtual long int getSpeedCPS() { return 3; }
-    virtual long int getSpeedCPSFiltered() { return 5; }
+    int speedCPS = 3;
+    int speedCPSFiltered = 5;
+    virtual long int getSpeedCPS() { return speedCPS; }
+    virtual long int getSpeedCPSFiltered() { return speedCPSFiltered; }
 };

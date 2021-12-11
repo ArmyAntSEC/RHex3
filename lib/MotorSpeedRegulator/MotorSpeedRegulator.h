@@ -20,7 +20,9 @@ private:
     int setPoint = 0;
     int lastInput = 0;
     float integratorCumulativeValue = 0;
-
+    int diffOfInput;
+    int errorTerm;
+    
     int maxOutput = 255;
 
     bool isOn = false;
@@ -35,9 +37,7 @@ public:
     virtual void init()
     {
         RecurringTaskBase::init();
-        input = speedometer->getSpeedCPS();
-        lastInput = input;
-        integratorCumulativeValue = clampOutput( driver->getMotorPWM() );
+        this->initState();
     }
 
     virtual void config(SpeedometerInterface *_speedometer, MotorDriverInterface *_driver,
@@ -56,8 +56,14 @@ public:
     {
         RecurringTaskBase::start();
         this->isOn = true;
-        this->lastInput = speedometer->getSpeedCPS(); //No derivative kick on first iteration
-        this->integratorCumulativeValue = 0;
+        this->initState();
+    }
+
+    void initState()
+    {
+        this->input = speedometer->getSpeedCPSFiltered();
+        this->lastInput = this->input; //No derivative kick on first iteration
+        this->integratorCumulativeValue = clampOutput( driver->getMotorPWM() );
     }
 
     void stop()
@@ -113,14 +119,15 @@ public:
     {
         input = speedometer->getSpeedCPSFiltered();
 
-        int errorTerm = setPoint - input;
+        errorTerm = setPoint - input;
         integratorCumulativeValue += integratorTerm * errorTerm;
         integratorCumulativeValue = this->clampOutputForSpeed(integratorCumulativeValue, setPoint);
 
-        int diffOfInput = input - lastInput;
+        diffOfInput = input - lastInput;
         lastInput = input;
 
-        output = clampOutputForSpeed(proportionalTerm * errorTerm + derivativeTerm * diffOfInput + integratorCumulativeValue, setPoint);
+        int rawOutput = proportionalTerm * errorTerm + derivativeTerm * diffOfInput + integratorCumulativeValue;
+        output = clampOutputForSpeed(rawOutput, setPoint);
     }
 
     void handleHardBreak()
