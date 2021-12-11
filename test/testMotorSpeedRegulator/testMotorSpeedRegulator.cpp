@@ -232,9 +232,7 @@ void testDoCorePIDAlgorithmStepClampedForSpeedIntegratorUpwardsClamping()
 
 void testDoCorePIDAlgorithmStepClampedForSpeedIntegratorDownwardsClamping()
 {
-    TEST_IGNORE();
-    
-    int setPoint = 1800;
+    int setPoint = 2100;
     int oldSpeed = 2000;
     int newSpeed = 2050;
 
@@ -259,12 +257,12 @@ void testDoCorePIDAlgorithmStepClampedForSpeedIntegratorDownwardsClamping()
     speedometer.speedCPSFiltered = newSpeed;
 
     regulator.setSetPoint( setPoint );
-    regulator.integratorCumulativeValue = 2500;
+    regulator.integratorCumulativeValue = 0;
 
     regulator.doCorePIDAlgorithmStepClampedForSpeed();
 
     TEST_ASSERT_EQUAL( newSpeed, regulator.input );
-    int expectedIntegratorCumulativeValue = 255;
+    int expectedIntegratorCumulativeValue = converter.GetPowerForFreeSpeed(setPoint)*0.6;
     TEST_ASSERT_EQUAL( expectedIntegratorCumulativeValue, regulator.integratorCumulativeValue );
     TEST_ASSERT_EQUAL( newSpeed, regulator.lastInput );    
     int expectedDiffOfInput = newSpeed - oldSpeed;
