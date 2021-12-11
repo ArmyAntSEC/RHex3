@@ -356,11 +356,63 @@ void testDoCorePIDAlgorithmStepClampedForSpeedOutputDownwardsClamping()
     TEST_ASSERT_EQUAL( expectedOutput, regulator.output );
 }
 
-void testHandleHardBreak ()
+void testHandleHardBreakNoHardBreakMode ()
 {
-    TEST_IGNORE();
+    MotorSpeedRegulator regulator;
+    regulator.input = 2500;
+    regulator.setPoint = 2000;
+    regulator.integratorCumulativeValue = 2700;
+    regulator.output = 165;
+    regulator.lastInput = 2400;
+    regulator.hardBreakMode = false;
+
+    regulator.handleHardBreak();
+
+    TEST_ASSERT_EQUAL( 2700, regulator.integratorCumulativeValue );
+    TEST_ASSERT_EQUAL( 165, regulator.output );
+    TEST_ASSERT_EQUAL( 2400, regulator.lastInput );
 }
-    
+
+void testHandleHardBreakTooFast ()
+{
+    MotorSpeedRegulator regulator;
+    regulator.input = 2500;
+    regulator.setPoint = 2000;
+    regulator.integratorCumulativeValue = 2700;
+    regulator.output = 165;
+    regulator.lastInput = 2400;
+    regulator.hardBreakMode = true;
+
+    regulator.handleHardBreak();
+
+    TEST_ASSERT_EQUAL( 0, regulator.integratorCumulativeValue );
+    TEST_ASSERT_EQUAL( 0, regulator.output );
+    TEST_ASSERT_EQUAL( regulator.input, regulator.lastInput );
+
+}
+
+void testHandleHardBreakTooSlow ()
+{
+    MotorSpeedRegulator regulator;
+
+    MockEEPROMBackedArray<2,8> array;    
+    SpeedToPowerConverter converter( &array );
+    regulator.converter = &converter;
+
+    regulator.input = 2000;
+    regulator.setPoint = 2500;
+    regulator.integratorCumulativeValue = 2700;
+    regulator.output = 165;
+    regulator.lastInput = 2400;
+    regulator.hardBreakMode = true;
+
+    regulator.handleHardBreak();
+
+    TEST_ASSERT_EQUAL( false, regulator.hardBreakMode );
+    TEST_ASSERT_EQUAL( regulator.input, regulator.lastInput );
+    TEST_ASSERT_EQUAL( converter.GetPowerForFreeSpeed(regulator.setPoint), regulator.integratorCumulativeValue );
+}
+
 void testRun()
 {
     TEST_IGNORE();
@@ -382,7 +434,9 @@ void processMotorSpeedRegulator()
     RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeedIntegratorDownwardsClamping );
     RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeedOutputUpwardsClamping );
     RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeedOutputDownwardsClamping );
-    RUN_TEST( testHandleHardBreak );
+    RUN_TEST( testHandleHardBreakNoHardBreakMode );
+    RUN_TEST( testHandleHardBreakTooFast );
+    RUN_TEST( testHandleHardBreakTooSlow );
     RUN_TEST ( testRun );
 }
 
