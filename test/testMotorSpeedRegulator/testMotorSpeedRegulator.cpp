@@ -273,6 +273,89 @@ void testDoCorePIDAlgorithmStepClampedForSpeedIntegratorDownwardsClamping()
     TEST_ASSERT_EQUAL( expectedOutput, regulator.output );
 }
 
+void testDoCorePIDAlgorithmStepClampedForSpeedOutputUpwardsClamping()
+{
+    int setPoint = 3000;
+    int oldSpeed = 2000;
+    int newSpeed = 2050;
+
+    MotorSpeedRegulator regulator;
+    MockSpeedometer speedometer;
+    speedometer.speedCPSFiltered = oldSpeed;
+    
+
+    MockMotorDriver driver;
+    MockEEPROMBackedArray<2,8> array;    
+    SpeedToPowerConverter converter( &array );
+    float P = 0.5;
+    float D = 0.1;
+    float I = 0.1;
+    float filter = 7;
+    
+    regulator.config(&speedometer, &driver, &converter, P, D, I, filter );
+    regulator.init();
+    regulator.start();
+    TEST_ASSERT_EQUAL( oldSpeed, regulator.lastInput );
+
+    speedometer.speedCPSFiltered = newSpeed;
+
+    regulator.setSetPoint( setPoint );
+
+    regulator.doCorePIDAlgorithmStepClampedForSpeed();
+
+    TEST_ASSERT_EQUAL( newSpeed, regulator.input );
+    int expectedIntegratorCumulativeValue = driver.motorPWM + I*(setPoint-newSpeed);
+    TEST_ASSERT_EQUAL( expectedIntegratorCumulativeValue, regulator.integratorCumulativeValue );
+    TEST_ASSERT_EQUAL( newSpeed, regulator.lastInput );    
+    int expectedDiffOfInput = newSpeed - oldSpeed;
+    TEST_ASSERT_EQUAL( expectedDiffOfInput, regulator.diffOfInput );
+    int expectedErrorTerm = setPoint - newSpeed;
+    TEST_ASSERT_EQUAL( expectedErrorTerm, regulator.errorTerm );
+    int expectedOutput = 255; 
+    TEST_ASSERT_EQUAL( expectedOutput, regulator.output );
+}
+
+void testDoCorePIDAlgorithmStepClampedForSpeedOutputDownwardsClamping()
+{
+    int setPoint = 000;
+    int oldSpeed = 2000;
+    int newSpeed = 2050;
+
+    MotorSpeedRegulator regulator;
+    MockSpeedometer speedometer;
+    speedometer.speedCPSFiltered = oldSpeed;
+    
+
+    MockMotorDriver driver;
+    MockEEPROMBackedArray<2,8> array;    
+    SpeedToPowerConverter converter( &array );
+    float P = 0.5;
+    float D = 0.1;
+    float I = 0.1;
+    float filter = 7;
+    
+    regulator.config(&speedometer, &driver, &converter, P, D, I, filter );
+    regulator.init();
+    regulator.start();
+    TEST_ASSERT_EQUAL( oldSpeed, regulator.lastInput );
+
+    speedometer.speedCPSFiltered = newSpeed;
+
+    regulator.setSetPoint( setPoint );
+
+    regulator.doCorePIDAlgorithmStepClampedForSpeed();
+
+    TEST_ASSERT_EQUAL( newSpeed, regulator.input );
+    TEST_ASSERT_EQUAL( 1, regulator.integratorCumulativeValue );
+    TEST_ASSERT_EQUAL( newSpeed, regulator.lastInput );    
+    int expectedDiffOfInput = newSpeed - oldSpeed;
+    TEST_ASSERT_EQUAL( expectedDiffOfInput, regulator.diffOfInput );
+    int expectedErrorTerm = setPoint - newSpeed;
+    TEST_ASSERT_EQUAL( expectedErrorTerm, regulator.errorTerm );
+    int expectedOutput = 1; 
+    TEST_ASSERT_EQUAL( expectedOutput, regulator.output );
+}
+
 void testHandleHardBreak ()
 {
     TEST_IGNORE();
@@ -297,6 +380,8 @@ void processMotorSpeedRegulator()
     RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeedNoClamping );
     RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeedIntegratorUpwardsClamping );
     RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeedIntegratorDownwardsClamping );
+    RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeedOutputUpwardsClamping );
+    RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeedOutputDownwardsClamping );
     RUN_TEST( testHandleHardBreak );
     RUN_TEST ( testRun );
 }
