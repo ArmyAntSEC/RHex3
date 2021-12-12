@@ -79,11 +79,11 @@ void measurePowerVsSpeedForOneLeg()
     {        
         //Spin up the motor
         driver.setMotorPWM(255);
-        sched.delayWithScheduler(500);
+        sched.delayWithoutStoppingScheduler(500);
 
         //Set the proper speed and let settle
         driver.setMotorPWM(power[i]);
-        sched.delayWithScheduler(1000);
+        sched.delayWithoutStoppingScheduler(1000);
 
         //Measure the speed
         int speed = encoder->getSpeedCPS(); //Filtered();

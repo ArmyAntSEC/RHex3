@@ -3,6 +3,7 @@
 
 #include <TaskScheduler.h>
 #include <MockTask.h>
+#include <HardwareInterface.h>
 
 void testAddTask()
 {
@@ -41,8 +42,22 @@ void testRun()
     TEST_ASSERT_EQUAL( 2, task2.countRun );    
 }
 
+void testDelayWithoutStoppingScheduler()
+{
+    TaskScheduler scheduler;
+    HardwareInterface::resetMicrosecondsSinceBoot();
+    MockTask task;
+    task.canActuallyRun = true;
+    scheduler.add(&task);
+    
+    scheduler.delayWithoutStoppingScheduler( 100 );
+    TEST_ASSERT_EQUAL( 130, HardwareInterface::getMillisecondsSinceBoot() ); //There are 3 additional calls to getMillis()
+    TEST_ASSERT_EQUAL( 10, task.countCanRun ); //Why does this become 5?????
+}
+
 void processTaskScheduler()
 {
     RUN_TEST( testAddTask );
     RUN_TEST( testRun );
+    RUN_TEST( testDelayWithoutStoppingScheduler );
 }

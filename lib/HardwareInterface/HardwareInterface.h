@@ -95,7 +95,7 @@ class HardwareInterface
     #ifdef ARDUINO
     return millis();
     #else    
-    return microsSinceBoot+=10000;
+    return (microsSinceBoot+=10000)/1000;
     #endif
   }
 

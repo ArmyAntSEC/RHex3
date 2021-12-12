@@ -42,7 +42,7 @@ void TaskScheduler::run() {
 	}	
 }
 
-void TaskScheduler::delayWithScheduler( unsigned long timeToWait )
+void TaskScheduler::delayWithoutStoppingScheduler( unsigned long timeToWait )
 {
     unsigned long startTime = HardwareInterface::getMillisecondsSinceBoot();
     unsigned long endTime = startTime + timeToWait;
