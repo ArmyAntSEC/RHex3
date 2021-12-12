@@ -115,7 +115,7 @@ public:
         this->hardBreakMode = true;
     }
 
-    void doCorePIDAlgorithmStepClampedForSpeed()
+    virtual void doCorePIDAlgorithmStepClampedForSpeed()
     {
         input = speedometer->getSpeedCPSFiltered();
 
@@ -130,7 +130,7 @@ public:
         output = clampOutputForSpeed(rawOutput, setPoint);
     }
 
-    void handleHardBreak()
+    virtual void handleHardBreak()
     {
         if (this->hardBreakMode)
         {

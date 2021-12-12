@@ -6,6 +6,7 @@
 #include "MockSpeedometer.h"
 #include "MockMotorDriver.h"
 #include "MockEEPROMBackedArray.h"
+#include "TestingMotorSpeedRegulator.h"
 
 void setUp(void) {
     HardwareInterface::resetMicrosecondsSinceBoot();
@@ -413,9 +414,37 @@ void testHandleHardBreakTooSlow ()
     TEST_ASSERT_EQUAL( converter.GetPowerForFreeSpeed(regulator.setPoint), regulator.integratorCumulativeValue );
 }
 
-void testRun()
+void testRunWhenOn()
 {
-    TEST_IGNORE();
+    TestingMotorSpeedRegulator regulator;
+    MockMotorDriver driver;
+    regulator.driver = &driver;
+
+    regulator.output = 123;
+    regulator.isOn = true;
+
+    regulator.run(0);
+
+    TEST_ASSERT_EQUAL( 123, driver.motorPWM );
+    TEST_ASSERT_EQUAL( 1, regulator.countDoCorePIDAlgorithmStepClampedForSpeed );
+    TEST_ASSERT_EQUAL( 1, regulator.countHandleHardBreak );
+}
+
+void testRunWhenOff()
+{
+    TestingMotorSpeedRegulator regulator;
+    MockMotorDriver driver;
+    driver.motorPWM = 0;
+    regulator.driver = &driver;
+
+    regulator.output = 123;
+    regulator.isOn = false;
+
+    regulator.run(0);
+
+    TEST_ASSERT_EQUAL( 0, driver.motorPWM );
+    TEST_ASSERT_EQUAL( 0, regulator.countDoCorePIDAlgorithmStepClampedForSpeed );
+    TEST_ASSERT_EQUAL( 0, regulator.countHandleHardBreak );
 }
 
 void processMotorSpeedRegulator()
@@ -437,6 +466,7 @@ void processMotorSpeedRegulator()
     RUN_TEST( testHandleHardBreakNoHardBreakMode );
     RUN_TEST( testHandleHardBreakTooFast );
     RUN_TEST( testHandleHardBreakTooSlow );
-    RUN_TEST ( testRun );
+    RUN_TEST ( testRunWhenOn );
+    RUN_TEST ( testRunWhenOff );
 }
 
