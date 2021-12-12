@@ -1,22 +1,16 @@
 #include <unity.h>
 
-#include <HardwareInterface.h>
 #define private public
 #include <MotorSpeedRegulator.h>
-#include "MockSpeedometer.h"
-#include "MockMotorDriver.h"
-#include "MockEEPROMBackedArray.h"
+#include <MockHomingEncoder.h>
+#include <MockMotorDriver.h>
+#include <MockEEPROMBackedArray.h>
 #include "TestingMotorSpeedRegulator.h"
-
-void setUp(void) {
-    HardwareInterface::resetMicrosecondsSinceBoot();
-    HardwareInterface::resetValues();
-}
 
 void testInit()
 {
     MotorSpeedRegulator regulator;
-    MockSpeedometer speedometer;
+    MockHomingEncoder speedometer;
     MockMotorDriver driver;
     SpeedToPowerConverter* converter = 0;
     float P = 4;
@@ -38,7 +32,7 @@ void testInit()
 void testConfig()
 {
     MotorSpeedRegulator regulator;
-    SpeedometerInterface* speedometer = 0;
+    MockHomingEncoder* speedometer = 0;
     MockMotorDriver driver;
     SpeedToPowerConverter* converter = 0;
     float P = 4;
@@ -48,7 +42,7 @@ void testConfig()
     
     regulator.config(speedometer, &driver, converter, P, D, I, filter );
 
-    TEST_ASSERT_EQUAL( speedometer, regulator.speedometer );
+    TEST_ASSERT_EQUAL( speedometer, regulator.homingEncoder );
     TEST_ASSERT_EQUAL( &driver, regulator.driver );
     TEST_ASSERT_EQUAL( converter, regulator.converter );
     TEST_ASSERT_EQUAL_FLOAT( P, regulator.proportionalTerm );
@@ -61,7 +55,7 @@ void testConfig()
 void testStart()
 {
     MotorSpeedRegulator regulator;
-    MockSpeedometer speedometer;
+    MockHomingEncoder speedometer;
     MockMotorDriver driver;
     SpeedToPowerConverter* converter = 0;
     float P = 4;
@@ -83,7 +77,7 @@ void testStart()
 void testStop()
 {
     MotorSpeedRegulator regulator;
-    SpeedometerInterface* speedometer = 0;
+    HomingEncoderInterface* speedometer = 0;
     MockMotorDriver driver;
     SpeedToPowerConverter* converter = 0;
     float P = 4;
@@ -129,7 +123,7 @@ void testClampOutputOK()
 void testClampOutputForSpeed()
 {    
     MotorSpeedRegulator regulator;
-    SpeedometerInterface* speedometer = 0;
+    HomingEncoderInterface* speedometer = 0;
     MockMotorDriver* driver = 0;
     MockEEPROMBackedArray<2,8> array;    
     SpeedToPowerConverter converter( &array );
@@ -153,7 +147,7 @@ void testDoCorePIDAlgorithmStepClampedForSpeedNoClamping()
     int newSpeed = 2050;
 
     MotorSpeedRegulator regulator;
-    MockSpeedometer speedometer;
+    MockHomingEncoder speedometer;
     speedometer.speedCPSFiltered = oldSpeed;
     
 
@@ -195,7 +189,7 @@ void testDoCorePIDAlgorithmStepClampedForSpeedIntegratorUpwardsClamping()
     int newSpeed = 2050;
 
     MotorSpeedRegulator regulator;
-    MockSpeedometer speedometer;
+    MockHomingEncoder speedometer;
     speedometer.speedCPSFiltered = oldSpeed;
     
 
@@ -238,7 +232,7 @@ void testDoCorePIDAlgorithmStepClampedForSpeedIntegratorDownwardsClamping()
     int newSpeed = 2050;
 
     MotorSpeedRegulator regulator;
-    MockSpeedometer speedometer;
+    MockHomingEncoder speedometer;
     speedometer.speedCPSFiltered = oldSpeed;
     
 
@@ -281,7 +275,7 @@ void testDoCorePIDAlgorithmStepClampedForSpeedOutputUpwardsClamping()
     int newSpeed = 2050;
 
     MotorSpeedRegulator regulator;
-    MockSpeedometer speedometer;
+    MockHomingEncoder speedometer;
     speedometer.speedCPSFiltered = oldSpeed;
     
 
@@ -323,7 +317,7 @@ void testDoCorePIDAlgorithmStepClampedForSpeedOutputDownwardsClamping()
     int newSpeed = 2050;
 
     MotorSpeedRegulator regulator;
-    MockSpeedometer speedometer;
+    MockHomingEncoder speedometer;
     speedometer.speedCPSFiltered = oldSpeed;
     
 

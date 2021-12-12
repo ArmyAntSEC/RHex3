@@ -3,7 +3,8 @@
 
 #include <MotorSpeedRegulator.h>
 #include <RecurringTaskBase.h>
-#include <SerialStream.h>
+#include <RotationPositionWithLaps.h>
+#include <HomingEncoderInterface.h>
 
 class MotorSpeedCommander : public RecurringTaskBase
 {
@@ -13,16 +14,36 @@ private:
     long int maxSpeedToMove = 3500;
     unsigned long int timeToMove;
     unsigned long int timeToArrive;
-    boolean hasArrivedAtPos = false;    
+    bool hasArrivedAtPos = false;    
 
-    HomingEncoder *encoder;
-    MotorDriver *driver;
+    HomingEncoderInterface *encoder;
 
     MotorSpeedRegulator *regulator;
 
 public:
-    int getMaxSpeed() { return this->maxSpeedToMove; }
+    virtual void config(HomingEncoderInterface *_encoder,
+        MotorSpeedRegulator *_regulator)
+    {
+        this->encoder = _encoder;
+        this->regulator = _regulator;
+    }
+
+    virtual void init(unsigned long int _timeToArrive,
+                      int _posToMoveTo)
+    {
+        RecurringTaskBase::init();
+        RotationPositionWithLaps currentPosition = this->encoder->getPosition();
+
+        this->timeToArrive = _timeToArrive;
+        this->posToMoveTo = currentPosition;
+        this->posToMoveTo.moveForwardTo( _posToMoveTo );
+
+        this->hasArrivedAtPos = false;
     
+        this->regulator->init();
+        this->regulator->useHardBreaks();
+    }
+
     long int computeTargetSpeedTakingNegativeTimeIntoAccount( long int timeLeft, long int clicksLeft )
     {
         long int targetSpeed = (1000L * clicksLeft) / timeLeft;
@@ -52,29 +73,6 @@ public:
         return targetSpeed;
     }
 
-    virtual void init(unsigned long int _timeToArrive,
-                      int _posToMoveTo)
-    {
-        RecurringTaskBase::init();
-        RotationPositionWithLaps currentPosition = this->encoder->getPosition();
-
-        this->timeToArrive = _timeToArrive;
-        this->posToMoveTo = currentPosition;
-        this->posToMoveTo.moveForwardTo( _posToMoveTo );
-
-        this->hasArrivedAtPos = false;
-    
-        this->regulator->init();
-        this->regulator->useHardBreaks();
-    }
-
-    virtual void config(HomingEncoder *_encoder, MotorDriver *_driver,
-                        MotorSpeedRegulator *_regulator)
-    {
-        this->encoder = _encoder;
-        this->driver = _driver;
-        this->regulator = _regulator;
-    }
 
     virtual void run(unsigned long int _now)
     {        
@@ -96,7 +94,7 @@ public:
         }
     }
 
-    boolean hasArrived()
+    bool hasArrived()
     {
         return this->hasArrivedAtPos;
     }
@@ -107,9 +105,5 @@ public:
         regulator->stop();
     }
 
-    HomingEncoder *getEncoder()
-    {
-        return this->encoder;
-    }
 };
 #endif

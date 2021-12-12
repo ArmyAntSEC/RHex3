@@ -5,10 +5,10 @@
 #include "RotationPositionWithLaps.h"
 #include <HardwareInterface.h>
 #include <VolatileRotationPositionWithLaps.h>
-#include <SpeedometerInterface.h>
+#include <HomingEncoderInterface.h>
 #define MAX_ENCODERS_SUPPORTED 6
 
-class HomingEncoder: public SpeedometerInterface
+class HomingEncoder: public HomingEncoderInterface
 {
 public:
   static const SQ15x16 clicksPerRevolution;
@@ -56,7 +56,7 @@ public:
     HardwareInterface::enableInterrupts();
   }
 
-  RotationPositionWithLaps getPosition()
+  virtual RotationPositionWithLaps getPosition()
   {
     return position.getNonVolatileCopy();
   }

@@ -1,7 +1,7 @@
 #ifndef _MOTORSPEEDCONTROLLER_H_
 #define _MOTORSPEEDCONTROLLER_H_
 
-#include "SpeedometerInterface.h"
+#include "HomingEncoderInterface.h"
 #include "MotorDriverInterface.h"
 #include <RecurringTaskBase.h>
 #include <SpeedToPowerConverter.h>
@@ -29,7 +29,7 @@ private:
 
     bool hardBreakMode = false;
 
-    SpeedometerInterface *speedometer;
+    HomingEncoderInterface *homingEncoder;
     MotorDriverInterface *driver;
     SpeedToPowerConverter *converter;
 
@@ -40,10 +40,10 @@ public:
         this->initState();
     }
 
-    virtual void config(SpeedometerInterface *_speedometer, MotorDriverInterface *_driver,
+    virtual void config(HomingEncoderInterface *_speedometer, MotorDriverInterface *_driver,
                         SpeedToPowerConverter *_converter, float _P, float _D, float _I, float _filter)
     {
-        this->speedometer = _speedometer;
+        this->homingEncoder = _speedometer;
         this->driver = _driver;
         this->converter = _converter;
         this->proportionalTerm = _P;
@@ -61,7 +61,7 @@ public:
 
     void initState()
     {
-        this->input = speedometer->getSpeedCPSFiltered();
+        this->input = homingEncoder->getSpeedCPSFiltered();
         this->lastInput = this->input; //No derivative kick on first iteration
         this->integratorCumulativeValue = clampOutput( driver->getMotorPWM() );
     }
@@ -117,7 +117,7 @@ public:
 
     virtual void doCorePIDAlgorithmStepClampedForSpeed()
     {
-        input = speedometer->getSpeedCPSFiltered();
+        input = homingEncoder->getSpeedCPSFiltered();
 
         errorTerm = setPoint - input;
         integratorCumulativeValue += integratorTerm * errorTerm;
