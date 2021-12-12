@@ -85,6 +85,15 @@ void testCapTargetSpeedCap()
     TEST_ASSERT_EQUAL( commander.maxSpeedToMove, commander.capTargetSpeed( targetSpeed) );
 }
 
+void testCapTargetSpeedLowCap()
+{
+    MotorSpeedCommander commander;
+    commander.maxSpeedToMove = 300;
+    long targetSpeed = -350;
+
+    TEST_ASSERT_EQUAL( 1, commander.capTargetSpeed( targetSpeed) );
+}
+
 void testComputeTargetSpeed()
 {
     MotorSpeedCommander commander;
@@ -160,6 +169,7 @@ void processMotorSpeedCommander()
     RUN_TEST( testComputeTargetSpeedTakingNegativeTimeIntoAccountNegativeTime );
     RUN_TEST( testCapTargetSpeedNoCap );
     RUN_TEST( testCapTargetSpeedCap );
+    RUN_TEST( testCapTargetSpeedLowCap );
     RUN_TEST( testComputeTargetSpeed );
     RUN_TEST( testRunHasArrived );
     RUN_TEST( testRunHasNotArrived );
