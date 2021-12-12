@@ -1,17 +1,25 @@
 #include <unity.h>
 
+#include <HardwareInterface.h>
+#include "testHomingEncoderISRs.h"
+#include "testHomingEncoderOverflowAndHoming.h"
+#include "testHomingEncoderComputeSpeed.h"
 #include "testRotationPositionWithLaps.h"
 #include "testVolatileRotationPositionWithLaps.h"
-#include <HardwareInterface.h>
+
+void setUp(void) {
+    HardwareInterface::resetMicrosecondsSinceBoot();
+}
 
 void process()
 {
-    UNITY_BEGIN();            
+    UNITY_BEGIN();  
+    runAllTestsHomingEncoderISR();      
+    runAllTestsHomingEncoderOverflowAndHoming();
+    runAllTestsHomingEncoderComputeSpeed();
     runAllTestsRotationPositionWithLap();
-    runAllTestsVolatileRotationPositionWithLap();        
+    runAllTestsVolatileRotationPositionWithLap();
     UNITY_END();
-    
-
 }
 
 #ifdef ARDUINO
