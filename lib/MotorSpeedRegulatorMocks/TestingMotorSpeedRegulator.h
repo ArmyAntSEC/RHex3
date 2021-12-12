@@ -6,6 +6,7 @@ struct TestingMotorSpeedRegulator: public MotorSpeedRegulator
 {
     int countDoCorePIDAlgorithmStepClampedForSpeed = 0;
     int countHandleHardBreak = 0;
+    int countInit = 0;
     
     virtual void handleHardBreak()
     {
@@ -16,5 +17,11 @@ struct TestingMotorSpeedRegulator: public MotorSpeedRegulator
     {
         countDoCorePIDAlgorithmStepClampedForSpeed++;
     }
+
+    virtual void init()
+    {
+        countInit++;
+    }
+
 
 };

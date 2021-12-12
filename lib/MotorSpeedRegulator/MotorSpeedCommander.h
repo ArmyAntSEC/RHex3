@@ -44,7 +44,7 @@ public:
         this->regulator->useHardBreaks();
     }
 
-    long int computeTargetSpeedTakingNegativeTimeIntoAccount( long int timeLeft, long int clicksLeft )
+    long computeTargetSpeedTakingNegativeTimeIntoAccount( long timeLeft, long clicksLeft )
     {
         long int targetSpeed = (1000L * clicksLeft) / timeLeft;
         if ( timeLeft < 0 ) {
@@ -53,7 +53,7 @@ public:
         return targetSpeed;
     }
     
-    long int capTargetSpeed( long int targetSpeed )
+    long capTargetSpeed( long targetSpeed )
     {
         if ( targetSpeed > this->maxSpeedToMove )
         {            
