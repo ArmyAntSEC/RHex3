@@ -10,7 +10,7 @@
 void testInit()
 {
     MotorSpeedRegulator regulator;
-    MockHomingEncoder speedometer;
+    MockHomingEncoder homingEncoder;
     MockMotorDriver driver;
     SpeedToPowerConverter* converter = 0;
     float P = 4;
@@ -18,13 +18,13 @@ void testInit()
     float I = 6;
     float filter = 7;
     
-    regulator.config(&speedometer, &driver, converter, P, D, I, filter );
+    regulator.config(&homingEncoder, &driver, converter, P, D, I, filter );
     
     regulator.init();
 
     TEST_ASSERT_EQUAL( true, regulator.running );
-    TEST_ASSERT_EQUAL( speedometer.speedCPSFiltered, regulator.input );
-    TEST_ASSERT_EQUAL( speedometer.speedCPSFiltered, regulator.lastInput );    
+    TEST_ASSERT_EQUAL( homingEncoder.speedCPSFiltered, regulator.input );
+    TEST_ASSERT_EQUAL( homingEncoder.speedCPSFiltered, regulator.lastInput );    
     TEST_ASSERT_EQUAL( driver.getMotorPWM(), regulator.integratorCumulativeValue );
 
 }
@@ -32,7 +32,7 @@ void testInit()
 void testConfig()
 {
     MotorSpeedRegulator regulator;
-    MockHomingEncoder* speedometer = 0;
+    MockHomingEncoder* homingEncoder = 0;
     MockMotorDriver driver;
     SpeedToPowerConverter* converter = 0;
     float P = 4;
@@ -40,9 +40,9 @@ void testConfig()
     float I = 6;
     float filter = 7;
     
-    regulator.config(speedometer, &driver, converter, P, D, I, filter );
+    regulator.config(homingEncoder, &driver, converter, P, D, I, filter );
 
-    TEST_ASSERT_EQUAL( speedometer, regulator.homingEncoder );
+    TEST_ASSERT_EQUAL( homingEncoder, regulator.homingEncoder );
     TEST_ASSERT_EQUAL( &driver, regulator.driver );
     TEST_ASSERT_EQUAL( converter, regulator.converter );
     TEST_ASSERT_EQUAL_FLOAT( P, regulator.proportionalTerm );
@@ -55,7 +55,7 @@ void testConfig()
 void testStart()
 {
     MotorSpeedRegulator regulator;
-    MockHomingEncoder speedometer;
+    MockHomingEncoder homingEncoder;
     MockMotorDriver driver;
     SpeedToPowerConverter* converter = 0;
     float P = 4;
@@ -64,20 +64,20 @@ void testStart()
     float filter = 7;
     regulator.integratorCumulativeValue = 5;
     
-    regulator.config(&speedometer, &driver, converter, P, D, I, filter );
+    regulator.config(&homingEncoder, &driver, converter, P, D, I, filter );
 
     regulator.start();
 
     TEST_ASSERT_TRUE( regulator.isOn );
     TEST_ASSERT_TRUE( regulator.running );
-    TEST_ASSERT_EQUAL( speedometer.speedCPSFiltered, regulator.lastInput );
+    TEST_ASSERT_EQUAL( homingEncoder.speedCPSFiltered, regulator.lastInput );
     TEST_ASSERT_EQUAL( driver.motorPWM, regulator.integratorCumulativeValue );
 }
 
 void testStop()
 {
     MotorSpeedRegulator regulator;
-    HomingEncoderInterface* speedometer = 0;
+    HomingEncoderInterface* homingEncoder = 0;
     MockMotorDriver driver;
     SpeedToPowerConverter* converter = 0;
     float P = 4;
@@ -86,7 +86,7 @@ void testStop()
     float filter = 7;
     driver.setMotorPWM(5);
     
-    regulator.config(speedometer, &driver, converter, P, D, I, filter );
+    regulator.config(homingEncoder, &driver, converter, P, D, I, filter );
 
     regulator.stop();
 
@@ -123,7 +123,7 @@ void testClampOutputOK()
 void testClampOutputForSpeed()
 {    
     MotorSpeedRegulator regulator;
-    HomingEncoderInterface* speedometer = 0;
+    HomingEncoderInterface* homingEncoder = 0;
     MockMotorDriver* driver = 0;
     MockEEPROMBackedArray<2,8> array;    
     SpeedToPowerConverter converter( &array );
@@ -133,7 +133,7 @@ void testClampOutputForSpeed()
     float I = 6;
     float filter = 7;
     
-    regulator.config(speedometer, driver, &converter, P, D, I, filter );
+    regulator.config(homingEncoder, driver, &converter, P, D, I, filter );
 
     TEST_ASSERT_EQUAL( regulator.maxOutput/2, regulator.clampOutputForSpeed(regulator.maxOutput/2, 13) );
     TEST_ASSERT_EQUAL( regulator.maxOutput, regulator.clampOutputForSpeed(regulator.maxOutput*2, 13) );
@@ -147,8 +147,8 @@ void testDoCorePIDAlgorithmStepClampedForSpeedNoClamping()
     int newSpeed = 2050;
 
     MotorSpeedRegulator regulator;
-    MockHomingEncoder speedometer;
-    speedometer.speedCPSFiltered = oldSpeed;
+    MockHomingEncoder homingEncoder;
+    homingEncoder.speedCPSFiltered = oldSpeed;
     
 
     MockMotorDriver driver;
@@ -159,12 +159,12 @@ void testDoCorePIDAlgorithmStepClampedForSpeedNoClamping()
     float I = 0.1;
     float filter = 7;
     
-    regulator.config(&speedometer, &driver, &converter, P, D, I, filter );
+    regulator.config(&homingEncoder, &driver, &converter, P, D, I, filter );
     regulator.init();
     regulator.start();
     TEST_ASSERT_EQUAL( oldSpeed, regulator.lastInput );
 
-    speedometer.speedCPSFiltered = newSpeed;
+    homingEncoder.speedCPSFiltered = newSpeed;
 
     regulator.setSetPoint( setPoint );
 
@@ -189,8 +189,8 @@ void testDoCorePIDAlgorithmStepClampedForSpeedIntegratorUpwardsClamping()
     int newSpeed = 2050;
 
     MotorSpeedRegulator regulator;
-    MockHomingEncoder speedometer;
-    speedometer.speedCPSFiltered = oldSpeed;
+    MockHomingEncoder homingEncoder;
+    homingEncoder.speedCPSFiltered = oldSpeed;
     
 
     MockMotorDriver driver;
@@ -201,12 +201,12 @@ void testDoCorePIDAlgorithmStepClampedForSpeedIntegratorUpwardsClamping()
     float I = 0.1;
     float filter = 7;
     
-    regulator.config(&speedometer, &driver, &converter, P, D, I, filter );
+    regulator.config(&homingEncoder, &driver, &converter, P, D, I, filter );
     regulator.init();
     regulator.start();
     TEST_ASSERT_EQUAL( oldSpeed, regulator.lastInput );
 
-    speedometer.speedCPSFiltered = newSpeed;
+    homingEncoder.speedCPSFiltered = newSpeed;
 
     regulator.setSetPoint( setPoint );
     regulator.integratorCumulativeValue = 2500;
@@ -232,8 +232,8 @@ void testDoCorePIDAlgorithmStepClampedForSpeedIntegratorDownwardsClamping()
     int newSpeed = 2050;
 
     MotorSpeedRegulator regulator;
-    MockHomingEncoder speedometer;
-    speedometer.speedCPSFiltered = oldSpeed;
+    MockHomingEncoder homingEncoder;
+    homingEncoder.speedCPSFiltered = oldSpeed;
     
 
     MockMotorDriver driver;
@@ -244,12 +244,12 @@ void testDoCorePIDAlgorithmStepClampedForSpeedIntegratorDownwardsClamping()
     float I = 0.1;
     float filter = 7;
     
-    regulator.config(&speedometer, &driver, &converter, P, D, I, filter );
+    regulator.config(&homingEncoder, &driver, &converter, P, D, I, filter );
     regulator.init();
     regulator.start();
     TEST_ASSERT_EQUAL( oldSpeed, regulator.lastInput );
 
-    speedometer.speedCPSFiltered = newSpeed;
+    homingEncoder.speedCPSFiltered = newSpeed;
 
     regulator.setSetPoint( setPoint );
     regulator.integratorCumulativeValue = 0;
@@ -275,8 +275,8 @@ void testDoCorePIDAlgorithmStepClampedForSpeedOutputUpwardsClamping()
     int newSpeed = 2050;
 
     MotorSpeedRegulator regulator;
-    MockHomingEncoder speedometer;
-    speedometer.speedCPSFiltered = oldSpeed;
+    MockHomingEncoder homingEncoder;
+    homingEncoder.speedCPSFiltered = oldSpeed;
     
 
     MockMotorDriver driver;
@@ -287,12 +287,12 @@ void testDoCorePIDAlgorithmStepClampedForSpeedOutputUpwardsClamping()
     float I = 0.1;
     float filter = 7;
     
-    regulator.config(&speedometer, &driver, &converter, P, D, I, filter );
+    regulator.config(&homingEncoder, &driver, &converter, P, D, I, filter );
     regulator.init();
     regulator.start();
     TEST_ASSERT_EQUAL( oldSpeed, regulator.lastInput );
 
-    speedometer.speedCPSFiltered = newSpeed;
+    homingEncoder.speedCPSFiltered = newSpeed;
 
     regulator.setSetPoint( setPoint );
 
@@ -317,8 +317,8 @@ void testDoCorePIDAlgorithmStepClampedForSpeedOutputDownwardsClamping()
     int newSpeed = 2050;
 
     MotorSpeedRegulator regulator;
-    MockHomingEncoder speedometer;
-    speedometer.speedCPSFiltered = oldSpeed;
+    MockHomingEncoder homingEncoder;
+    homingEncoder.speedCPSFiltered = oldSpeed;
     
 
     MockMotorDriver driver;
@@ -329,12 +329,12 @@ void testDoCorePIDAlgorithmStepClampedForSpeedOutputDownwardsClamping()
     float I = 0.1;
     float filter = 7;
     
-    regulator.config(&speedometer, &driver, &converter, P, D, I, filter );
+    regulator.config(&homingEncoder, &driver, &converter, P, D, I, filter );
     regulator.init();
     regulator.start();
     TEST_ASSERT_EQUAL( oldSpeed, regulator.lastInput );
 
-    speedometer.speedCPSFiltered = newSpeed;
+    homingEncoder.speedCPSFiltered = newSpeed;
 
     regulator.setSetPoint( setPoint );
 
