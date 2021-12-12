@@ -77,7 +77,7 @@ public:
     virtual void run(unsigned long int _now)
     {        
         RotationPositionWithLaps pos = this->encoder->getPosition();        
-        long int clicksLeft = this->posToMoveTo.getDifferenceInClicks( &pos );
+        long clicksLeft = this->posToMoveTo.getDifferenceInClicks( &pos );
 
         if (clicksLeft < 0)
         {

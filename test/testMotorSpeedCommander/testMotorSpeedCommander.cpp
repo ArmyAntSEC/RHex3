@@ -98,20 +98,59 @@ void testComputeTargetSpeed()
     TEST_ASSERT_EQUAL( commander.maxSpeedToMove, targetSpeed );
 }
 
-/*
-void testRun()
+void testRunHasArrived()
 {
     MotorSpeedCommander commander;
     MockHomingEncoder encoder;
     TestingMotorSpeedRegulator regulator;
+    regulator.setPoint = 200;
     commander.config( &encoder, &regulator );
-    
-    int timeToMoveTo = 100;
-    int posToMoveTo = 200;
+    commander.hasArrivedAtPos = false;
+    commander.timeToArrive = 100;
+    commander.posToMoveTo = RotationPositionWithLaps( 0, 1, 0 );
+    encoder.pos = RotationPositionWithLaps( 10, 1, 0 );
 
+    commander.run(0);
 
+    TEST_ASSERT_TRUE( commander.hasArrived() );
+    TEST_ASSERT_EQUAL( 200, regulator.setPoint ); //No change
 }
-*/
+
+void testRunHasNotArrived()
+{
+    MotorSpeedCommander commander;
+    MockHomingEncoder encoder;
+    TestingMotorSpeedRegulator regulator;
+    regulator.setPoint = 200;
+    commander.config( &encoder, &regulator );
+    commander.hasArrivedAtPos = false;
+    commander.timeToArrive = 100;
+    commander.posToMoveTo = RotationPositionWithLaps( 10, 1, 0 );
+    encoder.pos = RotationPositionWithLaps( 0, 1, 0 );
+
+    commander.run(0);
+
+    TEST_ASSERT_FALSE( commander.hasArrived() );
+    TEST_ASSERT_EQUAL( 100, regulator.setPoint );
+}
+
+void testRunHasAllreadyArrived()
+{
+    MotorSpeedCommander commander;
+    MockHomingEncoder encoder;
+    TestingMotorSpeedRegulator regulator;
+    regulator.setPoint = 200;
+    commander.config( &encoder, &regulator );
+    commander.hasArrivedAtPos = true;
+    commander.timeToArrive = 100;
+    commander.posToMoveTo = RotationPositionWithLaps( 10, 1, 0 );
+    encoder.pos = RotationPositionWithLaps( 0, 1, 0 );
+
+    commander.run(0);
+
+    TEST_ASSERT_TRUE( commander.hasArrived() );
+    TEST_ASSERT_EQUAL( 200, regulator.setPoint );
+}
 
 void processMotorSpeedCommander()
 {
@@ -122,4 +161,7 @@ void processMotorSpeedCommander()
     RUN_TEST( testCapTargetSpeedNoCap );
     RUN_TEST( testCapTargetSpeedCap );
     RUN_TEST( testComputeTargetSpeed );
+    RUN_TEST( testRunHasArrived );
+    RUN_TEST( testRunHasNotArrived );
+    RUN_TEST( testRunHasAllreadyArrived );
 }
