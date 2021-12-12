@@ -1,5 +1,4 @@
-#ifndef _MOTORSPEEDCOMMANDER_H_
-#define _MOTORSPEEDCOMMANDER_H_
+#pragma once
 
 #include <MotorSpeedRegulator.h>
 #include <RecurringTaskBase.h>
@@ -19,6 +18,22 @@ private:
     HomingEncoderInterface *encoder;
 
     MotorSpeedRegulator *regulator;
+
+    long checkArrivedStatusAndUpdateIt( long clicksLeft )
+    {
+        if (clicksLeft < 0)
+        {
+            clicksLeft = 0;
+            this->hasArrivedAtPos = true;
+        }
+        return clicksLeft;
+    }
+
+    long computeClicksLeft()
+    {
+        RotationPositionWithLaps pos = this->encoder->getPosition();        
+        return this->posToMoveTo.getDifferenceInClicks( &pos );
+    }
 
 public:
     virtual void config(HomingEncoderInterface *_encoder,
@@ -76,14 +91,9 @@ public:
 
     virtual void run(unsigned long int _now)
     {        
-        RotationPositionWithLaps pos = this->encoder->getPosition();        
-        long clicksLeft = this->posToMoveTo.getDifferenceInClicks( &pos );
+        long clicksLeft = computeClicksLeft();
 
-        if (clicksLeft < 0)
-        {
-            clicksLeft = 0;
-            this->hasArrivedAtPos = true;
-        }
+        clicksLeft = checkArrivedStatusAndUpdateIt( clicksLeft );
 
         long int targetSpeedClamped = this->computeTargetSpeed(
             this->timeToArrive - _now, clicksLeft);
@@ -106,4 +116,3 @@ public:
     }
 
 };
-#endif
