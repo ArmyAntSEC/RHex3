@@ -23,7 +23,6 @@ public:
 
     virtual bool canRun(unsigned long int now) 
     {
-        //ERROR(F("Test: Running: ") << this->running << " Now: " << now << " Next run:" << this->runTime << " Rate:" << this->rate );
         return this->isRunning() && now > this->runTime;
     }   
 
