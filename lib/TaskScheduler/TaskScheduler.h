@@ -14,7 +14,7 @@ class TaskScheduler {
 public:
     TaskScheduler();
     void add ( Task* task );
-    void run();    
+    void run( unsigned long now );    
     void delayWithoutStoppingScheduler( unsigned long timeToWait );
 private:
     const static int MaxTasks = 16;

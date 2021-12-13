@@ -31,9 +31,7 @@ void TaskScheduler::add(Task* task) {
 	}
 }
 
-void TaskScheduler::run() {	
-	unsigned long int nowU = HardwareInterface::getMicrosecondsSinceBoot();		
-	unsigned long int now = HardwareInterface::getMillisecondsSinceBoot();		
+void TaskScheduler::run(unsigned long now) {			
 	for (int i = 0; i < numTasks; i++) {		
 		Task* thisTask = this->tasks[i];				
 		if (thisTask->canRun(now)) {													
@@ -44,9 +42,10 @@ void TaskScheduler::run() {
 
 void TaskScheduler::delayWithoutStoppingScheduler( unsigned long timeToWait )
 {
-    unsigned long startTime = HardwareInterface::getMillisecondsSinceBoot();
-    unsigned long endTime = startTime + timeToWait;
-    while ( HardwareInterface::getMillisecondsSinceBoot() < endTime ) {
-        run();
+    unsigned long now = HardwareInterface::getMillisecondsSinceBoot();
+    unsigned long endTime = now + timeToWait;
+    while ( now < endTime ) {
+        run(now);
+		now = HardwareInterface::getMillisecondsSinceBoot();
     }
 }

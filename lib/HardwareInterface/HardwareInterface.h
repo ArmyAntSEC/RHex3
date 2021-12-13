@@ -86,6 +86,7 @@ class HardwareInterface
     #ifdef ARDUINO
     return micros();
     #else
+    std::cout << "Microseconds: " << microsSinceBoot << std::endl;
     return microsSinceBoot+=10;
     #endif
   }
@@ -94,8 +95,9 @@ class HardwareInterface
   {
     #ifdef ARDUINO
     return millis();
-    #else    
-    return (microsSinceBoot+=10000)/1000;
+    #else        
+    microsSinceBoot += 10000;
+    return microsSinceBoot/1000;
     #endif
   }
 

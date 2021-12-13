@@ -26,7 +26,7 @@ void testRun()
     scheduler.add( &task1 );
     scheduler.add( &task2 );
 
-    scheduler.run();
+    scheduler.run(0);
 
     TEST_ASSERT_EQUAL( 1, task1.countCanRun );
     TEST_ASSERT_EQUAL( 1, task2.countCanRun );    
@@ -34,7 +34,7 @@ void testRun()
     TEST_ASSERT_EQUAL( 1, task2.countRun );    
 
     task1.canActuallyRun = true;
-    scheduler.run();
+    scheduler.run(10);
 
     TEST_ASSERT_EQUAL( 2, task1.countCanRun );
     TEST_ASSERT_EQUAL( 2, task2.countCanRun );    
@@ -51,8 +51,8 @@ void testDelayWithoutStoppingScheduler()
     scheduler.add(&task);
     
     scheduler.delayWithoutStoppingScheduler( 100 );
-    TEST_ASSERT_EQUAL( 130, HardwareInterface::getMillisecondsSinceBoot() ); //There are 3 additional calls to getMillis()
-    TEST_ASSERT_EQUAL( 10, task.countCanRun ); //Why does this become 5?????
+    TEST_ASSERT_EQUAL( 110, HardwareInterface::microsSinceBoot/1000 ); //There are 2 additional calls to getMillis()
+    TEST_ASSERT_EQUAL( 10, task.countCanRun );
 }
 
 void processTaskScheduler()
