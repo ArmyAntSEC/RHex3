@@ -3,7 +3,7 @@
 
 #include <SingleTask.h>
 
-void testInit()
+void testInitSingleTask()
 {
     SingleTask task;
     task.init( 123 );
@@ -11,7 +11,7 @@ void testInit()
     TEST_ASSERT_EQUAL( 123, task.runTime );    
 }
 
-void testCanRun()
+void testCanRunSingleTask()
 {
     SingleTask task;
     task.init( 123 );
@@ -22,6 +22,6 @@ void testCanRun()
 
 void processSingleTask()
 {
-    RUN_TEST( testInit );
-    RUN_TEST( testCanRun );
+    RUN_TEST( testInitSingleTask );
+    RUN_TEST( testCanRunSingleTask );
 }

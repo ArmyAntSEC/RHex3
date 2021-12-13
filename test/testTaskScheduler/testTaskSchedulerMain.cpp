@@ -2,12 +2,14 @@
 
 void processTaskScheduler();
 void processSingleTask();
+void processRecurringTask();
 
 void process()
 {
     UNITY_BEGIN();  
     processTaskScheduler();
     processSingleTask();
+    processRecurringTask();
     UNITY_END();  
 }
 
