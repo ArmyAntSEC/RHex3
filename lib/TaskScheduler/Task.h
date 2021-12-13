@@ -16,7 +16,8 @@ public:
         return true;
     }
 
-    virtual void run(unsigned long int now) = 0;        
+    virtual void run(unsigned long int now)
+    {}        
 };
 
 #endif /* TASK_H_ */

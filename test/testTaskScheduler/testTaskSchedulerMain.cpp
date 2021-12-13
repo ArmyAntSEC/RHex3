@@ -1,11 +1,13 @@
 #include <unity.h>
 
 void processTaskScheduler();
+void processSingleTask();
 
 void process()
 {
     UNITY_BEGIN();  
     processTaskScheduler();
+    processSingleTask();
     UNITY_END();  
 }
 
