@@ -11,7 +11,7 @@ private:
 public:
     virtual bool canRun(unsigned long int ) 
     {        
-        return this->running;
+        return isRunning();
     }   
 
     virtual void init()
