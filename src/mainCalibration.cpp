@@ -1,9 +1,7 @@
 #include <Arduino.h>
-#include "LevelLogger.h"
 #include <configureOneLeg.h>
 
 #include <TaskScheduler.h>
-#include <LevelLogger.h>
 
 #include "getFreeMemory.h"
 #include "RecurringTaskGroup.h"

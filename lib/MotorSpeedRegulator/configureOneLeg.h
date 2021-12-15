@@ -39,7 +39,7 @@ MotorDriver driver;
 MotorSpeedRegulator regulator;
 MotorSpeedCommander commander;
 LegController leg;
-SpeedToPowerConverterProduction converter;
+SpeedToPowerConverter converter;
 
 
 void initOneLeg()

@@ -5,7 +5,7 @@
 #include "RecurringTaskBase.h"
 #include "HomingEncoder.h"
 
-class EncoderWrapperComputeSpeedTask: public Task
+class ComputeSpeedEncoderWrapperTask: public Task
 {
     private:
         HomingEncoder* encoder;
