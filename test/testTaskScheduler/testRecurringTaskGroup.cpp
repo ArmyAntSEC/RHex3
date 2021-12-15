@@ -66,6 +66,39 @@ void testGroupRun()
     TEST_ASSERT_EQUAL ( 2, task2.canRunCounter );
 }
 
+void testGroupCanRunStopped()
+{
+    RecurringTaskGroup<2> group(100);
+    group.runTime = 1000;
+    
+    TEST_ASSERT_FALSE( group.canRun(1100) ); //Not started, so allways false
+}
+
+void testGroupCanRunStarted()
+{
+    RecurringTaskGroup<2> group(100);
+    group.runTime = 1000;
+    group.start(0);
+
+    TEST_ASSERT_TRUE( group.canRun(1100) );
+    TEST_ASSERT_FALSE( group.canRun(900) ); 
+}
+
+void testGroupInit()
+{
+    RecurringTaskGroup<2> group(100);
+    group.init( 1000 );
+
+    TEST_ASSERT_EQUAL( 1100, group.runTime ); 
+}
+
+void testGroupGetRate()
+{
+    RecurringTaskGroup<2> group(100);
+
+    TEST_ASSERT_EQUAL( 100, group.getRate() ); 
+}
+
 void processRecurringTaskGroup()
 {
     RUN_TEST( testCreateGroup );
@@ -73,4 +106,7 @@ void processRecurringTaskGroup()
     RUN_TEST( testGroupAdd );
     RUN_TEST( testGroupAddTooMany );
     RUN_TEST( testGroupRun );
+    RUN_TEST( testGroupCanRunStopped );
+    RUN_TEST( testGroupInit );
+    RUN_TEST( testGroupGetRate );
 }
