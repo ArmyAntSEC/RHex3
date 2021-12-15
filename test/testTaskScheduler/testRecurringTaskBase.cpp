@@ -35,7 +35,7 @@ void testStop()
     TEST_ASSERT_EQUAL( false, task.isRunning() );
 }
 
-void processRecurringTask()
+void processRecurringTaskBase()
 {
     RUN_TEST( testCanRun );
     RUN_TEST( testInit );

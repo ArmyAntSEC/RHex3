@@ -12,11 +12,11 @@ class Task { // @suppress("Class has a virtual method and non-virtual destructor
 private:    
 
 public:
-    virtual bool canRun(unsigned long int now) {
+    virtual bool canRun(unsigned long now) {
         return true;
     }
 
-    virtual void run(unsigned long int now)
+    virtual void run(unsigned long now)
     {}        
 };
 
