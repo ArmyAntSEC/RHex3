@@ -47,6 +47,9 @@ class EEPROMBackedArray: public EEPROMBackedArrayInterface<N,M>
         
         virtual int const * getSubArray( int n )
         {            
-            return values[n];            
+            if ( n < N )
+                return values[n];
+            else
+                return 0;            
         }
 };

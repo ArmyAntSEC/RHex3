@@ -3,7 +3,7 @@
 
 #include <HomingEncoder.h>
 #include "MotorDriver.h"
-#include "RecurringSpeedComputingEncoderWrapper.h"
+#include "ComputeSpeedEncoderWrapperTask.h"
 #include "MotorSpeedRegulator.h"
 #include "MotorSpeedCommander.h"
 #include "LegController.h"
@@ -34,7 +34,7 @@
 #endif
 
 HomingEncoder* encoder;
-EncoderWrapperComputeSpeedTask encoderWrapperComputeSpeed;
+ComputeSpeedEncoderWrapperTask encoderWrapperComputeSpeed;
 MotorDriver driver;
 MotorSpeedRegulator regulator;
 MotorSpeedCommander commander;
