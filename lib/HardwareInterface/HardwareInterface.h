@@ -41,7 +41,7 @@ class HardwareInterface
   }
   
 
-  static void configurePin ( unsigned int pin, PinMode mode )
+  static void setPinMode ( unsigned int pin, PinMode mode )
   {
     #ifdef ARDUINO
     pinMode(pin, (uint8_t)mode );    

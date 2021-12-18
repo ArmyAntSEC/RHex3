@@ -25,9 +25,9 @@ public:
       this->driverPinTwo = _driverPinTwo;
       this->driverPinPWM = _driverPinPWM;      
 		
-      HardwareInterface::configurePin ( this->driverPinOne, HardwareInterface::OUTPUT );
-      HardwareInterface::configurePin ( this->driverPinTwo, HardwareInterface::OUTPUT );
-      HardwareInterface::configurePin ( this->driverPinPWM, HardwareInterface::OUTPUT );
+      HardwareInterface::setPinMode ( this->driverPinOne, HardwareInterface::OUTPUT );
+      HardwareInterface::setPinMode ( this->driverPinTwo, HardwareInterface::OUTPUT );
+      HardwareInterface::setPinMode ( this->driverPinPWM, HardwareInterface::OUTPUT );
 
       this->setMotorPWM(0); 
   }

@@ -38,9 +38,9 @@ public:
     encoderPin2 = _encoderPin2;
     homingPin = _breakerPin;
 
-    HardwareInterface::configurePin(encoderPin1, HardwareInterface::INPUT_PULLUP);
-    HardwareInterface::configurePin(encoderPin2, HardwareInterface::INPUT_PULLUP);
-    HardwareInterface::configurePin(homingPin, HardwareInterface::INPUT_PULLUP);
+    HardwareInterface::setPinMode(encoderPin1, HardwareInterface::INPUT_PULLUP);
+    HardwareInterface::setPinMode(encoderPin2, HardwareInterface::INPUT_PULLUP);
+    HardwareInterface::setPinMode(homingPin, HardwareInterface::INPUT_PULLUP);
 
     HardwareInterface::disableInterrupts();
     position = VolatileRotationPositionWithLaps();
