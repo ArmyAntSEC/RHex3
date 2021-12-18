@@ -1,4 +1,5 @@
 #include <unity.h>
+#include <HardwareInterface.h>
 
 void testGetPositionDefault()
 {

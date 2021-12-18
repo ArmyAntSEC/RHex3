@@ -1,7 +1,7 @@
 #include <unity.h>
+#include <HardwareInterface.h>
 
 void processEEPROMStorage();
-
 void processEEPROMBackedArrayStorage();
 
 void process()

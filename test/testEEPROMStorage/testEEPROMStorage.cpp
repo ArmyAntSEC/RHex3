@@ -31,8 +31,8 @@ void testWriteToIndex()
 
     eeprom.writeIntToIndex( 5, 1234 );
 
-    TEST_ASSERT_EQUAL( 210, HardwareInterface::EEPROMData[10] );
-    TEST_ASSERT_EQUAL( 4, HardwareInterface::EEPROMData[11] );
+    TEST_ASSERT_EQUAL( 210, HardwareInterface::ReadEEPROM(10) );
+    TEST_ASSERT_EQUAL( 4, HardwareInterface::ReadEEPROM(11) );
 }
 
 void testReadFromIndex()
@@ -52,10 +52,10 @@ void testWriteArrayToIndex()
     
     eeprom.writeIntArrayToAddress( 5, values, 2 );
 
-    TEST_ASSERT_EQUAL( 210, HardwareInterface::EEPROMData[10] );    
-    TEST_ASSERT_EQUAL( 4, HardwareInterface::EEPROMData[11] );    
-    TEST_ASSERT_EQUAL( 234, HardwareInterface::EEPROMData[12] );    
-    TEST_ASSERT_EQUAL( 29, HardwareInterface::EEPROMData[13] );    
+    TEST_ASSERT_EQUAL( 210, HardwareInterface::ReadEEPROM(10) );    
+    TEST_ASSERT_EQUAL( 4, HardwareInterface::ReadEEPROM(11) );    
+    TEST_ASSERT_EQUAL( 234, HardwareInterface::ReadEEPROM(12) );    
+    TEST_ASSERT_EQUAL( 29, HardwareInterface::ReadEEPROM(13) );    
 }
 
 void testReadArrayFromIndex()

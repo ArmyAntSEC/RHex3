@@ -31,14 +31,15 @@ class HardwareInterface
   static uint8_t EEPROMData[EEPROMSize];
   #endif
   
-  #ifndef ARDUINO
   static void resetValues()
   {
+    #ifndef ARDUINO
     memset(pinModes, 0, pinMaxCount*sizeof(PinMode) );
     memset(pinStatuses, 0, pinMaxCount*sizeof(PinStatus) );
     memset(EEPROMData, 0, EEPROMSize*sizeof(uint8_t) );
+    #endif
   }
-  #endif
+  
 
   static void configurePin ( unsigned int pin, PinMode mode )
   {
@@ -48,7 +49,27 @@ class HardwareInterface
     if ( pin < pinMaxCount ) {
       pinModes[pin] = mode;
     }
-    #endif //Ignore this if we have no hardware.
+    #endif 
+  }
+
+  static PinMode getPinMode ( unsigned int pin )
+  {
+    #ifdef ARDUINO
+    uint8_t bit = digitalPinToBitMask(pin);
+    uint8_t port = digitalPinToPort(pin);
+    volatile uint8_t *reg = portModeRegister(port);
+
+    if (*reg & bit) {
+      return PinMode::OUTPUT;
+    } else {
+      return PinMode::INPUT;
+    }  
+
+    #else
+    if ( pin < pinMaxCount ) {
+      return pinModes[pin];
+    }
+    #endif
   }
 
   static void attachAnInterrupt(unsigned int pin, void(*isr)(), PinStatus status )
