@@ -17,9 +17,9 @@ void testConfig()
     motorDriver.config( 3, 5, 7 );
 
     //Check the results
-    TEST_ASSERT_EQUAL( HardwareInterface::OUTPUT, HardwareInterface::pinModes[3] );
-    TEST_ASSERT_EQUAL( HardwareInterface::OUTPUT, HardwareInterface::pinModes[5] );
-    TEST_ASSERT_EQUAL( HardwareInterface::OUTPUT, HardwareInterface::pinModes[7] );    
+    TEST_ASSERT_EQUAL( HardwareInterface::OUTPUT, HardwareInterface::getPinMode(3) );
+    TEST_ASSERT_EQUAL( HardwareInterface::OUTPUT, HardwareInterface::getPinMode(5) );
+    TEST_ASSERT_EQUAL( HardwareInterface::OUTPUT, HardwareInterface::getPinMode(7) );    
     
     TEST_ASSERT_EQUAL( 3, motorDriver.driverPinOne );
     TEST_ASSERT_EQUAL( 5, motorDriver.driverPinTwo );

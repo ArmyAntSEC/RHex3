@@ -15,12 +15,12 @@ class HardwareInterface
   public:
   #ifdef ARDUINO
   enum PinStatus { LOW = ::LOW, HIGH = ::HIGH, CHANGE = ::CHANGE, 
-    FALLING = ::FALLING, RISING = ::RISING };
+    FALLING = ::FALLING, RISING = ::RISING, UNKNOWN_STATUS };
   enum PinMode { INPUT = ::INPUT, OUTPUT = ::OUTPUT, INPUT_PULLUP = ::INPUT_PULLUP, 
-    INPUT_PULLDOWN  = ::INPUT_PULLDOWN } ;
+    INPUT_PULLDOWN  = ::INPUT_PULLDOWN, UNKNOWN_MODE } ;
   #else
-  enum PinStatus { LOW, HIGH, CHANGE, FALLING, RISING };
-  enum PinMode { INPUT, OUTPUT, INPUT_PULLUP, INPUT_PULLDOWN } ;
+  enum PinStatus { LOW, HIGH, CHANGE, FALLING, RISING, UNKNOWN_STATUS };
+  enum PinMode { INPUT, OUTPUT, INPUT_PULLUP, INPUT_PULLDOWN, UNKNOWN_MODE } ;
   
   static long int microsSinceBoot;
   static const int pinMaxCount = 128;
@@ -68,6 +68,8 @@ class HardwareInterface
     #else
     if ( pin < pinMaxCount ) {
       return pinModes[pin];
+    } else {
+      return PinMode::UNKNOWN_MODE;
     }
     #endif
   }

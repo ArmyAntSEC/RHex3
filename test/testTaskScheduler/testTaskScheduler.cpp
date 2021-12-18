@@ -51,7 +51,7 @@ void testDelayWithoutStoppingScheduler()
     scheduler.add(&task);
     
     scheduler.delayWithoutStoppingScheduler( 100 );
-    TEST_ASSERT_EQUAL( 110, HardwareInterface::microsSinceBoot/1000 ); //There are 2 additional calls to getMillis()
+    TEST_ASSERT_EQUAL( 110, HardwareInterface::getMicrosecondsSinceBoot()/1000 ); //There are 2 additional calls to getMillis()
     TEST_ASSERT_EQUAL( 10, task.countCanRun );
 }
 
