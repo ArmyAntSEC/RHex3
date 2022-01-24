@@ -113,6 +113,8 @@ class HardwareInterface
     #else
     if ( pin < pinMaxCount ) {
       return pinStatuses[pin];
+    } else {
+      return -1;
     }
     #endif
   }

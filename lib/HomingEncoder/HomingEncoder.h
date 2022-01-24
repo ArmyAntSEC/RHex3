@@ -1,7 +1,6 @@
 #ifndef _HOMINGENCODER_H_
 #define _HOMINGENCODER_H_
 
-#include <FixedPointsCommon.h>
 #include "RotationPositionWithLaps.h"
 #include <HardwareInterface.h>
 #include <VolatileRotationPositionWithLaps.h>
@@ -11,7 +10,6 @@
 class HomingEncoder: public SpeedometerInterface
 {
 public:
-  static const SQ15x16 clicksPerRevolution;
   const int speedTimeConstant = 10;
 
   int encoderPin1;
@@ -26,8 +24,10 @@ public:
   //Also use the above object here as well.
   RotationPositionWithLaps positionAtLastSpeedMeasurement;  
   unsigned long int timestampMicrosAtLastSpeedMeasurement;
-  SQ15x16 speed_cps;
-  SQ15x16 speed_cps_filtered;
+  int speed_cps;
+  int speed_cps_filtered;
+
+  static const int clicksPerRevolution;
 
 public:
   void config(unsigned int _encoderPin1,
@@ -97,11 +97,11 @@ public:
 
     RotationPositionWithLaps thisPos = this->getPosition();
         
-    SQ15x16 posDelta = thisPos.getShortestPositiveDifferenceInt( 
+    int posDelta = thisPos.getShortestPositiveDifferenceInt( 
       &(this->positionAtLastSpeedMeasurement) );        
-    SQ15x16 timeDelta = nowU - timestampMicrosAtLastSpeedMeasurement;            
+    int timeDelta = nowU - timestampMicrosAtLastSpeedMeasurement;            
 
-    SQ15x16 speedCPS;
+    int speedCPS;
     if (timeDelta == 0)
     {
       speedCPS = 0;
@@ -130,17 +130,17 @@ public:
     if (pos1 >= pos2)
       return pos1 - pos2;
     else
-      return clicksPerRevolution.getInteger() + pos1 - pos2;
+      return clicksPerRevolution + pos1 - pos2;
   }
 
   long int getSpeedCPS()
   {
-    return speed_cps.getInteger();
+    return speed_cps;
   }
 
   long int getSpeedCPSFiltered()
   {
-    return speed_cps_filtered.getInteger();
+    return speed_cps_filtered;
   }
 
   void unHome()
@@ -203,7 +203,7 @@ public:
       unsigned int encoderPin1, unsigned int encoderPin2,
       unsigned int homingPin, int offset)
   {
-    static_assert(N < MAX_ENCODERS_SUPPORTED);
+    static_assert(N < MAX_ENCODERS_SUPPORTED, "Too many encoders requested" );
     HomingEncoder *state = &stateList[N];
 
     state->config(encoderPin1, encoderPin2, homingPin, offset);

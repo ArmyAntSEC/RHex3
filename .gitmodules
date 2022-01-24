@@ -1,3 +1,0 @@
-[submodule "lib/FixedPoints"]
-	path = lib/FixedPoints
-	url = git@github.com:ArmyAntSEC/FixedPointsArduino.git

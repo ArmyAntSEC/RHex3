@@ -1,20 +1,18 @@
 #ifndef _ROTATIONPOSITIONWITHLAP_H_
 #define _ROTATIONPOSITIONWITHLAP_H_
 
-#include <FixedPointsCommon.h>
-
 class RotationPositionWithLaps
 {
 private:
     int clickPosition = 0;
     long int laps = 0;
-    SQ1x14 remainder = 0;
+    int remainder = 0;
 
-    static SQ15x16 clicksPerRotation;
+    static int clicksPerRotation;
     
 
 public:
-    RotationPositionWithLaps(int _clickPosition = 0, long int _laps = 0, SQ1x14 _remainder = 0) : 
+    RotationPositionWithLaps(int _clickPosition = 0, long int _laps = 0, int _remainder = 0) : 
         clickPosition(_clickPosition), laps(_laps), remainder(_remainder)
     {    
         this->reduceToMinimalFormWithRecursion();
@@ -39,7 +37,7 @@ public:
     
     void reduceToMinimalFormWithRecursion()
     {
-        if ( this->clickPosition > this->clicksPerRotation.getInteger() )
+        if ( this->clickPosition > this->clicksPerRotation )
         {                
             this->removeOneLap();        
             this->reduceToMinimalFormWithRecursion();
@@ -48,9 +46,9 @@ public:
 
     void removeOneLap()
     {
-        SQ15x16 precise_position = SQ15x16((long int)this->clickPosition) + SQ15x16(this->remainder) - this->clicksPerRotation;
-        this->clickPosition = floorFixed(precise_position).getInteger();
-        this->remainder = SQ1x14(precise_position-floorFixed(precise_position));
+        long precise_position = ((long int)this->clickPosition) + (this->remainder) - this->clicksPerRotation;
+        this->clickPosition = precise_position;
+        this->remainder = precise_position-precise_position;
         this->laps++;            
     }
 
@@ -64,7 +62,7 @@ public:
         return this->laps;
     }
 
-    SQ1x14 getRemainder() const
+    int getRemainder() const
     {
         return this->remainder;
     }
@@ -75,7 +73,7 @@ public:
     }
 
 
-    SQ15x16 getClicksPerRotation() const
+    int getClicksPerRotation() const
     {
         return this->clicksPerRotation;
     }
@@ -84,7 +82,7 @@ public:
     {
         long clicksDifference = this->getClickPosition() - pos2->getClickPosition();
         if ( clicksDifference < 0 ) {                    
-            clicksDifference +=  this->getClicksPerRotation().getInteger();
+            clicksDifference +=  this->getClicksPerRotation();
         }
 
         return  clicksDifference;
@@ -94,7 +92,7 @@ public:
     {        
         long clicksDifference = this->getClickPosition() - pos2->getClickPosition();
         long lapDifference = this->getLaps() - pos2->getLaps();        
-        long clickDifferenceFromLaps = (lapDifference * this->getClicksPerRotation()).getInteger();
+        long clickDifferenceFromLaps = (lapDifference * this->getClicksPerRotation());
         //Log << "Lap difference: " << lapDifference << " clickDifference: " << clicksDifference << endl;
         return clicksDifference + clickDifferenceFromLaps;
     }
@@ -116,12 +114,12 @@ public:
 
     long int getSerialPosition()
     {
-        SQ31x32 clicksFromClicks = this->getClickPosition();
-        SQ31x32 clicksFromLaps = SQ31x32(this->getClicksPerRotation() * this->getLaps());
-        SQ31x32 clicksFromRemainder = SQ31x32( this->getRemainder() );
+        int clicksFromClicks = this->getClickPosition();
+        int clicksFromLaps = int(this->getClicksPerRotation() * this->getLaps());
+        int clicksFromRemainder = int( this->getRemainder() );
 
 
-        return (clicksFromClicks + clicksFromLaps + clicksFromRemainder).getInteger();
+        return clicksFromClicks + clicksFromLaps + clicksFromRemainder;
     }
 };
 
