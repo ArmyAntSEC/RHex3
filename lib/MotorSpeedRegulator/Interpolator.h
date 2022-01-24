@@ -1,8 +1,6 @@
 #ifndef _INTERPOLATOR_H_
 #define _INTERPOLATOR_H_
 
-#include <FixedPointsCommon.h>
-
 class Interpolator
 {
     public:
@@ -27,16 +25,16 @@ class Interpolator
 
         int xLow = xList[xIdx - 1];
         int xHigh = xList[xIdx];
-        SQ15x16 xSpan = xHigh - xLow;
+        long int xSpan = xHigh - xLow;
         int yLow = yList[xIdx - 1];
         int yHigh = yList[xIdx];
-        SQ15x16 ySpan = yHigh - yLow;
+        long int ySpan = yHigh - yLow;
 
-        SQ15x16 xRem = x - xLow;
-        SQ15x16 factor = ySpan / xSpan;
-        SQ15x16 yRem = xRem * factor;
+        long int xRem = x - xLow;
+        int factorTimes1000 = (1000 * ySpan) / xSpan;
+        int yRem = (xRem * factorTimes1000)/1000;
         
-        int y = roundFixed(yRem).getInteger() + yLow;
+        int y = yRem + yLow;
 
         return y;
     }

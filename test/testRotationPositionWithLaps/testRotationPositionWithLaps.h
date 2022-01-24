@@ -15,7 +15,7 @@ void testGetClicksPerRotation()
 {
 
     RotationPositionWithLaps pos( 0, 0 );    
-    SQ15x16 clicksPerRotation = pos.getClicksPerRotation();
+    int clicksPerRotation = pos.getClicksPerRotation();
     
     TEST_ASSERT_DOUBLE_WITHIN ( 1e-5, 1795.9626665, (double)clicksPerRotation  );
 }
@@ -71,7 +71,7 @@ void testPositiveDifferenceReverseOnSameLap()
 { 
     RotationPositionWithLaps pos1( 2000, 0 );        
     RotationPositionWithLaps pos2( 2500, 0 );   
-    TEST_ASSERT_EQUAL( pos1.getClicksPerRotation().getInteger() - 500, pos1.getShortestPositiveDifferenceInt( &pos2 ) );
+    TEST_ASSERT_EQUAL( pos1.getClicksPerRotation() - 500, pos1.getShortestPositiveDifferenceInt( &pos2 ) );
 }
 
 void testDifferenceSimpleOnSameLap()
@@ -85,7 +85,7 @@ void testDifferenceSimpleTenLapDifference()
 {    
     RotationPositionWithLaps pos1( 2500, 10 );        
     RotationPositionWithLaps pos2( 2000, 0 );            
-    TEST_ASSERT_EQUAL( 500 + (10 * pos1.getClicksPerRotation()).getInteger(), 
+    TEST_ASSERT_EQUAL( 500 + (10 * pos1.getClicksPerRotation()), 
         pos1.getDifferenceInClicks( &pos2 ) );
 }
 
@@ -119,7 +119,7 @@ void testCompareEquals()
 void testCompareDiffInRemainder()
 {
     RotationPositionWithLaps pos1( 1000, 2, 0 );
-    RotationPositionWithLaps pos2( 1000, 2, 0.5 );   
+    RotationPositionWithLaps pos2( 1000, 2, (int)0.5 );   
     TEST_ASSERT_FALSE( pos1 == pos2 );
 }
 
@@ -139,13 +139,13 @@ void testCompareDiffInClicks()
 
 void testConvertToLongInt()
 {
-    RotationPositionWithLaps pos1( 1200, 10, 0.5 );    
-    TEST_ASSERT_EQUAL_INT32( 1200 + (pos1.getClicksPerRotation()*10 + SQ15x16(0.5)).getInteger(), pos1.getSerialPosition() );
+    RotationPositionWithLaps pos1( 1200, 10, (int)0.5 );    
+    TEST_ASSERT_EQUAL_INT32( 1200 + (pos1.getClicksPerRotation()*10 + 0.5), pos1.getSerialPosition() );
 }
 
 void testMoveForwardToSameLap()
 {
-    RotationPositionWithLaps pos1( 1200, 10, 0.5 );    
+    RotationPositionWithLaps pos1( 1200, 10, (int)0.5 );    
     pos1.moveForwardTo( 1500 );
 
     TEST_ASSERT_EQUAL( 1500, pos1.getClickPosition() );
@@ -155,7 +155,7 @@ void testMoveForwardToSameLap()
 
 void testMoveForwardToOtherLap()
 {
-    RotationPositionWithLaps pos1( 1200, 10, 0.5 );    
+    RotationPositionWithLaps pos1( 1200, 10, (int)0.5 );    
     pos1.moveForwardTo( 5500 );
 
     TEST_ASSERT_EQUAL( 112, pos1.getClickPosition() );

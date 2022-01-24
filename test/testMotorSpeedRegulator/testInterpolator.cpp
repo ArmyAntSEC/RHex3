@@ -20,7 +20,7 @@ void testDoInterpolationBetweenPoints()
 
     int output = interpolator.doInterpolation( 5, xList, yList, listLength );
     
-    TEST_ASSERT_EQUAL( 7, output );
+    TEST_ASSERT_EQUAL( 6, output ); //Floor rounding.
 }
 
 void testDoInterpolationUnderValue()
