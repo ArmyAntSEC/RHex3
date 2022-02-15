@@ -6,7 +6,6 @@
  */
 
 #include "TaskScheduler.h"
-#include <SerialStream.h>
 #include <HardwareInterface.h>
 
 #ifdef ARDUINO
