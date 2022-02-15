@@ -58,9 +58,9 @@ void setup()
     
     encoder = encoderFactory.config<0>( ENCODER_1, ENCODER_2, OPTO, &listener );
 
-    driver.setMotorPWM( 128 );
+    driver.setMotorPWM( 32 );
 
-    delay(1000);
+    delay(10000);
 
     driver.setMotorPWM( 0 );
 
