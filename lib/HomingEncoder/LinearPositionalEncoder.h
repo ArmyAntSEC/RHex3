@@ -2,7 +2,12 @@
 
 #include "BasicEncoder.h"
 
-class LinearPositionEncoder: public BasicEncoderListener
+struct LinearPositionProvider
+{
+    virtual long getLinearPosition() = 0;    
+};
+
+class LinearPositionEncoder: public BasicEncoderListener, LinearPositionProvider
 {
 private:
     volatile long linearPosition = 0;
@@ -20,7 +25,7 @@ public:
             linearPosition = 0;
     }
 
-    long getLinearPosition()
+    virtual long getLinearPosition()
     {
         long rValue = 0;
         HardwareInterface::disableInterrupts();
