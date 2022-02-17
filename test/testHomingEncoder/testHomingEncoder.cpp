@@ -4,6 +4,7 @@
 #include "testHomingEncoderISRs.h"
 #include "testHomingEncoderOverflowAndHoming.h"
 #include "testHomingEncoderComputeSpeed.h"
+#include "testBasicEncoder.h"
 
 void setUp(void) {
     HardwareInterface::resetMicrosecondsSinceBoot();
@@ -15,6 +16,7 @@ void process()
     runAllTestsHomingEncoderISR();      
     runAllTestsHomingEncoderOverflowAndHoming();
     runAllTestsHomingEncoderComputeSpeed();
+    runAllTestsBasicEncoder();
     UNITY_END();
 }
 

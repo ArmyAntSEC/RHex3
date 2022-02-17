@@ -23,7 +23,6 @@ private:
     {}
 
 public:
-    //TODO: Unit test me
     void config(unsigned int _encoderPin1,
                 unsigned int _encoderPin2, unsigned int _breakerPin, BasicEncoderListener* listener)
     {
@@ -38,16 +37,14 @@ public:
         HardwareInterface::configurePin(homingPin, HardwareInterface::INPUT_PULLUP);
     }
 
-    //TODO: Unit test me
     void signalStepForwardISR()
     {
         listener->signalStepForwardISR();
     }
-    
-    //TODO: Unit test me
+
     void signalHomingISR()
     {
-        listener->signalStepForwardISR();
+        listener->signalHomingISR();
     }
 
     friend class BasicEncoderFactory;

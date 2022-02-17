@@ -4,6 +4,7 @@
 
 void testDoOverflow()
 {
+    TEST_IGNORE();
     HomingEncoder* encoder = HomingEncoderFactory::config<0>(0,0,0,0);    
 
     //Step the encoder 2000 times
@@ -21,6 +22,7 @@ void testDoOverflow()
 
 void testDoOverflowRecursive()
 {
+    TEST_IGNORE();
     HomingEncoder* encoder = HomingEncoderFactory::config<0>(0,0,0,0);    
 
     //Step the encoder 4000 times

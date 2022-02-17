@@ -5,10 +5,8 @@
 
 void doTestComputeSpeed()
 {
-    #ifdef ARDUINO
     TEST_IGNORE();
-    #endif
-
+ 
     HomingEncoder* encoder = HomingEncoderFactory::config<0>(0,0,0,0);        
 
     //This function causes one millisecond to pass when run on native.

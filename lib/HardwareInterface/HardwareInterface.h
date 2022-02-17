@@ -26,10 +26,12 @@ class HardwareInterface
   static const int pinMaxCount = 128;
   static PinMode pinModes[pinMaxCount];
   static int pinStatuses[pinMaxCount];
+  typedef void(*VoidFcnPtr)();
+  static VoidFcnPtr isrList[pinMaxCount];
   
   static const int EEPROMSize = 256;
   static uint8_t EEPROMData[EEPROMSize];
-  #endif
+  #endif 
   
   #ifndef ARDUINO
   static void resetValues()
@@ -37,6 +39,7 @@ class HardwareInterface
     memset(pinModes, 0, pinMaxCount*sizeof(PinMode) );
     memset(pinStatuses, 0, pinMaxCount*sizeof(PinStatus) );
     memset(EEPROMData, 0, EEPROMSize*sizeof(uint8_t) );
+    memset(isrList, 0, pinMaxCount*sizeof(VoidFcnPtr) );
   }
   #endif
 
@@ -55,7 +58,10 @@ class HardwareInterface
   {            
     #ifdef ARDUINO
     attachInterrupt(digitalPinToInterrupt(pin), isr, ::PinStatus(status) );    
-    #endif //Ignore this if we have no hardware
+    #else
+      pinStatuses[pin] = status;
+      isrList[pin] = isr;
+    #endif
   }
 
   static void disableInterrupts()

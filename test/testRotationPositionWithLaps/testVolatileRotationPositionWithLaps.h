@@ -34,7 +34,7 @@ void testVolatileConvertClicksToPrecisePosition2Laps()
 
 void testVolatileConvertToNonVolatileCopy()
 {
-
+    TEST_IGNORE();
     VolatileRotationPositionWithLaps volatilePos( 1234, 1, 54321 );
     RotationPositionWithLaps nonVolatilePos = volatilePos.getNonVolatileCopy();
 
