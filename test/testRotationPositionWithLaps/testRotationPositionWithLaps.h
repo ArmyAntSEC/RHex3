@@ -168,6 +168,7 @@ void testMoveForwardToOtherLap()
 
 void runAllTestsRotationPositionWithLap()
 {        
+    UNITY_BEGIN();    
     RUN_TEST( testSetAndReadPostion );
     RUN_TEST( testGetClicksPerRotation );
     RUN_TEST( testConvertClicksToPrecisePosition );
@@ -187,5 +188,6 @@ void runAllTestsRotationPositionWithLap()
     RUN_TEST( testDifferenceReverseOnSameLap );
     RUN_TEST( testMoveForwardToSameLap );
     RUN_TEST( testMoveForwardToOtherLap );
+    UNITY_END();    
     
 };

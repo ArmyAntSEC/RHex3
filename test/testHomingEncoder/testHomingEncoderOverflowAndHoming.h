@@ -62,7 +62,9 @@ void doTestForceHomed()
 
 void runAllTestsHomingEncoderOverflowAndHoming()
 {        
+    UNITY_BEGIN();
     RUN_TEST( testDoOverflow );   
     RUN_TEST( testDoOverflowRecursive ); 
     RUN_TEST( doTestForceHomed );
+    UNITY_END();
 }

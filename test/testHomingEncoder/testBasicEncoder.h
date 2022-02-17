@@ -39,31 +39,33 @@ void testBasicEncoderFactoryConfig()
     TEST_ASSERT_EQUAL( BasicEncoderFactory::isr_homing<0>, HardwareInterface::isrList[homingPin] );
 }
 
-void testBasicEncoderSignalStepForwardISR()
+void testBasicEncoderFactorySignalStepForwardISR()
 {
     BasicEncoderListenerMock listener;
     BasicEncoder* sut = BasicEncoderFactory::config<0>( 0, 1, 2, &listener );
     TEST_ASSERT_EQUAL( 0, listener.stepCounter );
     
-    sut->signalStepForwardISR();
+    BasicEncoderFactory::isr_encoder<0>();
 
     TEST_ASSERT_EQUAL( 1, listener.stepCounter );
 }
 
-void testBasicEncoderSignalHomingISR()
+void testBasicEncoderFactorySignalHomingISR()
 {
     BasicEncoderListenerMock listener;
     BasicEncoder* sut = BasicEncoderFactory::config<0>( 0, 1, 2, &listener );
     TEST_ASSERT_EQUAL( 0, listener.homingCounter );
     
-    sut->signalHomingISR();
+    BasicEncoderFactory::isr_homing<0>();
 
     TEST_ASSERT_EQUAL( 1, listener.homingCounter );
 }
 
 void runAllTestsBasicEncoder()
 {            
+    UNITY_BEGIN();
     RUN_TEST( testBasicEncoderFactoryConfig );
-    RUN_TEST( testBasicEncoderSignalStepForwardISR );
-    RUN_TEST( testBasicEncoderSignalHomingISR );
+    RUN_TEST( testBasicEncoderFactorySignalStepForwardISR );
+    RUN_TEST( testBasicEncoderFactorySignalHomingISR );
+    UNITY_END();
 }

@@ -5,6 +5,8 @@
 #include "testHomingEncoderOverflowAndHoming.h"
 #include "testHomingEncoderComputeSpeed.h"
 #include "testBasicEncoder.h"
+#include "testLinearPositionEncoder.h"
+#include "testSpeedComputer.h"
 
 void setUp(void) {
     HardwareInterface::resetMicrosecondsSinceBoot();
@@ -12,12 +14,12 @@ void setUp(void) {
 
 void process()
 {
-    UNITY_BEGIN();  
     runAllTestsHomingEncoderISR();      
     runAllTestsHomingEncoderOverflowAndHoming();
     runAllTestsHomingEncoderComputeSpeed();
     runAllTestsBasicEncoder();
-    UNITY_END();
+    runAllTestsLinearPositionEncoder();
+    runAllTestsSpeedComputer();
 }
 
 #ifdef ARDUINO

@@ -1,5 +1,4 @@
-#ifndef _BASICENCODER_H_
-#define _BASICENCODER_H_
+#pragma once
 
 #include <HardwareInterface.h>
 #define MAX_ENCODERS_SUPPORTED 6
@@ -86,5 +85,3 @@ public:
         state->signalHomingISR();
     }
 };
-
-#endif

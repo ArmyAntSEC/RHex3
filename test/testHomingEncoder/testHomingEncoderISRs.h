@@ -34,6 +34,8 @@ void testStepHoming()
 
 void runAllTestsHomingEncoderISR()
 {        
+    UNITY_BEGIN();
     RUN_TEST( testStepEncoder );
     RUN_TEST( testStepHoming );
+    UNITY_END();
 }

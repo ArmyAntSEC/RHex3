@@ -35,6 +35,8 @@ void doTestComputeSpeed()
 }
 
 void runAllTestsHomingEncoderComputeSpeed()
-{            
+{        
+    UNITY_BEGIN();    
     RUN_TEST( doTestComputeSpeed );
+    UNITY_END();
 }

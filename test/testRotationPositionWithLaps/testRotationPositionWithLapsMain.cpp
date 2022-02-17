@@ -6,12 +6,8 @@
 
 void process()
 {
-    UNITY_BEGIN();            
     runAllTestsRotationPositionWithLap();
-    runAllTestsVolatileRotationPositionWithLap();        
-    UNITY_END();
-    
-
+    runAllTestsVolatileRotationPositionWithLap();         
 }
 
 #ifdef ARDUINO

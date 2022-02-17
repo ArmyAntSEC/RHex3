@@ -92,7 +92,7 @@ class HardwareInterface
     #ifdef ARDUINO
     return micros();
     #else
-    return microsSinceBoot+=10;
+    return microsSinceBoot;
     #endif
   }
 
@@ -101,7 +101,16 @@ class HardwareInterface
     #ifdef ARDUINO
     return millis();
     #else    
-    return microsSinceBoot+=10000;
+    return microsSinceBoot/1000;
+    #endif
+  }
+
+  static void stepMicrosecondsSinceBoot( long us )
+  {
+    #ifdef ARDUINO
+    //Do nothing
+    #else    
+    microsSinceBoot += us;
     #endif
   }
 

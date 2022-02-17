@@ -33,7 +33,7 @@ void testVolatileConvertClicksToPrecisePosition2Laps()
 }
 
 void testVolatileConvertToNonVolatileCopy()
-{
+{    
     TEST_IGNORE();
     VolatileRotationPositionWithLaps volatilePos( 1234, 1, 54321 );
     RotationPositionWithLaps nonVolatilePos = volatilePos.getNonVolatileCopy();
@@ -46,8 +46,10 @@ void testVolatileConvertToNonVolatileCopy()
 
 void runAllTestsVolatileRotationPositionWithLap()
 {        
+    UNITY_BEGIN();    
     RUN_TEST( testVolatileSetAndReadPostion );    
     RUN_TEST( testVolatileConvertClicksToPrecisePosition );
     RUN_TEST( testVolatileConvertClicksToPrecisePosition2Laps );
     RUN_TEST( testVolatileConvertToNonVolatileCopy );
+    UNITY_END();    
 };
