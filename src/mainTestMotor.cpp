@@ -1,3 +1,4 @@
+#ifdef ARDUINO
 #include <Arduino.h>
 #include <SerialStream.h>
 #include <HardwareInterface.h>
@@ -71,3 +72,4 @@ void setup()
 void loop()
 {
 }
+#endif
