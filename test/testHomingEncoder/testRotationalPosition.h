@@ -41,7 +41,7 @@ void testShouldHandleWrapAround()
     RotationalPosition sut ( &linPos );
 
     TEST_ASSERT_EQUAL( 1, sut.getLaps() );
-    TEST_ASSERT_EQUAL( 408, sut.getClicks() );       
+    TEST_ASSERT_EQUAL( 409, sut.getClicks() );  //Algorithm rounds up.
 }
 
 void testShouldHandleLargeWrapAround()
@@ -51,7 +51,7 @@ void testShouldHandleLargeWrapAround()
     RotationalPosition sut ( &linPos );
 
     TEST_ASSERT_EQUAL( 11136, sut.getLaps() );
-    TEST_ASSERT_EQUAL( 319, sut.getClicks() );       
+    TEST_ASSERT_EQUAL( 320, sut.getClicks() ); //Algorithm rounds up.      
 }
 
 void runAllTestRotationalPosition()

@@ -14,11 +14,15 @@ public:
 
     long getLaps()
     {
-        return 0;
+        long long clickPosRaw = linPos->getLinearPosition();
+        return clickPosRaw * clicksPerLapDen / clicksPerLapNum;
     }
 
     long getClicks()
     {
-        return linPos->getLinearPosition();
+        long long laps = getLaps();
+        long long clickPosRaw = linPos->getLinearPosition();
+        long clicksRemain = clickPosRaw - laps * clicksPerLapNum / clicksPerLapDen;
+        return clicksRemain;
     }  
 };
