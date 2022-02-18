@@ -1,8 +1,9 @@
 #pragma once
 
 #include "BasicEncoder.h"
+#include "SpeedometerInterface.h"
 
-class SpeedComputer: public BasicEncoderListener 
+class SpeedComputer: public BasicEncoderListener, SpeedometerInterface
 {
 private:
     volatile long timeSinceLastStepUS = 0;
@@ -15,7 +16,7 @@ public:
         speedCPS = 1e6 / timeDiff;
     }
     
-    int getSpeedCPS()
+    virtual int getSpeedCPS()
     {
         HardwareInterface::disableInterrupts();
         return speedCPS;

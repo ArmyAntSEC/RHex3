@@ -1,9 +1,6 @@
 #include <unity.h>
 
 #include <HardwareInterface.h>
-#include "testHomingEncoderISRs.h"
-#include "testHomingEncoderOverflowAndHoming.h"
-#include "testHomingEncoderComputeSpeed.h"
 #include "testBasicEncoder.h"
 #include "testLinearPositionEncoder.h"
 #include "testSpeedComputer.h"
@@ -15,9 +12,6 @@ void setUp(void) {
 
 void process()
 {
-    runAllTestsHomingEncoderISR();      
-    runAllTestsHomingEncoderOverflowAndHoming();
-    runAllTestsHomingEncoderComputeSpeed();
     runAllTestsBasicEncoder();
     runAllTestsLinearPositionEncoder();
     runAllTestsSpeedComputer();

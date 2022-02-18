@@ -15,7 +15,7 @@
 
 MotorDriver driver;
 
-class EncoderListener: public BasicEncoderListener
+class BasicEncoder: public BasicEncoderListener
 {
 private:
     volatile long clickPosition = 0;
@@ -43,7 +43,7 @@ public:
     }
 };
 
-EncoderListener listener;
+BasicEncoder listener;
 BasicEncoderFactory encoderFactory;
 BasicEncoder* encoder;
 

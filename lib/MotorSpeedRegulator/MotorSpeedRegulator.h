@@ -111,7 +111,8 @@ public:
 
     void doCorePIDAlgorithmStepClampedForSpeed()
     {
-        input = speedometer->getSpeedCPSFiltered();
+
+        input = speedometer->getSpeedCPS();
 
         int errorTerm = setPoint - input;
         integratorCumulativeValue += integratorTerm * errorTerm;

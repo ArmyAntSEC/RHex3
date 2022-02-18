@@ -4,8 +4,7 @@
 class SpeedometerInterface
 {
     public:
-        virtual long int getSpeedCPS() = 0;
-        virtual long int getSpeedCPSFiltered() = 0;
+        virtual int getSpeedCPS() = 0;
 };
 
 #endif
