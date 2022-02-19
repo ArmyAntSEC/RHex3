@@ -6,10 +6,10 @@ void processSpeedToPowerConverter();
 
 void process()
 {
-    UNITY_BEGIN();  
     processMotorSpeedRegulator();
+    UNITY_BEGIN();  
     processInterpolator();
-    processSpeedToPowerConverter();
+    processSpeedToPowerConverter();    
     UNITY_END();  
 }
 

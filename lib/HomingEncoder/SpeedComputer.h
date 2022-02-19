@@ -3,7 +3,13 @@
 #include "BasicEncoder.h"
 #include "SpeedometerInterface.h"
 
-class SpeedComputer: public BasicEncoderListener, SpeedometerInterface
+class CanProvideSpeed
+{
+    public:
+        virtual int getSpeedCPS() = 0;
+};
+
+class SpeedComputer: public BasicEncoderListener, CanProvideSpeed
 {
 private:
     volatile long timeSinceLastStepUS = 0;
@@ -24,6 +30,6 @@ public:
     }
 
     virtual void signalHomingISR()
-    { /* Not used. Breaks Interface SOLID principle */ }
+    { /* Not used. Breaks Interface principle */ }
 
 };

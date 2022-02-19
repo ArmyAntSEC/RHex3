@@ -1,121 +1,199 @@
 #include <unity.h>
-
 #include <HardwareInterface.h>
+
 #define private public
 #include <MotorSpeedRegulator.h>
-#include "MockSpeedometer.h"
-#include "MockMotorDriver.h"
+#include <SpeedRegulator.h>
+
+struct MockSpeedometer: public CanProvideSpeed
+{    
+    int speed;
+    MockSpeedometer()
+    {
+        init();
+    }
+    void init()
+    {
+        speed = 3;
+    }
+
+    virtual  int getSpeedCPS() { return speed; }
+};
+
+struct MockDriver: public HasAnInputDriveSignal
+{
+    int driveSignal; 
+
+    MockDriver()
+    {
+        init();
+    }
+
+    void init()
+    {
+        driveSignal = 5;
+    }
+
+    virtual void setInputDriveSignal( int _driveSignal )
+    {
+        driveSignal = _driveSignal;
+    }
+
+    virtual int getLastInputDriveSignal()
+    {
+        return driveSignal;
+    }
+
+
+};
+
+SpeedRegulator regulator;
+MockSpeedometer speedometer;
+MockDriver target;
+float P = 4;
+float D = 5;
+float I = 6;
+float filterLength = 7;
 
 void setUp(void) {
     HardwareInterface::resetMicrosecondsSinceBoot();
     HardwareInterface::resetValues();
-}
-
-void testInit()
-{
-    MotorSpeedRegulator regulator;
-    MockSpeedometer speedometer;
-    MockMotorDriver driver;
-    SpeedToPowerConverter* converter = 0;
-    float P = 4;
-    float D = 5;
-    float I = 6;
-    float filter = 7;
     
-    regulator.config(&speedometer, &driver, converter, P, D, I, filter );
-    
-    regulator.init();
+    regulator.config( &speedometer, &target, P, I, D, filterLength );        
+    regulator.setSetPoint( 10 );
 
-    TEST_ASSERT_EQUAL( true, regulator.running );
-    TEST_ASSERT_EQUAL( 3, regulator.input );
-    TEST_ASSERT_EQUAL( 3, regulator.lastInput );    
-    TEST_ASSERT_EQUAL( driver.getMotorPWM(), regulator.integratorCumulativeValue );
-
+    target.init();
+    speedometer.init();
 }
 
 void testConfig()
 {
-    MotorSpeedRegulator regulator;
-    SpeedometerInterface* speedometer = 0;
-    MockMotorDriver driver;
-    SpeedToPowerConverter* converter = 0;
-    float P = 4;
-    float D = 5;
-    float I = 6;
-    float filter = 7;
-    
-    regulator.config(speedometer, &driver, converter, P, D, I, filter );
-
-    TEST_ASSERT_EQUAL( speedometer, regulator.speedometer );
-    TEST_ASSERT_EQUAL( &driver, regulator.driver );
-    TEST_ASSERT_EQUAL( converter, regulator.converter );
+    TEST_ASSERT_EQUAL( &speedometer, regulator.speedSource );
+    TEST_ASSERT_EQUAL( &target, regulator.target );
     TEST_ASSERT_EQUAL_FLOAT( P, regulator.proportionalTerm );
     TEST_ASSERT_EQUAL_FLOAT( D, regulator.derivativeTerm );
     TEST_ASSERT_EQUAL_FLOAT( I, regulator.integratorTerm );
-    TEST_ASSERT_EQUAL_FLOAT( filter, regulator.filter );
-
+    TEST_ASSERT_EQUAL_FLOAT( filterLength, regulator.filterLength );
 }
 
-void testStart()
+void testSetSetPoint()
 {
-    MotorSpeedRegulator regulator;
-    MockSpeedometer speedometer;
-    MotorDriverInterface* driver = 0;
-    SpeedToPowerConverter* converter = 0;
-    float P = 4;
-    float D = 5;
-    float I = 6;
-    float filter = 7;
-    regulator.integratorCumulativeValue = 5;
-    
-    regulator.config(&speedometer, driver, converter, P, D, I, filter );
+    regulator.setSetPoint(10);
 
+    TEST_ASSERT_EQUAL( 10, regulator.setPoint );
+}
+
+void testStartWithNormalLastInput()
+{    
     regulator.start();
-
+        
     TEST_ASSERT_TRUE( regulator.isOn );
-    TEST_ASSERT_TRUE( regulator.running );
-    TEST_ASSERT_EQUAL( speedometer.getSpeedCPS(), regulator.lastInput );
-    TEST_ASSERT_EQUAL( 0, regulator.integratorCumulativeValue );
+    TEST_ASSERT_EQUAL( speedometer.getSpeedCPS(), regulator.input );
+    TEST_ASSERT_EQUAL( regulator.input, regulator.lastInput );
+    TEST_ASSERT_EQUAL( target.getLastInputDriveSignal(), regulator.integratorCumulativeValue );
+}
+
+void testStartWithLargeLastInput()
+{
+    target.driveSignal = 400; //A large value    
+    regulator.start();
+        
+    TEST_ASSERT_TRUE( regulator.isOn );
+    TEST_ASSERT_EQUAL( speedometer.getSpeedCPS(), regulator.input );
+    TEST_ASSERT_EQUAL( regulator.input, regulator.lastInput );
+    TEST_ASSERT_EQUAL( regulator.maxOutput, regulator.integratorCumulativeValue );
 }
 
 void testStop()
-{
-    MotorSpeedRegulator regulator;
-    SpeedometerInterface* speedometer = 0;
-    MockMotorDriver driver;
-    SpeedToPowerConverter* converter = 0;
-    float P = 4;
-    float D = 5;
-    float I = 6;
-    float filter = 7;
-    driver.setMotorPWM(5);
-    
-    regulator.config(speedometer, &driver, converter, P, D, I, filter );
-
+{    
     regulator.stop();
+    TEST_ASSERT_FALSE( regulator.isOn );    
+}
 
-    TEST_ASSERT_FALSE( regulator.isOn );
-    TEST_ASSERT_FALSE( regulator.running );
-    TEST_ASSERT_EQUAL( 0, driver.getMotorPWM() );
-    TEST_ASSERT_EQUAL( 0, regulator.integratorCumulativeValue );
+void testStepWhenStopped()
+{
+    regulator.stop();    
+    regulator.step();
+    TEST_ASSERT_EQUAL( 5, target.driveSignal ); //Should not change from starting value
+}
+
+void testStepWithSimpleProportionalTerm()
+{
+    regulator.integratorTerm = 0;
+    regulator.derivativeTerm = 0;
+    speedometer.speed = 3;
+    TEST_ASSERT_EQUAL( 4, regulator.proportionalTerm );
+    TEST_ASSERT_EQUAL( 10, regulator.setPoint );
+    TEST_ASSERT_EQUAL( 3, speedometer.getSpeedCPS() );
+    //Output = (10-3)*4 = 28;
+    
+    regulator.start();    
+    regulator.integratorCumulativeValue = 0;
+
+    regulator.step();
+    TEST_ASSERT_EQUAL( 28, target.driveSignal );
+}
+
+void testStepWithSimpleProportionalTermAndLargeDiff()
+{
+    regulator.integratorTerm = 0;
+    regulator.derivativeTerm = 0;
+    regulator.proportionalTerm = 100;
+    //P = 100
+    //SetPoint = 10;
+    //Input = 3;
+    // => Output = (10-3)*100 = 700;    
+    regulator.start();    
+    regulator.integratorCumulativeValue = 0;
+
+    regulator.step();
+    TEST_ASSERT_EQUAL( 255, target.driveSignal ); //Should not change from starting value
+}
+
+void testStepWithSimpleDerivativeTerm()
+{
+    regulator.integratorTerm = 0;
+    regulator.proportionalTerm = 0;    
+    TEST_ASSERT_EQUAL( 5, regulator.derivativeTerm );
+    TEST_ASSERT_EQUAL( 10, regulator.setPoint );
+    // => Output = (5-3)*5 = 10;
+    
+    regulator.start();    
+    regulator.integratorCumulativeValue = 0;
+    speedometer.speed = 5;
+
+    regulator.step();
+    TEST_ASSERT_EQUAL( 10, target.driveSignal ); 
+}
+
+void testStepWithSimpleIntegralTerm()
+{
+    regulator.derivativeTerm = 0;
+    regulator.proportionalTerm = 0;    
+    TEST_ASSERT_EQUAL( 6, regulator.integratorTerm );
+    TEST_ASSERT_EQUAL( 3, speedometer.getSpeedCPS() );
+    TEST_ASSERT_EQUAL( 10, regulator.setPoint );    
+    // ITerm = 5 + 6*(10-3) = 47    
+    regulator.start();    
+    TEST_ASSERT_EQUAL( 5, regulator.integratorCumulativeValue );
+    
+    regulator.step();
+    TEST_ASSERT_EQUAL( 47, target.driveSignal ); 
 }
 
 void testClampOutputHigh()
 {
-    MotorSpeedRegulator regulator;   
     TEST_ASSERT_EQUAL( regulator.maxOutput, regulator.clampOutput(regulator.maxOutput*2) );
 }
 
 void testClampOutputLow()
 {
-    MotorSpeedRegulator regulator;   
     TEST_ASSERT_EQUAL( 1, regulator.clampOutput(-regulator.maxOutput*2) );
 }
 
 void testClampOutputZero()
 {
-    MotorSpeedRegulator regulator;   
-    TEST_ASSERT_EQUAL( 0, regulator.clampOutput(0) );
+    TEST_ASSERT_EQUAL( 1, regulator.clampOutput(0) );
 }
 
 void testClampOutputOK()
@@ -145,10 +223,17 @@ void testRun()
 
 void processMotorSpeedRegulator()
 {    
-    RUN_TEST( testInit );
-    RUN_TEST( testConfig );
-    RUN_TEST( testStart );
+    UNITY_BEGIN();  
+    RUN_TEST( testConfig );    
+    RUN_TEST( testStartWithLargeLastInput );
+    RUN_TEST( testStartWithNormalLastInput );
     RUN_TEST( testStop );
+    RUN_TEST( testSetSetPoint );
+    RUN_TEST( testStepWhenStopped );
+    RUN_TEST( testStepWithSimpleProportionalTerm );
+    RUN_TEST( testStepWithSimpleProportionalTermAndLargeDiff );
+    RUN_TEST( testStepWithSimpleDerivativeTerm );
+    RUN_TEST( testStepWithSimpleIntegralTerm );
     RUN_TEST( testClampOutputHigh );
     RUN_TEST( testClampOutputLow );
     RUN_TEST( testClampOutputOK );
@@ -157,5 +242,6 @@ void processMotorSpeedRegulator()
     RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeed );
     RUN_TEST( testHandleHardBreak );
     RUN_TEST ( testRun );
+    UNITY_END();  
 }
 
