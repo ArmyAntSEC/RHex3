@@ -3,7 +3,7 @@
 #define private public
 #include <TaskScheduler.h>
 
-struct RunnableAtTimeMock: public RunnableAtTime
+struct RunnableAtTimeMock: public RunnableAtTimeInterface
 {
     int runCount = 0;
     unsigned long lastRunTime = 0;
@@ -25,8 +25,8 @@ struct RunnableAtTimeMock: public RunnableAtTime
 void testAddTask()
 {
     TaskScheduler<6> scheduler;
-    RunnableAtTime* task;
-    RunnableAtTime* task2;
+    RunnableAtTimeInterface* task;
+    RunnableAtTimeInterface* task2;
     
     scheduler.addTask( task );
     scheduler.addTask( task2 );

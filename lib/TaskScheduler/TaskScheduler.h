@@ -1,20 +1,15 @@
 #pragma once
 #include <RunnableInterface.h>
 
-struct RunnableAtTime
-{
-    virtual void run(unsigned long now) = 0;
-    virtual bool canRun( unsigned long now) = 0;
-};
 
 template<int MaxTasks> class TaskScheduler: public RunnableInterface
 {
     private:
-        RunnableAtTime* taskList[MaxTasks];
+        RunnableAtTimeInterface* taskList[MaxTasks];
         int numTasks = 0;
 
     public:
-        void addTask( RunnableAtTime* task )
+        void addTask( RunnableAtTimeInterface* task )
         {            
             taskList[numTasks++] = task;
         }
@@ -24,7 +19,7 @@ template<int MaxTasks> class TaskScheduler: public RunnableInterface
             return numTasks;
         }
 
-        RunnableAtTime* getTask( int n )
+        RunnableAtTimeInterface* getTask( int n )
         {            
             return taskList[n];
         }
