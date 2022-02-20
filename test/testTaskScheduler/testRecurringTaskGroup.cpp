@@ -2,7 +2,7 @@
 
 #define private public
 
-#include <RecurringTaskGroup2.h>
+#include <RecurringTaskGroup.h>
 
 struct MockRunnable: public RunnableInterface
 {

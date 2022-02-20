@@ -1,7 +1,7 @@
 #include <unity.h>
 
 #define private public
-#include <TaskScheduler2.h>
+#include <TaskScheduler.h>
 
 struct RunnableAtTimeMock: public RunnableAtTime
 {
