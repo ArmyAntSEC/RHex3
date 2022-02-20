@@ -2,17 +2,17 @@
 
 #include <RunnableInterface.h>
 
-template<int MaxTasks> class RecurringTaskGroup: public RunnableInterface
+template<int MaxTasks> class RecurringTaskGroup: public RunnableAtTimeInterface
 {
 private:
     RunnableInterface* taskList[MaxTasks];
     int numTasks = 0;
-    unsigned periodMS;
-    unsigned nextRunTime = 0;
+    unsigned periodMicros;
+    unsigned nextRunTimeMicros = 0;
 
 public:
 
-    RecurringTaskGroup( unsigned _periodMS = 1000 ): periodMS(_periodMS), nextRunTime(_periodMS)
+    RecurringTaskGroup( unsigned _periodMicros = 1000 ): periodMicros(_periodMicros), nextRunTimeMicros(_periodMicros)
     {
 
     }
@@ -32,14 +32,22 @@ public:
         return taskList[n];
     }
     
-    virtual void run( unsigned long int now )
-    {        
-        if ( now > nextRunTime ) {
-            nextRunTime += periodMS;
-            for ( int i = 0; i < numTasks; i++ )
-            {
-                taskList[i]->run(now);
-            }
+    virtual bool canRun( unsigned long nowMicros )
+    {
+        if ( nowMicros > nextRunTimeMicros ) {
+            nextRunTimeMicros += periodMicros;        
+            return true;
+        } else {
+            return false;
         }
+    }
+
+    virtual void run( unsigned long nowMicros )
+    {                
+        nextRunTimeMicros += periodMicros;
+        for ( int i = 0; i < numTasks; i++ )
+        {
+            taskList[i]->run(nowMicros);
+        }        
     }
 };

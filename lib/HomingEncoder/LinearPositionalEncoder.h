@@ -1,6 +1,8 @@
 #pragma once
 
+#include <HardwareInterrupts.h>
 #include "BasicEncoder.h"
+
 
 struct LinearPositionProvider
 {
@@ -12,7 +14,11 @@ class LinearPositionEncoder: public BasicEncoderListener, LinearPositionProvider
 private:
     volatile long linearPosition = 0;
     volatile bool isHomed = false;
+    HardwareInterrupts* interrupts;
 public:
+
+    LinearPositionEncoder( HardwareInterrupts* _interrupts ): interrupts(_interrupts)
+    {}
 
     virtual void signalStepForwardISR()
     {

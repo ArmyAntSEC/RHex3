@@ -23,7 +23,7 @@ void testAddRecurringTaskToGroup()
     TEST_ASSERT_EQUAL( task, group.getTask(0) );
 } 
 
-void testRunRecurringTasksAfterTime()
+void testRunRecurringTasks()
 {
     RecurringTaskGroup<3> group;
     MockRunnable task;
@@ -31,44 +31,26 @@ void testRunRecurringTasksAfterTime()
     group.addTask( &task );
     group.addTask( &task2 );
 
-    group.run( 1500 );
+    group.run( 0 );
 
     TEST_ASSERT_EQUAL( 1, task.runCount );
     TEST_ASSERT_EQUAL( 1, task2.runCount );
 }
 
-void testRunRecurringTasksTooEarly()
-{
-    RecurringTaskGroup<3> group(1000);
-    MockRunnable task;    
-    group.addTask( &task );    
-
-    group.run( 100 );
-
-    TEST_ASSERT_EQUAL( 0, task.runCount );    
-}
-
-void testRunRecurringTasksTwiceWithoutIncreasingTime()
+void testCanRunAndIncrementsNextTime()
 {
     RecurringTaskGroup<3> group;
-    MockRunnable task;
-    MockRunnable task2;
-    group.addTask( &task );
-    group.addTask( &task2 );
+    group.nextRunTimeMicros = 1000;
 
-    group.run( 1500 );
-    group.run( 1500 );
-
-    TEST_ASSERT_EQUAL( 1, task.runCount );
-    TEST_ASSERT_EQUAL( 1, task2.runCount );
+    TEST_ASSERT_TRUE( group.canRun(1500) );
+    TEST_ASSERT_FALSE( group.canRun(1500) );
 }
 
 void runAllRecurringTaskGroupTests()
 {
     UNITY_BEGIN();
     RUN_TEST( testAddRecurringTaskToGroup );
-    RUN_TEST( testRunRecurringTasksAfterTime );
-    RUN_TEST( testRunRecurringTasksTooEarly );
-    RUN_TEST( testRunRecurringTasksTwiceWithoutIncreasingTime );
+    RUN_TEST( testRunRecurringTasks );
+    RUN_TEST( testCanRunAndIncrementsNextTime );
     UNITY_END();    
 }
