@@ -3,6 +3,7 @@
 
 #include "RecurringTask.h"
 
+
 template <int MaxTasks> class RecurringTaskGroup: public RecurringTask
 {
     private:        
@@ -14,9 +15,9 @@ template <int MaxTasks> class RecurringTaskGroup: public RecurringTask
 
         RecurringTaskGroup( unsigned long int _rate ): RecurringTask(_rate)
         {} 
-
+        
         void add ( Task* task )
-        {
+        {            
             if ( numTasks < MaxTasks ) {
                 taskList[numTasks] = task;
                 numTasks++;

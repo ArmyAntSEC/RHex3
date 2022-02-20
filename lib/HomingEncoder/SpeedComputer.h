@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BasicEncoder.h"
-#include "SpeedometerInterface.h"
 
 class CanProvideSpeed
 {

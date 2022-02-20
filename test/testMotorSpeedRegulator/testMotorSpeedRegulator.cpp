@@ -2,7 +2,6 @@
 #include <HardwareInterface.h>
 
 #define private public
-#include <MotorSpeedRegulator.h>
 #include <SpeedRegulator.h>
 
 struct MockSpeedometer: public CanProvideSpeed
@@ -197,28 +196,8 @@ void testClampOutputZero()
 }
 
 void testClampOutputOK()
-{
-    MotorSpeedRegulator regulator;   
-    TEST_ASSERT_EQUAL( regulator.maxOutput/2, regulator.clampOutput(regulator.maxOutput/2) );
-}
-
-void testClampOutputForSpeed()
 {    
-    TEST_IGNORE();
-}
-void testDoCorePIDAlgorithmStepClampedForSpeed()
-{
-    TEST_IGNORE();
-}
-    
-void testHandleHardBreak ()
-{
-    TEST_IGNORE();
-}
-    
-void testRun()
-{
-    TEST_IGNORE();
+    TEST_ASSERT_EQUAL( regulator.maxOutput/2, regulator.clampOutput(regulator.maxOutput/2) );
 }
 
 void processMotorSpeedRegulator()
@@ -238,10 +217,6 @@ void processMotorSpeedRegulator()
     RUN_TEST( testClampOutputLow );
     RUN_TEST( testClampOutputOK );
     RUN_TEST( testClampOutputZero );
-    RUN_TEST( testClampOutputForSpeed );
-    RUN_TEST( testDoCorePIDAlgorithmStepClampedForSpeed );
-    RUN_TEST( testHandleHardBreak );
-    RUN_TEST ( testRun );
     UNITY_END();  
 }
 

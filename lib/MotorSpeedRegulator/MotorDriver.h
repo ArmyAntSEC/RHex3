@@ -9,7 +9,13 @@
 #define MOTORDRIVER_H_
 
 #include <HardwareInterface.h>
-#include <MotorDriverInterface.h>
+
+class MotorDriverInterface
+{
+    public:
+        virtual void setMotorPWM( int motorPWM ) = 0;
+        virtual int getMotorPWM() = 0;
+};
 
 class MotorDriver: public MotorDriverInterface
 {
