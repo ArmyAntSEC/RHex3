@@ -1,6 +1,8 @@
 #pragma once
 
 #include <HardwareInterface.h>
+#include <HardwarePins.h>
+
 #define MAX_ENCODERS_SUPPORTED 6
 
 class BasicEncoderListener

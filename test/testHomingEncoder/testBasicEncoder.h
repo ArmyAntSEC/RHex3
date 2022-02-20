@@ -37,6 +37,8 @@ void testBasicEncoderFactoryConfig()
     TEST_ASSERT_EQUAL( &BasicEncoderFactory::stateList[0], sut );    
     TEST_ASSERT_EQUAL( BasicEncoderFactory::isr_encoder<0>, HardwareInterface::isrList[encoderPin1] );
     TEST_ASSERT_EQUAL( BasicEncoderFactory::isr_homing<0>, HardwareInterface::isrList[homingPin] );
+
+    TEST_FAIL_MESSAGE( "Need to swich over to the HardwarePin class to interface with HW." );
 }
 
 void testBasicEncoderFactorySignalStepForwardISR()
