@@ -22,7 +22,9 @@ class HardwareInterface
   enum PinStatus { LOW, HIGH, CHANGE, FALLING, RISING };
   enum PinMode { INPUT, OUTPUT, INPUT_PULLUP, INPUT_PULLDOWN } ;
   
-  static long int microsSinceBoot;
+  static unsigned long microsSinceBoot;
+  static unsigned long microsToStepOnEachRead;
+
   static const int pinMaxCount = 128;
   static PinMode pinModes[pinMaxCount];
   static int pinStatuses[pinMaxCount];
@@ -91,7 +93,8 @@ class HardwareInterface
   {
     #ifdef ARDUINO
     return micros();
-    #else
+    #else    
+    microsSinceBoot += microsToStepOnEachRead;
     return microsSinceBoot;
     #endif
   }
@@ -101,9 +104,17 @@ class HardwareInterface
     #ifdef ARDUINO
     return millis();
     #else    
+    microsSinceBoot += microsToStepOnEachRead;
     return microsSinceBoot/1000;
     #endif
   }
+
+  #ifndef ARDUINO
+    static void setMicrosToStepOnEachRead( unsigned microsToStep )
+    {
+      microsToStepOnEachRead = microsToStep;
+    }
+  #endif
 
   static void stepMicrosecondsSinceBoot( long us )
   {

@@ -13,7 +13,7 @@ struct MockRunnable: public Runnable
     }
 };
 
-void testAddTestToGroup()
+void testAddRecurringTaskToGroup()
 {        
     RecurringTaskGroup<3> group;
     Runnable* task;
@@ -23,7 +23,7 @@ void testAddTestToGroup()
     TEST_ASSERT_EQUAL( task, group.getTask(0) );
 } 
 
-void testRunTasksAfterTime()
+void testRunRecurringTasksAfterTime()
 {
     RecurringTaskGroup<3> group;
     MockRunnable task;
@@ -37,7 +37,7 @@ void testRunTasksAfterTime()
     TEST_ASSERT_EQUAL( 1, task2.runCount );
 }
 
-void testRunTasksTooEarly()
+void testRunRecurringTasksTooEarly()
 {
     RecurringTaskGroup<3> group(1000);
     MockRunnable task;    
@@ -48,7 +48,7 @@ void testRunTasksTooEarly()
     TEST_ASSERT_EQUAL( 0, task.runCount );    
 }
 
-void testRunTasksTwiceWithoutIncreasingTime()
+void testRunRecurringTasksTwiceWithoutIncreasingTime()
 {
     RecurringTaskGroup<3> group;
     MockRunnable task;
@@ -63,12 +63,12 @@ void testRunTasksTwiceWithoutIncreasingTime()
     TEST_ASSERT_EQUAL( 1, task2.runCount );
 }
 
-void processAllRecurringTaskGroupTests()
+void runAllRecurringTaskGroupTests()
 {
     UNITY_BEGIN();
-    RUN_TEST( testAddTestToGroup );
-    RUN_TEST( testRunTasksAfterTime );
-    RUN_TEST( testRunTasksTooEarly );
-    RUN_TEST( testRunTasksTwiceWithoutIncreasingTime );
+    RUN_TEST( testAddRecurringTaskToGroup );
+    RUN_TEST( testRunRecurringTasksAfterTime );
+    RUN_TEST( testRunRecurringTasksTooEarly );
+    RUN_TEST( testRunRecurringTasksTwiceWithoutIncreasingTime );
     UNITY_END();    
 }

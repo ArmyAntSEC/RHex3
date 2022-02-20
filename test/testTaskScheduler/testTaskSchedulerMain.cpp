@@ -1,10 +1,14 @@
 #include <unity.h>
 
-void processAllRecurringTaskGroupTests();
+void runAllRecurringTaskGroupTests();
+void runAllTaskSchedulerTests();
+void runAllTestsTaskAwareDelay();
 
 void process()
 {
-    processAllRecurringTaskGroupTests();
+    runAllRecurringTaskGroupTests();
+    runAllTaskSchedulerTests();
+    runAllTestsTaskAwareDelay();
 }
 
 #ifdef ARDUINO

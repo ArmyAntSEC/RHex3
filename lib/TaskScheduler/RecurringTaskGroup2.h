@@ -1,9 +1,6 @@
 #pragma once
 
-struct Runnable
-{
-    virtual void run(unsigned long int now) = 0;
-};
+#include <Runnable.h>
 
 template<int MaxTasks> class RecurringTaskGroup: public Runnable
 {
