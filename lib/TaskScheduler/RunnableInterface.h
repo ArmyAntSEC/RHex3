@@ -1,6 +1,6 @@
 #pragma once
 
-struct Runnable
+struct RunnableInterface
 {
     virtual void run(unsigned long int nowMicros) = 0;
 };

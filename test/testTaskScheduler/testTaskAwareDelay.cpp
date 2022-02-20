@@ -3,8 +3,9 @@
 #define private public
 #include <TaskAwareDelay.h>
 #include <HardwareClock.h>
+#include <RunnableInterface.h>
 
-struct RunnableMock: public Runnable
+struct RunnableMock: public RunnableInterface
 {
     int runCount = 0;
     unsigned long lastRunTime = 0;

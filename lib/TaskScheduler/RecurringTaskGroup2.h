@@ -1,11 +1,11 @@
 #pragma once
 
-#include <Runnable.h>
+#include <RunnableInterface.h>
 
-template<int MaxTasks> class RecurringTaskGroup: public Runnable
+template<int MaxTasks> class RecurringTaskGroup: public RunnableInterface
 {
 private:
-    Runnable* taskList[MaxTasks];
+    RunnableInterface* taskList[MaxTasks];
     int numTasks = 0;
     unsigned periodMS;
     unsigned nextRunTime = 0;
@@ -17,7 +17,7 @@ public:
 
     }
 
-    void addTask( Runnable* task )
+    void addTask( RunnableInterface* task )
     {
         taskList[numTasks++] = task;
     }
@@ -27,7 +27,7 @@ public:
         return numTasks;
     }
 
-    Runnable* getTask( int n )
+    RunnableInterface* getTask( int n )
     {
         return taskList[n];
     }

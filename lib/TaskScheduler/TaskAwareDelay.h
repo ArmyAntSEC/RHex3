@@ -1,16 +1,16 @@
 #pragma once
 
 #include <HardwareClock.h>
-#include <Runnable.h>
+#include <RunnableInterface.h>
 
 class TaskAwareDelay
 {
 private:
     HardwareClockInterface* clock;
-    Runnable* runnable;
+    RunnableInterface* runnable;
 
 public:
-    TaskAwareDelay( HardwareClockInterface* _clock, Runnable* _runnable ): clock(_clock), runnable(_runnable)
+    TaskAwareDelay( HardwareClockInterface* _clock, RunnableInterface* _runnable ): clock(_clock), runnable(_runnable)
     {}
 
     void delayMicros( unsigned long micros )

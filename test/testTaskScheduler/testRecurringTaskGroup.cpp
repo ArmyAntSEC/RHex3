@@ -4,7 +4,7 @@
 
 #include <RecurringTaskGroup2.h>
 
-struct MockRunnable: public Runnable
+struct MockRunnable: public RunnableInterface
 {
     int runCount = 0;
     virtual void run(unsigned long int now)
@@ -16,7 +16,7 @@ struct MockRunnable: public Runnable
 void testAddRecurringTaskToGroup()
 {        
     RecurringTaskGroup<3> group;
-    Runnable* task;
+    RunnableInterface* task;
     group.addTask( task );
 
     TEST_ASSERT_EQUAL( 1, group.getNumberOfTasks() );

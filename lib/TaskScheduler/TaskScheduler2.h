@@ -1,5 +1,5 @@
 #pragma once
-#include <Runnable.h>
+#include <RunnableInterface.h>
 
 struct RunnableAtTime
 {
@@ -7,7 +7,7 @@ struct RunnableAtTime
     virtual bool canRun( unsigned long now) = 0;
 };
 
-template<int MaxTasks> class TaskScheduler: public Runnable
+template<int MaxTasks> class TaskScheduler: public RunnableInterface
 {
     private:
         RunnableAtTime* taskList[MaxTasks];
