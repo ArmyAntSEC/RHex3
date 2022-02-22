@@ -1,21 +1,24 @@
 #pragma once
 #include <unity.h>
-
+#include <HardwareClock.h>
+#include <HardwareInterrupts.h>
 #define private public
 
 #include <SpeedComputer.h>
+HardwareClock HWClock;
+HardwareInterrupts HWInterrupts;
 
 void testShouldComputeZeroSpeedIfNothingHappens()
 {
-    SpeedComputer sut;
+    SpeedComputer sut( &HWClock, &HWInterrupts );
     TEST_ASSERT_EQUAL( 0, sut.getSpeedCPS() );
 }
 
 void testShouldComputeSpeedAfterClicks()
 {
-    SpeedComputer sut;
-    HardwareInterface::resetMicrosecondsSinceBoot();
-    HardwareInterface::stepMicrosecondsSinceBoot( 1000 );
+    SpeedComputer sut( &HWClock, &HWInterrupts );
+    HWClock.resetMicrosecondsSinceBoot();
+    HWClock.stepMicrosecondsSinceBoot( 1000 );
     sut.signalStepForwardISR();
 
     TEST_ASSERT_EQUAL( 1000, sut.getSpeedCPS() );

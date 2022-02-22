@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LinearPositionalEncoder.h"
+#include "HomingEncoderInterfaces.h"
 
 class RotationalPosition
 {

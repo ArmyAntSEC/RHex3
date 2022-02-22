@@ -1,25 +1,29 @@
 #include <unity.h>
 
-#include <HardwareInterface.h>
+#include <HardwarePins.h>
+#include <HardwareClock.h>
+
 #define private public
 #include <MotorDriver.h>
 
+HardwareClock HWClock;
+HardwarePins HWPins;
+
 void setUp(void) {
-    HardwareInterface::resetMicrosecondsSinceBoot();
-    HardwareInterface::resetValues();
-    
+    HWClock.resetMicrosecondsSinceBoot();   
+    HWPins.resetValues(); 
 }
 
 void testConfig()
 {
     //Do the config
     MotorDriver motorDriver = MotorDriver();
-    motorDriver.config( 3, 5, 7 );
+    motorDriver.config( 3, 5, 7, &HWPins );
 
     //Check the results
-    TEST_ASSERT_EQUAL( HardwareInterface::OUTPUT, HardwareInterface::pinModes[3] );
-    TEST_ASSERT_EQUAL( HardwareInterface::OUTPUT, HardwareInterface::pinModes[5] );
-    TEST_ASSERT_EQUAL( HardwareInterface::OUTPUT, HardwareInterface::pinModes[7] );    
+    TEST_ASSERT_EQUAL( HWPins.OUTPUT, HWPins.pinModes[3] );
+    TEST_ASSERT_EQUAL( HWPins.OUTPUT, HWPins.pinModes[5] );
+    TEST_ASSERT_EQUAL( HWPins.OUTPUT, HWPins.pinModes[7] );    
     
     TEST_ASSERT_EQUAL( 3, motorDriver.driverPinOne );
     TEST_ASSERT_EQUAL( 5, motorDriver.driverPinTwo );
@@ -32,16 +36,16 @@ void testSetMotorPWMHardStopFromForward()
 {
     //Do the config
     MotorDriver motorDriver = MotorDriver();
-    motorDriver.config( 3, 5, 7 );
+    motorDriver.config( 3, 5, 7, &HWPins );
     motorDriver.lastMotorPWM = 10;
     
     //Stop the motor
     motorDriver.setMotorPWM(0);
 
     //Check the results
-    TEST_ASSERT_EQUAL( HardwareInterface::HIGH, HardwareInterface::pinStatuses[3] );
-    TEST_ASSERT_EQUAL( HardwareInterface::LOW, HardwareInterface::pinStatuses[5] );
-    TEST_ASSERT_EQUAL( 0, HardwareInterface::pinStatuses[0] );
+    TEST_ASSERT_EQUAL( HWPins.HIGH, HWPins.pinStatuses[3] );
+    TEST_ASSERT_EQUAL( HWPins.LOW, HWPins.pinStatuses[5] );
+    TEST_ASSERT_EQUAL( 0, HWPins.pinStatuses[7] );
     TEST_ASSERT_EQUAL( 0, motorDriver.lastMotorPWM );
 }
 
@@ -49,16 +53,16 @@ void testSetMotorPWMHardStopFromBackwards()
 {
     //Do the config
     MotorDriver motorDriver = MotorDriver();
-    motorDriver.config( 3, 5, 7 );
+    motorDriver.config( 3, 5, 7, &HWPins );
     motorDriver.lastMotorPWM = -10;
     
     //Stop the motor
     motorDriver.setMotorPWM(0);
 
     //Check the results
-    TEST_ASSERT_EQUAL( HardwareInterface::LOW, HardwareInterface::pinStatuses[3] );
-    TEST_ASSERT_EQUAL( HardwareInterface::HIGH, HardwareInterface::pinStatuses[5] );
-    TEST_ASSERT_EQUAL( 0, HardwareInterface::pinStatuses[0] );
+    TEST_ASSERT_EQUAL( HWPins.LOW, HWPins.pinStatuses[3] );
+    TEST_ASSERT_EQUAL( HWPins.HIGH, HWPins.pinStatuses[5] );    
+    TEST_ASSERT_EQUAL( 0, HWPins.pinStatuses[7] );
     TEST_ASSERT_EQUAL( 0, motorDriver.lastMotorPWM );
 }
 
@@ -66,16 +70,16 @@ void testSetMotorPWMForward()
 {
     //Do the config
     MotorDriver motorDriver = MotorDriver();
-    motorDriver.config( 3, 5, 7 );
+    motorDriver.config( 3, 5, 7, &HWPins );
     motorDriver.lastMotorPWM = -10;
     
     //Stop the motor
     motorDriver.setMotorPWM(10);
 
     //Check the results
-    TEST_ASSERT_EQUAL( HardwareInterface::LOW, HardwareInterface::pinStatuses[3] );
-    TEST_ASSERT_EQUAL( HardwareInterface::HIGH, HardwareInterface::pinStatuses[5] );
-    TEST_ASSERT_EQUAL( 10, HardwareInterface::pinStatuses[7] );
+    TEST_ASSERT_EQUAL( HWPins.LOW, HWPins.pinStatuses[3] );
+    TEST_ASSERT_EQUAL( HWPins.HIGH, HWPins.pinStatuses[5] );
+    TEST_ASSERT_EQUAL( 10, HWPins.pinStatuses[7] );
     TEST_ASSERT_EQUAL( 10, motorDriver.lastMotorPWM );
 }
 
@@ -83,16 +87,16 @@ void testSetMotorPWMBackward()
 {
     //Do the config
     MotorDriver motorDriver = MotorDriver();
-    motorDriver.config( 3, 5, 7 );
+    motorDriver.config( 3, 5, 7, &HWPins );
     motorDriver.lastMotorPWM = 10;
     
     //Stop the motor
     motorDriver.setMotorPWM(-10);
 
     //Check the results
-    TEST_ASSERT_EQUAL( HardwareInterface::HIGH, HardwareInterface::pinStatuses[3] );
-    TEST_ASSERT_EQUAL(  HardwareInterface::LOW, HardwareInterface::pinStatuses[5] );
-    TEST_ASSERT_EQUAL( 10, HardwareInterface::pinStatuses[7] );
+    TEST_ASSERT_EQUAL( HWPins.HIGH, HWPins.pinStatuses[3] );
+    TEST_ASSERT_EQUAL(  HWPins.LOW, HWPins.pinStatuses[5] );
+    TEST_ASSERT_EQUAL( 10, HWPins.pinStatuses[7] );
     TEST_ASSERT_EQUAL( -10, motorDriver.lastMotorPWM );
 }
 

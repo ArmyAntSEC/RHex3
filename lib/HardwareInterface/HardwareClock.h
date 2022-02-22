@@ -48,6 +48,11 @@ public:
     {
         microsToStepOnRead = micros;
     }
+
+    void stepMicrosecondsSinceBoot( unsigned long us )
+    {
+        microsSinceStart += us;
+    }
 };
 
 #endif

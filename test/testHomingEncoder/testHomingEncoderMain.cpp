@@ -1,14 +1,9 @@
 #include <unity.h>
 
-#include <HardwareInterface.h>
 #include "testBasicEncoder.h"
 #include "testLinearPositionEncoder.h"
 #include "testSpeedComputer.h"
 #include "testRotationalPosition.h"
-
-void setUp(void) {
-    HardwareInterface::resetMicrosecondsSinceBoot();
-}
 
 void process()
 {

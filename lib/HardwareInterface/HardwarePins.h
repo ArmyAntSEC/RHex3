@@ -44,31 +44,44 @@ class HardwarePins
 public:
     enum PinStatus { LOW, HIGH, CHANGE, FALLING, RISING };
     enum PinMode { INPUT, OUTPUT, INPUT_PULLUP, INPUT_PULLDOWN } ;
-      
+    
+    static const int pinMaxCount = 128;
+    typedef void(*VoidFcnPtr)();
+    VoidFcnPtr isrList[pinMaxCount];
+    int pinStatuses[pinMaxCount];
+    int pinModes[pinMaxCount];
+
+    void resetValues()
+    {
+        memset ( isrList, 0, pinMaxCount * sizeof(VoidFcnPtr) );
+        memset ( pinStatuses, 0, pinMaxCount * sizeof(int) );
+    }
+
     void configurePin ( unsigned int pin, PinMode mode )
     {        
-        std::cerr << "Implement me!" << std::endl;
+        pinModes[pin] = mode;
     }
 
     void attachAnInterrupt(unsigned int pin, void(*isr)(), PinStatus status )
     {    
-        std::cerr << "Implement me!" << std::endl;                
+        isrList[pin] = isr;
+        pinStatuses[pin] = status;
     }
 
     int getDigitalValueFromPin(int pin )
     {    
-        std::cerr << "Implement me!" << std::endl;
+        std::cerr << "Implement getDigitalValueFromPin!" << std::endl;
         return 0;
     }
   
     void setDigitalValueForPin( int pin, PinStatus value )
     {     
-        std::cerr << "Implement me!" << std::endl;       
+        pinStatuses[pin] = value;
     }
   
     void setAnalogValueForPin( int pin, int value )
     {            
-        std::cerr << "Implement me!" << std::endl;
+        pinStatuses[pin] = value;
     }  
 };
 

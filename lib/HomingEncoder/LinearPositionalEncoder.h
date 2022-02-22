@@ -1,13 +1,8 @@
 #pragma once
 
 #include <HardwareInterrupts.h>
-#include "BasicEncoder.h"
-
-
-struct LinearPositionProvider
-{
-    virtual long getLinearPosition() = 0;    
-};
+#include <HardwareInterface.h>
+#include "HomingEncoderInterfaces.h"
 
 class LinearPositionEncoder: public BasicEncoderListener, LinearPositionProvider
 {

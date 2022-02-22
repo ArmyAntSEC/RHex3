@@ -27,7 +27,8 @@ void testBasicEncoderFactoryConfig()
     int encoderPin2 = 1;
     int homingPin = 2;
     BasicEncoderListenerMock listener;
-    BasicEncoder* sut = BasicEncoderFactory::config<0>( encoderPin1, encoderPin2, homingPin, &listener );
+    HardwarePins pins;    
+    BasicEncoder* sut = BasicEncoderFactory::config<0>( encoderPin1, encoderPin2, homingPin, &listener, &pins );
 
     TEST_ASSERT_EQUAL(encoderPin1, sut->encoderPin1 );
     TEST_ASSERT_EQUAL(encoderPin2, sut->encoderPin2 );
@@ -35,16 +36,21 @@ void testBasicEncoderFactoryConfig()
     TEST_ASSERT_EQUAL( &listener, sut->listener );
 
     TEST_ASSERT_EQUAL( &BasicEncoderFactory::stateList[0], sut );    
-    TEST_ASSERT_EQUAL( BasicEncoderFactory::isr_encoder<0>, HardwareInterface::isrList[encoderPin1] );
-    TEST_ASSERT_EQUAL( BasicEncoderFactory::isr_homing<0>, HardwareInterface::isrList[homingPin] );
-
-    TEST_FAIL_MESSAGE( "Need to swich over to the HardwarePin class to interface with HW." );
+    TEST_ASSERT_EQUAL( BasicEncoderFactory::isr_encoder<0>, pins.isrList[encoderPin1] );
+    TEST_ASSERT_EQUAL(  pins.CHANGE, pins.pinStatuses[encoderPin1] );
+    TEST_ASSERT_EQUAL( BasicEncoderFactory::isr_homing<0>, pins.isrList[homingPin] );    
+    TEST_ASSERT_EQUAL(  pins.FALLING, pins.pinStatuses[homingPin] );
+    
+    TEST_ASSERT_EQUAL( pins.INPUT_PULLUP, pins.pinModes[encoderPin1] );
+    TEST_ASSERT_EQUAL( pins.INPUT_PULLUP, pins.pinModes[encoderPin2] );
+    TEST_ASSERT_EQUAL( pins.INPUT_PULLUP, pins.pinModes[homingPin] );
 }
 
 void testBasicEncoderFactorySignalStepForwardISR()
 {
     BasicEncoderListenerMock listener;
-    BasicEncoder* sut = BasicEncoderFactory::config<0>( 0, 1, 2, &listener );
+    HardwarePins pins;    
+    BasicEncoder* sut = BasicEncoderFactory::config<0>( 0, 1, 2, &listener, &pins );
     TEST_ASSERT_EQUAL( 0, listener.stepCounter );
     
     BasicEncoderFactory::isr_encoder<0>();
@@ -55,7 +61,8 @@ void testBasicEncoderFactorySignalStepForwardISR()
 void testBasicEncoderFactorySignalHomingISR()
 {
     BasicEncoderListenerMock listener;
-    BasicEncoder* sut = BasicEncoderFactory::config<0>( 0, 1, 2, &listener );
+    HardwarePins pins;    
+    BasicEncoder* sut = BasicEncoderFactory::config<0>( 0, 1, 2, &listener, &pins );
     TEST_ASSERT_EQUAL( 0, listener.homingCounter );
     
     BasicEncoderFactory::isr_homing<0>();
