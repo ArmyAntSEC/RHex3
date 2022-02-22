@@ -1,5 +1,5 @@
 #include <unity.h>
-#include <HardwareInterface.h>
+//#include <HardwareInterface.h>
 
 #define private public
 #include <SpeedRegulator.h>
@@ -55,8 +55,6 @@ float I = 6;
 float filterLength = 7;
 
 void setUp(void) {
-    //HardwareInterface::resetMicrosecondsSinceBoot();
-    //HardwareInterface::resetValues();
     
     regulator.config( &speedometer, &target, P, I, D, filterLength );        
     regulator.setSetPoint( 10 );

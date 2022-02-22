@@ -3,13 +3,15 @@
 #define private public
 #include <EEPROMStorage.h>
 
+HardwareEEPROM HWEeprom;
+
 void setUp(void) {    
-    HardwareInterface::resetValues();    
+    HWEeprom.resetValues();    
 }
 
 void testConvertIndexToFirstAddress()
 {
-    EEPROMStorage eeprom;
+    EEPROMStorage eeprom( &HWEeprom );
 
     int address = eeprom.convertIndexToFirstAddress( 3 );
 
@@ -18,7 +20,7 @@ void testConvertIndexToFirstAddress()
 
 void testConvertIndexToSecondAddress()
 {
-    EEPROMStorage eeprom;
+    EEPROMStorage eeprom( &HWEeprom );
 
     int address = eeprom.convertIndexToSecondAddress( 3 );
 
@@ -27,17 +29,17 @@ void testConvertIndexToSecondAddress()
 
 void testWriteToIndex()
 {
-    EEPROMStorage eeprom;
+    EEPROMStorage eeprom( &HWEeprom );
 
     eeprom.writeIntToIndex( 5, 1234 );
 
-    TEST_ASSERT_EQUAL( 210, HardwareInterface::EEPROMData[10] );
-    TEST_ASSERT_EQUAL( 4, HardwareInterface::EEPROMData[11] );
+    TEST_ASSERT_EQUAL( 210, HWEeprom.EEPROMData[10] );
+    TEST_ASSERT_EQUAL( 4, HWEeprom.EEPROMData[11] );
 }
 
 void testReadFromIndex()
 {
-    EEPROMStorage eeprom;
+    EEPROMStorage eeprom( &HWEeprom );
     eeprom.writeIntToIndex( 5, 1234 );
 
     int rValue = eeprom.readIntFromIndex( 5 );
@@ -47,20 +49,20 @@ void testReadFromIndex()
 
 void testWriteArrayToIndex()
 {
-    EEPROMStorage eeprom;    
+    EEPROMStorage eeprom( &HWEeprom );    
     int values[] = {1234, 7658};
     
     eeprom.writeIntArrayToAddress( 5, values, 2 );
 
-    TEST_ASSERT_EQUAL( 210, HardwareInterface::EEPROMData[10] );    
-    TEST_ASSERT_EQUAL( 4, HardwareInterface::EEPROMData[11] );    
-    TEST_ASSERT_EQUAL( 234, HardwareInterface::EEPROMData[12] );    
-    TEST_ASSERT_EQUAL( 29, HardwareInterface::EEPROMData[13] );    
+    TEST_ASSERT_EQUAL( 210, HWEeprom.EEPROMData[10] );    
+    TEST_ASSERT_EQUAL( 4, HWEeprom.EEPROMData[11] );    
+    TEST_ASSERT_EQUAL( 234, HWEeprom.EEPROMData[12] );    
+    TEST_ASSERT_EQUAL( 29, HWEeprom.EEPROMData[13] );    
 }
 
 void testReadArrayFromIndex()
 {
-    EEPROMStorage eeprom;    
+    EEPROMStorage eeprom( &HWEeprom );    
     int values[] = {1234, 7658};    
     eeprom.writeIntArrayToAddress( 5, values, 2 );
 

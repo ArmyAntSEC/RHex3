@@ -1,7 +1,7 @@
 #include <unity.h>
 
 #include "testEEPROMStorage.h"
-#include <HardwareInterface.h>
+
 
 void process()
 {
@@ -11,10 +11,14 @@ void process()
 }
 
 #ifdef ARDUINO
+
+#include <HardwareClock.h>
+
 void setup() {
     // NOTE!!! Wait for >2 secs
     // if board doesn't support software reset via Serial.DTR/RTS
-    HardwareInterface::delayForMilliseconds(2000);
+    HardwareClock clock;
+    clock.delayMicroseconds(2000);
 
     process();
 }

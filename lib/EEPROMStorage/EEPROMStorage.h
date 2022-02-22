@@ -1,7 +1,8 @@
 #ifndef _EEPROMSTORAGE_H_
 #define _EEPROMSTORAGE_H_
 
-#include <HardwareInterface.h>
+#include <HardwareEEPROM.h>
+#include <stdint.h>
 
 class EEPROMStorageInterface
 {
@@ -15,6 +16,8 @@ class EEPROMStorageInterface
 class EEPROMStorage: public EEPROMStorageInterface
 {
     private:
+        HardwareEEPROM* EEPROM;
+
         virtual int convertIndexToFirstAddress( int index ) {
             return index * 2;
         }
@@ -23,24 +26,27 @@ class EEPROMStorage: public EEPROMStorageInterface
             return convertIndexToFirstAddress(index) + 1;
         }
     public:
+        EEPROMStorage( HardwareEEPROM* _eeprom): EEPROM(_eeprom)
+        {}
+
         virtual void writeIntToIndex( int index, int value )
         {                                  
             int address1 = convertIndexToFirstAddress(index);
             uint8_t value1 = value & 0xFF;
-            HardwareInterface::UpdateEEPROM( address1, value1 );
+            EEPROM->UpdateEEPROM( address1, value1 );
             
             int address2 = convertIndexToSecondAddress(index);
             uint8_t value2 = (value >> 8) & 0xFF;
-            HardwareInterface::UpdateEEPROM( address2, value2 );                        
+            EEPROM->UpdateEEPROM( address2, value2 );                        
         }
 
         virtual int readIntFromIndex( int index )
         {            
             int address1 = convertIndexToFirstAddress(index);
-            int value1 = HardwareInterface::ReadEEPROM(address1 );
+            int value1 = EEPROM->ReadEEPROM(address1 );
             
             int address2 = convertIndexToSecondAddress(index);
-            int value2 = HardwareInterface::ReadEEPROM (address2 );
+            int value2 = EEPROM->ReadEEPROM (address2 );
 
             return value1 + (value2 << 8);         
         }

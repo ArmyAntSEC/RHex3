@@ -21,6 +21,13 @@ class HardwareClock: public HardwareClockInterface
     {
         return micros() - timeOffset;
     }    
+    virtual void delayMicroseconds( unsigned long us )
+    {
+        if ( us > 10000 )
+            delay( us / 1000 );
+        else
+            delayMicroseconds( us );
+    }
 };
 
 #else
