@@ -6,8 +6,8 @@
 
 void testShouldStepForward()
 {
-    HardwareInterrupts interrupts;    
-    LinearPositionEncoder sut( &interrupts );
+    HardwareInterrupts hwInterrupts;    
+    LinearPositionEncoder sut( &hwInterrupts );
     TEST_ASSERT_EQUAL( 0, sut.getLinearPosition() );
 
     sut.signalStepForwardISR();
@@ -17,8 +17,8 @@ void testShouldStepForward()
 
 void testShouldHomeIfNotHomed()
 {
-    HardwareInterrupts interrupts;    
-    LinearPositionEncoder sut( &interrupts );
+    HardwareInterrupts hwInterrupts;    
+    LinearPositionEncoder sut( &hwInterrupts );
 
     sut.linearPosition = 100;
 
@@ -29,8 +29,8 @@ void testShouldHomeIfNotHomed()
 
 void testShouldNotHomeIfHomed()
 {
-    HardwareInterrupts interrupts;    
-    LinearPositionEncoder sut( &interrupts );
+    HardwareInterrupts hwInterrupts;    
+    LinearPositionEncoder sut( &hwInterrupts );
 
     sut.linearPosition = 100;
     sut.isHomed = true;

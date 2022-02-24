@@ -3,7 +3,7 @@
 #define private public
 #include <EEPROMStorage.h>
 
-HardwareEEPROM HWEeprom;
+HardwareEEPROMMock HWEeprom;
 
 void setUp(void) {    
     HWEeprom.resetValues();    
@@ -74,7 +74,7 @@ void testReadArrayFromIndex()
 }
 
 void processEEPROMStorage()
-{
+{    
     RUN_TEST( testConvertIndexToFirstAddress );
     RUN_TEST( testConvertIndexToSecondAddress );
     RUN_TEST( testWriteToIndex );

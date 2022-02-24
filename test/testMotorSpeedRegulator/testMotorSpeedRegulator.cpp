@@ -200,7 +200,6 @@ void testClampOutputOK()
 
 void processMotorSpeedRegulator()
 {    
-    UNITY_BEGIN();  
     RUN_TEST( testConfig );    
     RUN_TEST( testStartWithLargeLastInput );
     RUN_TEST( testStartWithNormalLastInput );
@@ -215,6 +214,5 @@ void processMotorSpeedRegulator()
     RUN_TEST( testClampOutputLow );
     RUN_TEST( testClampOutputOK );
     RUN_TEST( testClampOutputZero );
-    UNITY_END();  
 }
 

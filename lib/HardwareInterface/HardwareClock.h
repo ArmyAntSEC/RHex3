@@ -4,7 +4,8 @@
 struct HardwareClockInterface
 {
     virtual void resetMicrosecondsSinceBoot() = 0;
-    virtual unsigned long getMicrosecondsSinceBoot() = 0;    
+    virtual unsigned long getMicrosecondsSinceBoot() = 0;        
+    virtual void delayMicroseconds( unsigned long us ) = 0;    
 };
 
 #ifdef ARDUINO
@@ -12,15 +13,20 @@ struct HardwareClockInterface
 
 class HardwareClock: public HardwareClockInterface
 {
+private:    
     unsigned long timeOffset = 0;
+
+public:    
     virtual void resetMicrosecondsSinceBoot()
     {
         timeOffset = micros();
     }
+    
     virtual unsigned long getMicrosecondsSinceBoot()
     {
         return micros() - timeOffset;
     }    
+
     virtual void delayMicroseconds( unsigned long us )
     {
         if ( us > 10000 )
@@ -30,9 +36,9 @@ class HardwareClock: public HardwareClockInterface
     }
 };
 
-#else
+#endif
 
-class HardwareClock: public HardwareClockInterface
+class HardwareClockMock: public HardwareClockInterface
 {
 private:
     unsigned long microsSinceStart = 0;   
@@ -51,15 +57,18 @@ public:
         return oldMicros;
     }
     
-    void setMicrosToStepOnRead( unsigned long micros )
+    virtual void setMicrosToStepOnRead( unsigned long micros )
     {
         microsToStepOnRead = micros;
     }
 
-    void stepMicrosecondsSinceBoot( unsigned long us )
+    virtual void stepMicrosecondsSinceBoot( unsigned long us )
     {
         microsSinceStart += us;
     }
-};
 
-#endif
+    virtual void delayMicroseconds( unsigned long us )
+    {
+        //Do nothing.
+    }
+};

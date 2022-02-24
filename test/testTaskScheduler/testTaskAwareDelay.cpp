@@ -18,7 +18,7 @@ struct RunnableMock: public RunnableInterface
 
 void testDelay()
 {
-    HardwareClock clock;    
+    HardwareClockMock clock;    
     clock.setMicrosToStepOnRead( 500 );
     RunnableMock runnable;
     TaskAwareDelay delay ( &clock, &runnable );
@@ -31,8 +31,6 @@ void testDelay()
 }
 
 void runAllTestsTaskAwareDelay()
-{
-    UNITY_BEGIN();
+{    
     RUN_TEST( testDelay );
-    UNITY_END();
 }

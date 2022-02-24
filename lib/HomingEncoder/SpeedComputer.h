@@ -9,11 +9,11 @@ class SpeedComputer: public BasicEncoderListener, CanProvideSpeed
 private:
     volatile long timeSinceLastStepUS = 0;
     volatile long speedCPS = 0;
-    HardwareClock* HWClock;
+    HardwareClockInterface* HWClock;
     HardwareInterrupts* HWInterrupts;
 
 public:
-    SpeedComputer( HardwareClock* _clock, HardwareInterrupts* _interrupts ): 
+    SpeedComputer( HardwareClockInterface* _clock, HardwareInterrupts* _interrupts ): 
         HWClock(_clock), HWInterrupts(_interrupts)
     {}
 

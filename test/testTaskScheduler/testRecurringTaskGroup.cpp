@@ -48,9 +48,7 @@ void testCanRunAndIncrementsNextTime()
 
 void runAllRecurringTaskGroupTests()
 {
-    UNITY_BEGIN();
     RUN_TEST( testAddRecurringTaskToGroup );
     RUN_TEST( testRunRecurringTasks );
     RUN_TEST( testCanRunAndIncrementsNextTime );
-    UNITY_END();    
 }

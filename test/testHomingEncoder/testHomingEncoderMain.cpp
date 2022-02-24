@@ -7,10 +7,12 @@
 
 void process()
 {
+    UNITY_BEGIN();
     runAllTestsBasicEncoder();
     runAllTestsLinearPositionEncoder();
     runAllTestsSpeedComputer();
     runAllTestRotationalPosition();
+    UNITY_END();
 }
 
 #ifdef ARDUINO

@@ -74,9 +74,7 @@ void testDelayWithScheduler()
 
 void runAllTaskSchedulerTests()
 {
-    UNITY_BEGIN();
     RUN_TEST( testAddTask );
     RUN_TEST( testRunTasksAfterTime );
     RUN_TEST( testRunTasksBeforeTime );
-    UNITY_END();
 }

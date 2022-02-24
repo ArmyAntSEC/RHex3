@@ -55,11 +55,9 @@ void testShouldHandleLargeWrapAround()
 }
 
 void runAllTestRotationalPosition()
-{
-    UNITY_BEGIN();
+{    
     RUN_TEST( testShouldGiveZeroForZero );
     RUN_TEST( testShouldGiveSameForSmallValues );
     RUN_TEST( testShouldHandleWrapAround );
     RUN_TEST( testShouldHandleLargeWrapAround );
-    UNITY_END();
 }

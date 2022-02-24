@@ -1,25 +1,20 @@
 #pragma once
 
-#ifdef ARDUINO
-struct HardwareEEPROM
-{
-    void UpdateEEPROM(unsigned address, unsigned value)
-    {
-        EEPROM.update(address, value);
-    }
-
-    unsigned int ReadEEPROM(unsigned address) return EEPROM.read(address);
-}
-}
-;
-#else
 #include <string.h>
-struct HardwareEEPROM
+
+struct HardwareEEPROMInterface
+{
+    virtual void UpdateEEPROM(unsigned address, unsigned value) = 0;
+    virtual unsigned int ReadEEPROM(unsigned address) = 0;
+};
+
+
+struct HardwareEEPROMMock: public HardwareEEPROMInterface
 {
     static const int EEPROMSize = 256;
     int EEPROMData[EEPROMSize];
 
-    HardwareEEPROM()
+    HardwareEEPROMMock()
     {
         resetValues();
     }
@@ -29,7 +24,7 @@ struct HardwareEEPROM
         memset(EEPROMData, 0, EEPROMSize);
     }
 
-    void UpdateEEPROM(unsigned address, unsigned value)
+    virtual void UpdateEEPROM(unsigned address, unsigned value)
     {
         if (address < EEPROMSize)
         {
@@ -38,7 +33,7 @@ struct HardwareEEPROM
         }
     }
 
-    unsigned int ReadEEPROM(unsigned address)
+    virtual unsigned int ReadEEPROM(unsigned address)
     {
         if (address < EEPROMSize)
         {
@@ -48,6 +43,21 @@ struct HardwareEEPROM
         {
             return 0;
         }
+    }
+};
+
+#ifdef ARDUINO
+#include <EEPROM.h>
+struct HardwareEEPROM: public HardwareEEPROMInterface
+{
+    virtual void UpdateEEPROM(unsigned address, unsigned value)
+    {
+        EEPROM.update(address, value);
+    }
+
+    virtual unsigned int ReadEEPROM(unsigned address) 
+    {
+        return EEPROM.read(address);
     }
 };
 

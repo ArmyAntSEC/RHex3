@@ -69,11 +69,11 @@ void testGetArrayLength()
 
 
 void processEEPROMBackedArrayStorage()
-{
+{    
     RUN_TEST(testConstructEEPROMStorage);
     RUN_TEST(testLoadFromEEPROM);
     RUN_TEST(testSetValue);
     RUN_TEST(testStoreToEEPROM);
     RUN_TEST(testGetSubArray);
-    RUN_TEST(testGetArrayLength);
+    RUN_TEST(testGetArrayLength);    
 }

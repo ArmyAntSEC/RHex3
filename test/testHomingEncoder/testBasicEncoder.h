@@ -27,7 +27,7 @@ void testBasicEncoderFactoryConfig()
     int encoderPin2 = 1;
     int homingPin = 2;
     BasicEncoderListenerMock listener;
-    HardwarePins pins;    
+    HardwarePinsMock pins;    
     BasicEncoder* sut = BasicEncoderFactory::config<0>( encoderPin1, encoderPin2, homingPin, &listener, &pins );
 
     TEST_ASSERT_EQUAL(encoderPin1, sut->encoderPin1 );
@@ -49,7 +49,7 @@ void testBasicEncoderFactoryConfig()
 void testBasicEncoderFactorySignalStepForwardISR()
 {
     BasicEncoderListenerMock listener;
-    HardwarePins pins;    
+    HardwarePinsMock pins;    
     BasicEncoder* sut = BasicEncoderFactory::config<0>( 0, 1, 2, &listener, &pins );
     TEST_ASSERT_EQUAL( 0, listener.stepCounter );
     
@@ -61,7 +61,7 @@ void testBasicEncoderFactorySignalStepForwardISR()
 void testBasicEncoderFactorySignalHomingISR()
 {
     BasicEncoderListenerMock listener;
-    HardwarePins pins;    
+    HardwarePinsMock pins;    
     BasicEncoder* sut = BasicEncoderFactory::config<0>( 0, 1, 2, &listener, &pins );
     TEST_ASSERT_EQUAL( 0, listener.homingCounter );
     
@@ -71,10 +71,8 @@ void testBasicEncoderFactorySignalHomingISR()
 }
 
 void runAllTestsBasicEncoder()
-{            
-    UNITY_BEGIN();
+{                
     RUN_TEST( testBasicEncoderFactoryConfig );
     RUN_TEST( testBasicEncoderFactorySignalStepForwardISR );
-    RUN_TEST( testBasicEncoderFactorySignalHomingISR );
-    UNITY_END();
+    RUN_TEST( testBasicEncoderFactorySignalHomingISR );    
 }

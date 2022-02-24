@@ -16,7 +16,7 @@ class EEPROMStorageInterface
 class EEPROMStorage: public EEPROMStorageInterface
 {
     private:
-        HardwareEEPROM* EEPROM;
+        HardwareEEPROMInterface* EEPROM;
 
         virtual int convertIndexToFirstAddress( int index ) {
             return index * 2;
@@ -26,7 +26,7 @@ class EEPROMStorage: public EEPROMStorageInterface
             return convertIndexToFirstAddress(index) + 1;
         }
     public:
-        EEPROMStorage( HardwareEEPROM* _eeprom): EEPROM(_eeprom)
+        EEPROMStorage( HardwareEEPROMInterface* _eeprom): EEPROM(_eeprom)
         {}
 
         virtual void writeIntToIndex( int index, int value )

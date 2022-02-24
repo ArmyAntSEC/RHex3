@@ -19,7 +19,7 @@ private:
 public:
     void config(unsigned int _encoderPin1,
                 unsigned int _encoderPin2, unsigned int _breakerPin, 
-                BasicEncoderListener* listener, HardwarePins* pins )
+                BasicEncoderListener* listener, HardwarePinsInterface* pins )
     {
         encoderPin1 = _encoderPin1;
         encoderPin2 = _encoderPin2;
@@ -53,7 +53,7 @@ public:
     template <int N>
     static BasicEncoder *config(
         unsigned int encoderPin1, unsigned int encoderPin2,
-        unsigned int homingPin, BasicEncoderListener* listener, HardwarePins* pins )
+        unsigned int homingPin, BasicEncoderListener* listener, HardwarePinsInterface* pins )
     {
         static_assert(N < MAX_ENCODERS_SUPPORTED, "Too many encoders requested");
         BasicEncoder *state = &stateList[N];

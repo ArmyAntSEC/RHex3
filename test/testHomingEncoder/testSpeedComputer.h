@@ -5,7 +5,7 @@
 #define private public
 
 #include <SpeedComputer.h>
-HardwareClock HWClock;
+HardwareClockMock HWClock;
 HardwareInterrupts HWInterrupts;
 
 void testShouldComputeZeroSpeedIfNothingHappens()
@@ -25,9 +25,7 @@ void testShouldComputeSpeedAfterClicks()
 }
 
 void runAllTestsSpeedComputer()
-{
-    UNITY_BEGIN();
+{    
     RUN_TEST( testShouldComputeZeroSpeedIfNothingHappens );
     RUN_TEST( testShouldComputeSpeedAfterClicks );
-    UNITY_END();
 }

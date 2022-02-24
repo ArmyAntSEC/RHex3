@@ -24,10 +24,10 @@ private:
   int driverPinTwo;	  
   int driverPinPWM;
   int lastMotorPWM = 0;
-  HardwarePins* pins;
+  HardwarePinsInterface* pins;
   
 public:	
-  void config( int _driverPinOne, int _driverPinTwo, int _driverPinPWM, HardwarePins* _pins ) {
+  void config( int _driverPinOne, int _driverPinTwo, int _driverPinPWM, HardwarePinsInterface* _pins ) {
       driverPinOne = _driverPinOne;
       driverPinTwo = _driverPinTwo;
       driverPinPWM = _driverPinPWM;      

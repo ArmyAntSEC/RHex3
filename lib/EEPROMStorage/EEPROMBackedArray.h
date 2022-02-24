@@ -21,11 +21,8 @@ class EEPROMBackedArray: public EEPROMBackedArrayInterface<N,M>
         EEPROMBackedArray( EEPROMStorageInterface* _eeprom, int _startIndex ):
             startIndex(_startIndex)
         {
-            eeprom = _eeprom;
-
-            #ifndef ARDUINO
+            eeprom = _eeprom;            
             memset(values,0,N*M*sizeof(int));
-            #endif
         }
 
         void setValue( int n, int m, int value )

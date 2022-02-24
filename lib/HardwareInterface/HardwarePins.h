@@ -2,15 +2,36 @@
 
 #ifdef ARDUINO
 #include <Arduino.h>
+#endif
 
-class HardwarePins
+struct HardwarePinsInterface
 {
-public:
+#ifdef ARDUINO
     enum PinStatus { LOW = ::LOW, HIGH = ::HIGH, CHANGE = ::CHANGE, 
         FALLING = ::FALLING, RISING = ::RISING };
     enum PinMode { INPUT = ::INPUT, OUTPUT = ::OUTPUT, INPUT_PULLUP = ::INPUT_PULLUP, 
         INPUT_PULLDOWN  = ::INPUT_PULLDOWN };
+#else
+    enum PinStatus { LOW, HIGH, CHANGE, FALLING, RISING };
+    enum PinMode { INPUT, OUTPUT, INPUT_PULLUP, INPUT_PULLDOWN } ;
+#endif
     
+    virtual void configurePin ( unsigned int pin, PinMode mode ) = 0;
+
+    virtual void attachAnInterrupt(unsigned int pin, void(*isr)(), PinStatus status ) = 0;    
+
+    virtual int getDigitalValueFromPin(int pin ) = 0;
+  
+    virtual void setDigitalValueForPin( int pin, PinStatus value ) = 0;
+    
+    virtual void setAnalogValueForPin( int pin, int value ) = 0;
+};
+
+#ifdef ARDUINO
+#include <Arduino.h>
+
+struct HardwarePins: public HardwarePinsInterface
+{    
     void configurePin ( unsigned int pin, PinMode mode )
     {
         pinMode(pin, (uint8_t)mode );
@@ -36,14 +57,12 @@ public:
         analogWrite( pin, value );
     }  
 };
-#else
-#include <iostream>
+#endif
 
-class HardwarePins
+class HardwarePinsMock: public HardwarePinsInterface
 {
 public:
-    enum PinStatus { LOW, HIGH, CHANGE, FALLING, RISING };
-    enum PinMode { INPUT, OUTPUT, INPUT_PULLUP, INPUT_PULLDOWN } ;
+    
     
     static const int pinMaxCount = 128;
     typedef void(*VoidFcnPtr)();
@@ -69,9 +88,8 @@ public:
     }
 
     int getDigitalValueFromPin(int pin )
-    {    
-        std::cerr << "Implement getDigitalValueFromPin!" << std::endl;
-        return 0;
+    {            
+        return pinStatuses[pin];
     }
   
     void setDigitalValueForPin( int pin, PinStatus value )
@@ -84,5 +102,3 @@ public:
         pinStatuses[pin] = value;
     }  
 };
-
-#endif
