@@ -2,6 +2,8 @@
 
 #ifdef ARDUINO
 #include <Arduino.h>
+#else
+#include <string.h> //For memset();
 #endif
 
 struct HardwarePinsInterface
@@ -28,7 +30,6 @@ struct HardwarePinsInterface
 };
 
 #ifdef ARDUINO
-#include <Arduino.h>
 
 struct HardwarePins: public HardwarePinsInterface
 {    
