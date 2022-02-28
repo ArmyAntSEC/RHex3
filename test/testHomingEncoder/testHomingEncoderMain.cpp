@@ -1,9 +1,9 @@
 #include <unity.h>
 
-#include "testBasicEncoder.h"
-#include "testLinearPositionEncoder.h"
-#include "testSpeedComputer.h"
-#include "testRotationalPosition.h"
+void runAllTestsBasicEncoder();
+void runAllTestsLinearPositionEncoder();
+void runAllTestsSpeedComputer();
+void runAllTestRotationalPosition();
 
 void process()
 {

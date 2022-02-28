@@ -1,5 +1,4 @@
-#pragma once
-#include <unity.h>
+#include <unityEx.h>
 #include <HardwareClock.h>
 #include <HardwareInterrupts.h>
 #define private public
@@ -26,6 +25,8 @@ void testShouldComputeSpeedAfterClicks()
 
 void runAllTestsSpeedComputer()
 {    
+    UNITY_BEGIN_INT();
     RUN_TEST( testShouldComputeZeroSpeedIfNothingHappens );
     RUN_TEST( testShouldComputeSpeedAfterClicks );
+    UNITY_END_INT();
 }

@@ -1,5 +1,4 @@
-#pragma once
-#include <unity.h>
+#include <unityEx.h>
 
 #define private public
 #include <LinearPositionalEncoder.h>
@@ -42,7 +41,9 @@ void testShouldNotHomeIfHomed()
 
 void runAllTestsLinearPositionEncoder()
 {
+    UNITY_BEGIN_INT();
     RUN_TEST( testShouldStepForward );   
     RUN_TEST( testShouldHomeIfNotHomed ); 
     RUN_TEST( testShouldNotHomeIfHomed ); 
+    UNITY_END_INT();
 }

@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 //#include <HardwareInterface.h>
 
 #define private public
@@ -200,6 +200,7 @@ void testClampOutputOK()
 
 void processMotorSpeedRegulator()
 {    
+    UNITY_BEGIN_INT();
     RUN_TEST( testConfig );    
     RUN_TEST( testStartWithLargeLastInput );
     RUN_TEST( testStartWithNormalLastInput );
@@ -214,5 +215,6 @@ void processMotorSpeedRegulator()
     RUN_TEST( testClampOutputLow );
     RUN_TEST( testClampOutputOK );
     RUN_TEST( testClampOutputZero );
+    UNITY_END_INT();
 }
 

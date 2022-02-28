@@ -1,5 +1,4 @@
-#pragma once
-#include <unity.h>
+#include <unityEx.h>
 
 #define private public
 #include <LinearPositionalEncoder.h>
@@ -56,8 +55,10 @@ void testShouldHandleLargeWrapAround()
 
 void runAllTestRotationalPosition()
 {    
+    UNITY_BEGIN_INT();
     RUN_TEST( testShouldGiveZeroForZero );
     RUN_TEST( testShouldGiveSameForSmallValues );
     RUN_TEST( testShouldHandleWrapAround );
     RUN_TEST( testShouldHandleLargeWrapAround );
+    UNITY_END_INT();
 }

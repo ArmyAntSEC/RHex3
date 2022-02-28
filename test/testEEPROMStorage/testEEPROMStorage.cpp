@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 
 #define private public
 #include <EEPROMStorage.h>
@@ -75,10 +75,12 @@ void testReadArrayFromIndex()
 
 void processEEPROMStorage()
 {    
+    UNITY_BEGIN_INT();
     RUN_TEST( testConvertIndexToFirstAddress );
     RUN_TEST( testConvertIndexToSecondAddress );
     RUN_TEST( testWriteToIndex );
     RUN_TEST( testReadFromIndex );
     RUN_TEST( testWriteArrayToIndex );
     RUN_TEST( testReadArrayFromIndex );
+    UNITY_END_INT();
 }

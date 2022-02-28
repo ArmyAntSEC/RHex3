@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 
 #include "MockEEPROMBackedArray.h"
 
@@ -38,7 +38,9 @@ void testFreeSpeedForPower()
 
 void processSpeedToPowerConverter()
 {
+    UNITY_BEGIN_INT();
     RUN_TEST( testCreate );   
     RUN_TEST( testGetPowerForFreeSpeed ); 
     RUN_TEST( testFreeSpeedForPower );     
+    UNITY_END_INT();
 }

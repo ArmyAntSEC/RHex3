@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 
 void processMotorSpeedRegulator();
 void processInterpolator();
@@ -6,11 +6,11 @@ void processSpeedToPowerConverter();
 
 void process()
 {
-    UNITY_BEGIN();  
+    UNITY_BEGIN_EXT();  
     processMotorSpeedRegulator();    
     processInterpolator();
     processSpeedToPowerConverter();    
-    UNITY_END();  
+    UNITY_END_EXT();  
 }
 
 #ifdef ARDUINO

@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 #include <HardwareClock.h>
 
 void processEEPROMStorage();
@@ -7,10 +7,10 @@ void processEEPROMBackedArrayStorage();
 
 void process()
 {
-    UNITY_BEGIN();
+    UNITY_BEGIN_EXT();
     processEEPROMStorage();   
     processEEPROMBackedArrayStorage();         
-    UNITY_END();
+    UNITY_END_EXT();
 }
 
 #ifdef ARDUINO

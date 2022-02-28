@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 
 #define private public
 
@@ -48,7 +48,9 @@ void testCanRunAndIncrementsNextTime()
 
 void runAllRecurringTaskGroupTests()
 {
+    UNITY_BEGIN_INT();
     RUN_TEST( testAddRecurringTaskToGroup );
     RUN_TEST( testRunRecurringTasks );
     RUN_TEST( testCanRunAndIncrementsNextTime );
+    UNITY_END_INT();
 }

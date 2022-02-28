@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 #define private public
 
 #include <BasicEncoder.h>
@@ -71,8 +71,10 @@ void testBasicEncoderFactorySignalHomingISR()
 }
 
 void runAllTestsBasicEncoder()
-{                
+{               
+    UNITY_BEGIN_INT(); 
     RUN_TEST( testBasicEncoderFactoryConfig );
     RUN_TEST( testBasicEncoderFactorySignalStepForwardISR );
     RUN_TEST( testBasicEncoderFactorySignalHomingISR );    
+    UNITY_END_INT();
 }

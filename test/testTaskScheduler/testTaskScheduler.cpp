@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 
 #define private public
 #include <TaskScheduler.h>
@@ -74,7 +74,9 @@ void testDelayWithScheduler()
 
 void runAllTaskSchedulerTests()
 {
+    UNITY_BEGIN_INT();
     RUN_TEST( testAddTask );
     RUN_TEST( testRunTasksAfterTime );
     RUN_TEST( testRunTasksBeforeTime );
+    UNITY_END_INT();
 }

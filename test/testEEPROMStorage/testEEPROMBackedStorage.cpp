@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 
 #include "MockEEPROM.h"
 
@@ -70,10 +70,12 @@ void testGetArrayLength()
 
 void processEEPROMBackedArrayStorage()
 {    
+    UNITY_BEGIN_INT();
     RUN_TEST(testConstructEEPROMStorage);
     RUN_TEST(testLoadFromEEPROM);
     RUN_TEST(testSetValue);
     RUN_TEST(testStoreToEEPROM);
     RUN_TEST(testGetSubArray);
     RUN_TEST(testGetArrayLength);    
+    UNITY_END_INT();
 }

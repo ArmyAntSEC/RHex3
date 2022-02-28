@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 
 #define private public
 #include <TaskAwareDelay.h>
@@ -32,5 +32,7 @@ void testDelay()
 
 void runAllTestsTaskAwareDelay()
 {    
+    UNITY_BEGIN_INT();
     RUN_TEST( testDelay );
+    UNITY_END_INT();
 }

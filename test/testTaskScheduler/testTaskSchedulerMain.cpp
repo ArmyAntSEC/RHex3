@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 #include <HardwareClock.h>
 
 void runAllRecurringTaskGroupTests();
@@ -7,11 +7,11 @@ void runAllTestsTaskAwareDelay();
 
 void process()
 {
-    UNITY_BEGIN();
+    UNITY_BEGIN_EXT();
     runAllRecurringTaskGroupTests();
     runAllTaskSchedulerTests();
     runAllTestsTaskAwareDelay();
-    UNITY_END();
+    UNITY_END_EXT();
 }
 
 #ifdef ARDUINO

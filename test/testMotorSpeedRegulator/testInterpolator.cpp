@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 #include <Interpolator.h>
 
 const unsigned int listLength = 3;
@@ -44,8 +44,10 @@ void testDoInterpolationOverValue()
 
 void processInterpolator()
 {
+    UNITY_BEGIN_INT();
     RUN_TEST( testDoInterpolationOnPoint );
     RUN_TEST( testDoInterpolationBetweenPoints );
     RUN_TEST( testDoInterpolationUnderValue );
     RUN_TEST( testDoInterpolationOverValue );
+    UNITY_END_INT();
 }
