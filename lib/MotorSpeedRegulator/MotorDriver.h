@@ -9,13 +9,13 @@
 #define MOTORDRIVER_H_
 
 #include <HardwarePins.h>
+#include <MotorSpeedRegulatorInterfaces.h>
 
-class MotorDriverInterface
-{
-    public:
-        virtual void setMotorPWM( int motorPWM ) = 0;
-        virtual int getMotorPWM() = 0;
-};
+#ifdef ARDUINO
+#include <Arduino.h>
+#else
+#include <cmath>
+#endif
 
 class MotorDriver: public MotorDriverInterface
 {

@@ -19,7 +19,7 @@ struct MockSpeedometer: public CanProvideSpeed
     virtual  int getSpeedCPS() { return speed; }
 };
 
-struct MockDriver: public HasAnInputDriveSignal
+struct MockDriver: public MotorDriverInterface
 {
     int driveSignal; 
 
@@ -33,12 +33,12 @@ struct MockDriver: public HasAnInputDriveSignal
         driveSignal = 5;
     }
 
-    virtual void setInputDriveSignal( int _driveSignal )
+    virtual void setMotorPWM( int _driveSignal )
     {
         driveSignal = _driveSignal;
     }
 
-    virtual int getLastInputDriveSignal()
+    virtual int getMotorPWM()
     {
         return driveSignal;
     }
@@ -87,7 +87,7 @@ void testStartWithNormalLastInput()
     TEST_ASSERT_TRUE( regulator.isOn );
     TEST_ASSERT_EQUAL( speedometer.getSpeedCPS(), regulator.input );
     TEST_ASSERT_EQUAL( regulator.input, regulator.lastInput );
-    TEST_ASSERT_EQUAL( target.getLastInputDriveSignal(), regulator.integratorCumulativeValue );
+    TEST_ASSERT_EQUAL( target.getMotorPWM(), regulator.integratorCumulativeValue );
 }
 
 void testStartWithLargeLastInput()

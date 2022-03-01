@@ -1,14 +1,9 @@
 #pragma once
 
 #include <SpeedComputer.h>
+#include <MotorSpeedRegulatorInterfaces.h>
 
-struct HasAnInputDriveSignal
-{
-    virtual void setInputDriveSignal( int driveSignal )=0;
-    virtual int getLastInputDriveSignal()=0;
-};
-
-class SpeedRegulator
+class SpeedRegulator: public SpeedRegulatorInterface
 {
 private:
     const int maxOutput = 255;
@@ -28,10 +23,21 @@ private:
     int setPoint;
 
     CanProvideSpeed* speedSource;
-    HasAnInputDriveSignal* target;
+    MotorDriverInterface* target;
+
+    int clampOutput( int output )
+    {
+        if (output > maxOutput )
+            return maxOutput;        
+        else if ( output < 1 )
+            return 1; //We use 0 to signal hard break. 
+        else
+            return output;
+    }
+
 public:
     void config( CanProvideSpeed* _speedSource, 
-        HasAnInputDriveSignal* _target, 
+        MotorDriverInterface* _target, 
         int _P, int _I, int _D, int _filterLength )
     {
         proportionalTerm = _P;
@@ -49,7 +55,7 @@ public:
         isOn = true;
         input = speedSource->getSpeedCPS();
         lastInput = input;
-        integratorCumulativeValue = clampOutput( target->getLastInputDriveSignal() );
+        integratorCumulativeValue = clampOutput( target->getMotorPWM() );
     }
 
     void stop()
@@ -57,7 +63,7 @@ public:
         isOn = false;
     }
 
-    void setSetPoint( int _setPoint )
+    virtual void setSetPoint( int _setPoint )
     {
         setPoint = _setPoint;
     }
@@ -71,17 +77,7 @@ public:
             float derivateiveOutput = derivativeTerm * (input - lastInput); 
             integratorCumulativeValue += integratorTerm * error;            
             int clampedOutput = clampOutput( proportionalOutput + derivateiveOutput + integratorCumulativeValue );
-            target->setInputDriveSignal( clampedOutput ); 
+            target->setMotorPWM( clampedOutput ); 
         }
-    }
-
-    int clampOutput( int output )
-    {
-        if (output > maxOutput )
-            return maxOutput;        
-        else if ( output < 1 )
-            return 1; //We use 0 to signal hard break. 
-        else
-            return output;
     }
 };

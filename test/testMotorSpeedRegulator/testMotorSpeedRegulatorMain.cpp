@@ -3,6 +3,7 @@
 void processMotorSpeedRegulator();
 void processInterpolator();
 void processSpeedToPowerConverter();
+void runAllTestsMotorSpeedCommander();
 
 void process()
 {
@@ -10,6 +11,7 @@ void process()
     processMotorSpeedRegulator();    
     processInterpolator();
     processSpeedToPowerConverter();    
+    runAllTestsMotorSpeedCommander();
     UNITY_END_EXT();  
 }
 
