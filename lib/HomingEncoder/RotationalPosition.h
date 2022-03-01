@@ -2,27 +2,37 @@
 
 #include "HomingEncoderInterfaces.h"
 
-class RotationalPosition
+class RotationalPosition: public RotationalPositionProvider
 {
 private:
-    LinearPositionProvider * linPos;
-    static const long clicksPerLapNum = 10775776;
-    static const long clicksPerLapDen = 3000;
+    long linPos;        
 public:
-    RotationalPosition( LinearPositionProvider* _linPos ): linPos(_linPos)
+    RotationalPosition( long _linPos = 0 ): linPos(_linPos)
     {}
 
-    long getLaps()
+    virtual long getLaps()
     {
-        long long clickPosRaw = linPos->getLinearPosition();
+        long long clickPosRaw = linPos;
         return clickPosRaw * clicksPerLapDen / clicksPerLapNum;
     }
 
-    long getClicks()
+    virtual long getClicks()
     {
         long long laps = getLaps();
-        long long clickPosRaw = linPos->getLinearPosition();
+        long long clickPosRaw = linPos;
         long clicksRemain = clickPosRaw - laps * clicksPerLapNum / clicksPerLapDen;
         return clicksRemain;
-    }  
+    }      
+    
+    bool operator==( const RotationalPosition& pos )
+    {
+        return linPos == pos.linPos;
+    }
+
+    bool operator!=( const RotationalPosition& pos )
+    {
+        return !this->operator==( pos );        
+    }
+
 };
+

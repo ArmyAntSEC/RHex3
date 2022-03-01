@@ -5,7 +5,13 @@
 
 void testSetGoal()
 {
-    TEST_FAIL();
+    MotorSpeedCommander commander;
+    RotationalPosition pos ( 1234 );
+
+    commander.setGoal( pos, 4321 );
+
+    TEST_ASSERT( pos == commander.positionGoal );
+    TEST_ASSERT_EQUAL( 4321, commander.timeGoal );
 }
 
 void runAllTestsMotorSpeedCommander()

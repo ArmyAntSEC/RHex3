@@ -8,7 +8,10 @@
 	"settings": {
 		"files.associations": {
 			"cmath": "cpp",
-			"*.tcc": "cpp"
+			"*.tcc": "cpp",
+			"__functional_03": "cpp",
+			"memory_resource": "cpp",
+			"string": "cpp"
 		}
 	}
 }
