@@ -1,5 +1,7 @@
 #pragma once
 
+#include <RotationalPosition.h>
+
 class MotorDriverInterface
 {
     public:
@@ -9,6 +11,7 @@ class MotorDriverInterface
 
 struct MotorSpeedCommanderInterface
 {
+    virtual void setGoal( RotationalPosition* _pos, unsigned long _time ) = 0;
 };
 
 struct SpeedRegulatorInterface
