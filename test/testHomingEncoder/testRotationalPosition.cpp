@@ -56,6 +56,16 @@ void testSupportsEquality()
     TEST_ASSERT( sut2 == sut3 );
 }
 
+void testRotationalPositionEncoder()
+{
+    LinearPositionProviderMock linPos;
+    linPos.linearPos = 1234;
+
+    RotationalPositionEncoder sut( &linPos );
+
+    TEST_ASSERT_EQUAL( 1234, sut.getLinearPosition() );
+}
+
 void runAllTestRotationalPosition()
 {    
     UNITY_BEGIN_INT();
@@ -64,5 +74,6 @@ void runAllTestRotationalPosition()
     RUN_TEST( testShouldHandleWrapAround );
     RUN_TEST( testShouldHandleLargeWrapAround );
     RUN_TEST( testSupportsEquality );
+    RUN_TEST( testRotationalPositionEncoder );
     UNITY_END_INT();
 }
