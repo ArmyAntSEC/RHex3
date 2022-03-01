@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unityEx.h>
 
 void runAllTestsBasicEncoder();
 void runAllTestsLinearPositionEncoder();
@@ -7,12 +7,12 @@ void runAllTestRotationalPosition();
 
 void process()
 {
-    UNITY_BEGIN();
+    UNITY_BEGIN_EXT();
     runAllTestsBasicEncoder();
     runAllTestsLinearPositionEncoder();
     runAllTestsSpeedComputer();
     runAllTestRotationalPosition();
-    UNITY_END();
+    UNITY_END_EXT();
 }
 
 #ifdef ARDUINO
