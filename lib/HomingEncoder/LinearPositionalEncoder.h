@@ -1,7 +1,6 @@
 #pragma once
 
 #include <HardwareInterrupts.h>
-#include <HardwareInterface.h>
 #include "HomingEncoderInterfaces.h"
 
 class LinearPositionEncoder: public BasicEncoderListener, LinearPositionProvider
@@ -29,9 +28,9 @@ public:
     virtual long getLinearPosition()
     {
         long rValue = 0;
-        HardwareInterface::disableInterrupts();
+        hwInterrupts->disableInterrupts();
         rValue = linearPosition;
-        HardwareInterface::enableInterrupts();
+        hwInterrupts->enableInterrupts();
         return rValue;
     }
 
