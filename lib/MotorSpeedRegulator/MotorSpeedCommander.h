@@ -1,15 +1,17 @@
 #pragma once
 
 #include <MotorSpeedRegulatorInterfaces.h>
+#include <RunnableInterface.h>
 
-class MotorSpeedCommander: public MotorSpeedCommanderInterface
+class MotorSpeedCommander: public MotorSpeedCommanderInterface, RunnableInterface
 {
 private:
     RotationalPositionProvider* currentRotPos;
     SpeedRegulatorInterface* speedRegulator;
     RotationalPosition positionGoal;
-    unsigned long timeGoal;
+    unsigned long timeGoalMicros;
     int maxSpeedCPS;
+    bool arrived = false;
 
     long cappedSpeedCPS( long speedCPS )
     {
@@ -32,7 +34,7 @@ public:
     virtual void setGoal( RotationalPosition _pos, unsigned long _time )
     {
         positionGoal = _pos;
-        timeGoal = _time;
+        timeGoalMicros = _time;
     }    
 
     long computeTargetSpeedCPS( long timeLeftMicros, long clicksLeft )
@@ -40,5 +42,26 @@ public:
         long int targetSpeedCPS = targetSpeedCPS = (1000L * clicksLeft) / timeLeftMicros;
 
         return cappedSpeedCPS( targetSpeedCPS );
+    }
+
+    virtual void run(unsigned long int nowMicros)
+    {
+        long int clicksLeft = positionGoal.getLinearPosition() - currentRotPos->getLinearPosition();
+        if ( clicksLeft < 0 )
+        {
+            arrived = true;
+            speedRegulator->setSetPoint( 0 );            
+        } else {
+            arrived = false;
+            long timeLeft = timeGoalMicros - nowMicros;
+            long targetSpeed = computeTargetSpeedCPS( timeLeft, clicksLeft ); 
+            speedRegulator->setSetPoint( targetSpeed );            
+        }
+    }
+
+    bool hasArrived()
+    {
+        //TODO: Make sure that this value is reset when new position is sent.
+        return arrived;
     }
 };

@@ -8,10 +8,9 @@ private:
     static const long clicksPerLapNum = 10775776;
     static const long clicksPerLapDen = 3000;
 
-protected:
+public:
     virtual long getLinearPosition() = 0;          
 
-public:
     virtual long getLaps()
     {
         long long clickPosRaw = getLinearPosition();
