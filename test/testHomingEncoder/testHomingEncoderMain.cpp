@@ -16,10 +16,13 @@ void process()
 }
 
 #ifdef ARDUINO
+#include <HardwareClock.h>
+HardwareClock hwClock;
+
 void setup() {
     // NOTE!!! Wait for >2 secs
     // if board doesn't support software reset via Serial.DTR/RTS
-    HardwareInterface::delayForMilliseconds(2000);
+    hwClock.delayMicroseconds(2000000);
 
     process();
 }
