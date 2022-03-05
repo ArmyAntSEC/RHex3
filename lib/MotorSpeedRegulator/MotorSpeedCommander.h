@@ -10,7 +10,7 @@ private:
     SpeedRegulatorInterface* speedRegulator;
     RotationalPosition positionGoal;
     unsigned long timeGoalMicros;
-    int maxSpeedCPS;
+    int maxSpeedCPS = 5000;
     bool arrived = false;
 
     long cappedSpeedCPS( long speedCPS )
@@ -38,10 +38,12 @@ public:
     }    
 
     long computeTargetSpeedCPS( long timeLeftMicros, long clicksLeft )
-    {
-        long int targetSpeedCPS = targetSpeedCPS = (1000L * clicksLeft) / timeLeftMicros;
-
-        return cappedSpeedCPS( targetSpeedCPS );
+    {        
+        long clicksLeftScaled = 1000L * clicksLeft;        
+        long targetSpeedCPS = clicksLeftScaled / timeLeftMicros;
+        long targetSpeedCPSCapped = cappedSpeedCPS( targetSpeedCPS );
+        
+        return targetSpeedCPSCapped;
     }
 
     virtual void run(unsigned long int nowMicros)
