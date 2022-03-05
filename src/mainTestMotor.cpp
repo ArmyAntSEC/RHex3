@@ -1,7 +1,8 @@
 #ifdef ARDUINO
+#include <HardwareInterrupts.h>
+#include <HardwarePins.h>
 #include <Arduino.h>
 #include <SerialStream.h>
-#include <HardwareInterface.h>
 #include <MotorDriver.h>
 #include <BasicEncoder.h>
 
@@ -14,18 +15,20 @@
 #define ENCODER_1 14
 
 MotorDriver driver;
+HardwareInterrupts hwInterrupts;
+HardwarePins hwPins;
 
-class BasicEncoder: public BasicEncoderListener
+class BasicEncoderStore: public BasicEncoderListener
 {
 private:
     volatile long clickPosition = 0;
 
 public:
     void signalStepForwardISR()
-    {
-        HardwareInterface::disableInterrupts();
+    {        
+        hwInterrupts.disableInterrupts();
         clickPosition++;
-        HardwareInterface::enableInterrupts();
+        hwInterrupts.enableInterrupts();
     }
 
     void signalHomingISR()
@@ -36,14 +39,14 @@ public:
     long getClickPosition()
     {
         long rValue = 0;
-        HardwareInterface::disableInterrupts();
+        hwInterrupts.disableInterrupts();
         rValue = this->clickPosition;
-        HardwareInterface::enableInterrupts();
+        hwInterrupts.enableInterrupts();
         return rValue;
     }
 };
 
-BasicEncoder listener;
+BasicEncoderStore listener;
 BasicEncoderFactory encoderFactory;
 BasicEncoder* encoder;
 
@@ -55,9 +58,9 @@ void setup()
 
     Serial.println("Hello World!");    
 
-    driver.config( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM );
+    driver.config( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, &hwPins );
     
-    encoder = encoderFactory.config<0>( ENCODER_1, ENCODER_2, OPTO, &listener );
+    encoder = encoderFactory.config<0>( ENCODER_1, ENCODER_2, OPTO, &listener, &hwPins );
 
     driver.setMotorPWM( 32 );
 
