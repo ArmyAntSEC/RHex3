@@ -1,25 +1,7 @@
 #include <unityEx.h>
 #define private public
 
-#include <BasicEncoder.h>
-
-class BasicEncoderListenerMock: public BasicEncoderListener
-{
-    public:
-
-    int stepCounter = 0;
-    int homingCounter = 0;
-
-    void signalStepForwardISR() 
-    {
-        stepCounter++;
-    }
-    
-    void signalHomingISR() 
-    {
-        homingCounter++;
-    }
-};
+#include "BasicEncoderListenerMock.h"
 
 void testBasicEncoderFactoryConfig()
 {

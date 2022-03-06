@@ -23,6 +23,7 @@ public:
     {
         if ( !isHomed )
             linearPosition = 0;
+        isHomed = true;
     }
 
     virtual long getLinearPosition()
