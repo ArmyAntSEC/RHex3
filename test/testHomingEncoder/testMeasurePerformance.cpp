@@ -22,6 +22,7 @@ void testRotationalPositionGetClicksPerformance()
         value = sut.getClicks();
     }
     unsigned long endTimeMicros = hwClock.getMicrosecondsSinceBoot();    
+    
     TEST_ASSERT_LESS_THAN_INT32( 20*1000L, endTimeMicros - startTimeMicros );
     TEST_ASSERT_GREATER_THAN_INT32( 15*1000L, endTimeMicros - startTimeMicros );
 
@@ -42,18 +43,16 @@ void testBasicEncoderWithMockListenersPerformance()
     //hwInterrupts.enableInterrupts();
 
     unsigned long startTimeMicros = hwClock.getMicrosecondsSinceBoot();
-    for ( int i = 0; i < 6000; i++ ) //MAx number of clicks per second
+    for ( int i = 0; i < 10000; i++ ) //Max number of clicks per second
     {
-        BasicEncoderFactory::isr_encoder<0>();
-        BasicEncoderFactory::isr_homing<0>();                        
+        BasicEncoderFactory::isr_encoder<0>();        
     }
     unsigned long endTimeMicros = hwClock.getMicrosecondsSinceBoot();
     
-    TEST_ASSERT_EQUAL( 6000, listenerMock1.stepCounter ); //To ensure the loop isn't optimized away.
-    TEST_ASSERT_EQUAL( 6000, listenerMock1.homingCounter ); 
+    TEST_ASSERT_LESS_THAN_INT32( 70*1000L, endTimeMicros - startTimeMicros );    
+    TEST_ASSERT_GREATER_THAN_INT32( 65*1000L, endTimeMicros - startTimeMicros );    
 
-    TEST_ASSERT_LESS_THAN_INT32( 85*1000L, endTimeMicros - startTimeMicros );    
-    TEST_ASSERT_GREATER_THAN_INT32( 70*1000L, endTimeMicros - startTimeMicros );    
+    TEST_ASSERT_EQUAL( 10000, listenerMock1.stepCounter ); //To ensure the loop isn't optimized away.    
 #else
     TEST_IGNORE_MESSAGE( "No performance measurements on Native" );
 #endif
@@ -73,17 +72,16 @@ void testBasicEncoderWithLinearAndSpeedMeasurementPerformance()
     encoder->addListener ( &speed );    
     
     unsigned long startTimeMicros = hwClock.getMicrosecondsSinceBoot();
-    for ( int i = 0; i < 6000; i++ ) //Max clicks per second
+    for ( int i = 0; i < 10000; i++ ) //Max clicks per second
     {
-        BasicEncoderFactory::isr_encoder<0>();
-        BasicEncoderFactory::isr_homing<0>();                
+        BasicEncoderFactory::isr_encoder<0>();        
     }    
-    unsigned long endTimeMicros = hwClock.getMicrosecondsSinceBoot();
+    unsigned long endTimeMicros = hwClock.getMicrosecondsSinceBoot();    
 
-    TEST_ASSERT_EQUAL( 6000, linear.getLinearPosition() ); //To ensure the loop isn't optimized away.    
+    TEST_ASSERT_LESS_THAN_INT32( 120*1000L, endTimeMicros - startTimeMicros );    
+    TEST_ASSERT_GREATER_THAN_INT32( 110*1000L, endTimeMicros - startTimeMicros );    
 
-    TEST_ASSERT_LESS_THAN_INT32( 200*1000L, endTimeMicros - startTimeMicros );    
-    TEST_ASSERT_GREATER_THAN_INT32( 150*1000L, endTimeMicros - startTimeMicros );    
+    TEST_ASSERT_EQUAL( 10000, linear.getLinearPosition() ); //To ensure the loop isn't optimized away.    
 #else
     TEST_IGNORE_MESSAGE( "No performance measurements on Native" );
 #endif

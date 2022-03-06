@@ -13,16 +13,32 @@ void testShouldComputeZeroSpeedIfNothingHappens()
     TEST_ASSERT_EQUAL( 0, sut.getSpeedCPS() );
 }
 
-void testShouldComputeSpeedAfterTwoClicks()
+void testShouldNotComputeSpeedAfterNineClicks()
 {
     HardwareClockMock hwClock;
     HardwareInterruptsMock hwInterrupts;
     SpeedComputer sut( &hwClock, &hwInterrupts );
     hwClock.resetMicrosecondsSinceBoot();
-    hwClock.stepMicrosecondsSinceBoot( 1230 );
-    sut.signalStepForwardISR();
-    hwClock.stepMicrosecondsSinceBoot( 1000 );
-    sut.signalStepForwardISR();
+    
+    for ( int i = 0; i < 9; i++ ) {
+        hwClock.stepMicrosecondsSinceBoot( 1000 );
+        sut.signalStepForwardISR();
+    }
+
+    TEST_ASSERT_EQUAL( 0, sut.getSpeedCPS() );
+}
+
+void testShouldComputeSpeedAfterTenClicks()
+{
+    HardwareClockMock hwClock;
+    HardwareInterruptsMock hwInterrupts;
+    SpeedComputer sut( &hwClock, &hwInterrupts );
+    hwClock.resetMicrosecondsSinceBoot();
+    
+    for ( int i = 0; i < 10; i++ ) {
+        hwClock.stepMicrosecondsSinceBoot( 1000 );
+        sut.signalStepForwardISR();
+    }
 
     TEST_ASSERT_EQUAL( 1000, sut.getSpeedCPS() );
 }
@@ -43,7 +59,8 @@ void runAllTestsSpeedComputer()
 {    
     UNITY_BEGIN_INT();        
     RUN_TEST( testShouldComputeZeroSpeedIfNothingHappens );    
-    RUN_TEST( testShouldComputeSpeedAfterTwoClicks );
+    RUN_TEST( testShouldNotComputeSpeedAfterNineClicks );
+    RUN_TEST( testShouldComputeSpeedAfterTenClicks );
     RUN_TEST ( testSpeedComputerShouldRestoreInterruptFlags );
     UNITY_END_INT();
 }

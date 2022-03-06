@@ -7,8 +7,9 @@
 class SpeedComputer: public BasicEncoderListener, CanProvideSpeed
 {
 private:
-    volatile long timeAtLastClickMicros = 0;
-    volatile long timeAtThisClickMicros = 0;
+    volatile long timeAtLastUpdateMicros = 0;
+    volatile long timeAtThisUpdateMicros = 0;
+    volatile int clicksSinceLastUpdate = 0;
 
     HardwareClockInterface* hwClock;
     HardwareInterruptsInterface* hwInterrupts;
@@ -20,16 +21,23 @@ public:
 
     virtual void signalStepForwardISR()
     {
-        timeAtLastClickMicros = timeAtThisClickMicros;
-        timeAtThisClickMicros = hwClock->getMicrosecondsSinceBoot();                
+        //We measure the speed every 10th click. Gives some filtering and also saves compute time.
+        if ( clicksSinceLastUpdate < 9 ) { //9 of these and one measurement becomes 10.
+            clicksSinceLastUpdate++;
+        } else {
+            clicksSinceLastUpdate = 0;
+            timeAtLastUpdateMicros = timeAtThisUpdateMicros;
+            timeAtThisUpdateMicros = hwClock->getMicrosecondsSinceBoot();                
+        }
+        
     }
     
     virtual int getSpeedCPS()
     {
         
         hwInterrupts->disableInterrupts();
-        long lastTime = timeAtLastClickMicros;
-        long thisTime = timeAtThisClickMicros;
+        long lastTime = timeAtLastUpdateMicros;
+        long thisTime = timeAtThisUpdateMicros;
         hwInterrupts->enableInterrupts();
                 
         long timeDiff = thisTime - lastTime;
@@ -37,7 +45,7 @@ public:
         if ( timeDiff == 0 )                  
             return 0;
         else
-            return 1e6 / timeDiff;        
+            return 1e6L * 10L / timeDiff;  //We only measure every 10th click.   
     }
 
     virtual void signalHomingISR()
