@@ -13,12 +13,14 @@ void testShouldComputeZeroSpeedIfNothingHappens()
     TEST_ASSERT_EQUAL( 0, sut.getSpeedCPS() );
 }
 
-void testShouldComputeSpeedAfterClicks()
+void testShouldComputeSpeedAfterTwoClicks()
 {
     HardwareClockMock hwClock;
     HardwareInterruptsMock hwInterrupts;
     SpeedComputer sut( &hwClock, &hwInterrupts );
     hwClock.resetMicrosecondsSinceBoot();
+    hwClock.stepMicrosecondsSinceBoot( 1230 );
+    sut.signalStepForwardISR();
     hwClock.stepMicrosecondsSinceBoot( 1000 );
     sut.signalStepForwardISR();
 
@@ -41,7 +43,7 @@ void runAllTestsSpeedComputer()
 {    
     UNITY_BEGIN_INT();        
     RUN_TEST( testShouldComputeZeroSpeedIfNothingHappens );    
-    RUN_TEST( testShouldComputeSpeedAfterClicks );
+    RUN_TEST( testShouldComputeSpeedAfterTwoClicks );
     RUN_TEST ( testSpeedComputerShouldRestoreInterruptFlags );
     UNITY_END_INT();
 }

@@ -52,8 +52,8 @@ void testBasicEncoderWithMockListenersPerformance()
     TEST_ASSERT_EQUAL( 6000, listenerMock1.stepCounter ); //To ensure the loop isn't optimized away.
     TEST_ASSERT_EQUAL( 6000, listenerMock1.homingCounter ); 
 
-    TEST_ASSERT_LESS_THAN_INT32( 100*1000L, endTimeMicros - startTimeMicros );    
-    TEST_ASSERT_GREATER_THAN_INT32( 50*1000L, endTimeMicros - startTimeMicros );    
+    TEST_ASSERT_LESS_THAN_INT32( 85*1000L, endTimeMicros - startTimeMicros );    
+    TEST_ASSERT_GREATER_THAN_INT32( 70*1000L, endTimeMicros - startTimeMicros );    
 #else
     TEST_IGNORE_MESSAGE( "No performance measurements on Native" );
 #endif
@@ -82,8 +82,8 @@ void testBasicEncoderWithLinearAndSpeedMeasurementPerformance()
 
     TEST_ASSERT_EQUAL( 6000, linear.getLinearPosition() ); //To ensure the loop isn't optimized away.    
 
-    TEST_ASSERT_LESS_THAN_INT32( 500*1000L, endTimeMicros - startTimeMicros );    
-    TEST_ASSERT_GREATER_THAN_INT32( 300*1000L, endTimeMicros - startTimeMicros );    
+    TEST_ASSERT_LESS_THAN_INT32( 200*1000L, endTimeMicros - startTimeMicros );    
+    TEST_ASSERT_GREATER_THAN_INT32( 150*1000L, endTimeMicros - startTimeMicros );    
 #else
     TEST_IGNORE_MESSAGE( "No performance measurements on Native" );
 #endif

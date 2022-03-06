@@ -7,8 +7,9 @@
 class SpeedComputer: public BasicEncoderListener, CanProvideSpeed
 {
 private:
-    volatile long timeSinceLastStepUS = 0;
-    volatile long speedCPS = 0;
+    volatile long timeAtLastClickMicros = 0;
+    volatile long timeAtThisClickMicros = 0;
+
     HardwareClockInterface* hwClock;
     HardwareInterruptsInterface* hwInterrupts;
 
@@ -19,18 +20,24 @@ public:
 
     virtual void signalStepForwardISR()
     {
-        long thisTimeUS = hwClock->getMicrosecondsSinceBoot();
-        long timeDiff = thisTimeUS - timeSinceLastStepUS;
-        speedCPS = 1e6 / timeDiff;
+        timeAtLastClickMicros = timeAtThisClickMicros;
+        timeAtThisClickMicros = hwClock->getMicrosecondsSinceBoot();                
     }
     
     virtual int getSpeedCPS()
     {
         
         hwInterrupts->disableInterrupts();
-        int rValue = speedCPS;
+        long lastTime = timeAtLastClickMicros;
+        long thisTime = timeAtThisClickMicros;
         hwInterrupts->enableInterrupts();
-        return rValue;
+                
+        long timeDiff = thisTime - lastTime;
+
+        if ( timeDiff == 0 )                  
+            return 0;
+        else
+            return 1e6 / timeDiff;        
     }
 
     virtual void signalHomingISR()
