@@ -4,10 +4,10 @@
 #define private public
 
 #include <SpeedComputer.h>
-HardwareClockMock hwClock;
 
 void testShouldComputeZeroSpeedIfNothingHappens()
 {
+    HardwareClockMock hwClock;
     HardwareInterruptsMock hwInterrupts;
     SpeedComputer sut( &hwClock, &hwInterrupts );
     TEST_ASSERT_EQUAL( 0, sut.getSpeedCPS() );
@@ -15,6 +15,7 @@ void testShouldComputeZeroSpeedIfNothingHappens()
 
 void testShouldComputeSpeedAfterClicks()
 {
+    HardwareClockMock hwClock;
     HardwareInterruptsMock hwInterrupts;
     SpeedComputer sut( &hwClock, &hwInterrupts );
     hwClock.resetMicrosecondsSinceBoot();
@@ -26,6 +27,7 @@ void testShouldComputeSpeedAfterClicks()
 
 void testSpeedComputerShouldRestoreInterruptFlags()
 {    
+    HardwareClockMock hwClock;
     HardwareInterruptsMock hwInterrupts;
     SpeedComputer sut( &hwClock, &hwInterrupts );    
     

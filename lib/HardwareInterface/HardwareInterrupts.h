@@ -23,7 +23,7 @@ public:
     }
 };
 
-#else
+#endif
 
 class HardwareInterruptsMock: public HardwareInterruptsInterface
 {
@@ -41,5 +41,3 @@ public:
         interruptsDisabledCount++;
     }
 };
-
-#endif
