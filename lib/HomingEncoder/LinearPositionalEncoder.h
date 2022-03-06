@@ -3,7 +3,7 @@
 #include <HardwareInterrupts.h>
 #include "HomingEncoderInterfaces.h"
 
-class LinearPositionEncoder: public BasicEncoderListener, LinearPositionProvider
+class LinearPositionEncoder: public BasicEncoderListener, public LinearPositionProvider
 {
 private:
     volatile long linearPosition = 0;
@@ -11,8 +11,10 @@ private:
     HardwareInterruptsInterface* hwInterrupts;
 public:
 
-    LinearPositionEncoder( HardwareInterruptsInterface* _interrupts ): hwInterrupts(_interrupts)
-    {}
+    void config( HardwareInterruptsInterface* _interrupts )
+    {
+        hwInterrupts = _interrupts;
+    }
 
     virtual void signalStepForwardISR()
     {

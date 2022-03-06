@@ -9,7 +9,8 @@ void testShouldComputeZeroSpeedIfNothingHappens()
 {
     HardwareClockMock hwClock;
     HardwareInterruptsMock hwInterrupts;
-    SpeedComputer sut( &hwClock, &hwInterrupts );
+    SpeedComputer sut;
+    sut.config( &hwClock, &hwInterrupts );
     TEST_ASSERT_EQUAL( 0, sut.getSpeedCPS() );
 }
 
@@ -17,7 +18,8 @@ void testShouldNotComputeSpeedAfterNineClicks()
 {
     HardwareClockMock hwClock;
     HardwareInterruptsMock hwInterrupts;
-    SpeedComputer sut( &hwClock, &hwInterrupts );
+    SpeedComputer sut;
+    sut.config( &hwClock, &hwInterrupts );
     hwClock.resetMicrosecondsSinceBoot();
     
     for ( int i = 0; i < 9; i++ ) {
@@ -32,7 +34,8 @@ void testShouldComputeSpeedAfterTenClicks()
 {
     HardwareClockMock hwClock;
     HardwareInterruptsMock hwInterrupts;
-    SpeedComputer sut( &hwClock, &hwInterrupts );
+    SpeedComputer sut;
+    sut.config( &hwClock, &hwInterrupts );
     hwClock.resetMicrosecondsSinceBoot();
     
     for ( int i = 0; i < 10; i++ ) {
@@ -47,7 +50,8 @@ void testSpeedComputerShouldRestoreInterruptFlags()
 {    
     HardwareClockMock hwClock;
     HardwareInterruptsMock hwInterrupts;
-    SpeedComputer sut( &hwClock, &hwInterrupts );    
+    SpeedComputer sut;
+    sut.config( &hwClock, &hwInterrupts );    
     
     sut.getSpeedCPS();
 

@@ -1,33 +1,14 @@
 #ifdef ARDUINO
-#include <Arduino.h>
-#include <HardwareClock.h>
-#include <RotationalPosition.h>
-#include <BasicEncoder.h>
-#include <LinearPositionalEncoder.h>
-#include <SpeedComputer.h>
 #include <SerialStream.h>
+#include "oneLeg.h"
 
-struct BasicEncoderListenerMock: public BasicEncoderListener
-{
-    volatile int stepCounter;
-    volatile int homingCounter;
-
-    virtual void signalStepForwardISR()
-    {
-        stepCounter++;    
-    }
-
-    virtual void signalHomingISR()
-    {
-        homingCounter++;
-    }
-};
+OneLeg<0> leg(4, 5, 7);
 
 void setup()
 {
   Serial.begin(115200);
   while (!Serial) {}    
-  Serial.println("Hello World!");
+  Log << "Hello World!" << endl;
 }
 
 
@@ -38,8 +19,8 @@ void loop()
 #else
 
 int main()
-{
-
+{ 
+    
 }
 
 #endif

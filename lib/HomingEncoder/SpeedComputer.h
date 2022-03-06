@@ -4,7 +4,7 @@
 #include "HardwareClock.h"
 #include "HardwareInterrupts.h"
 
-class SpeedComputer: public BasicEncoderListener, CanProvideSpeed
+class SpeedComputer: public CanProvideSpeed, public BasicEncoderListener 
 {
 private:
     volatile long timeAtLastUpdateMicros = 0;
@@ -15,9 +15,11 @@ private:
     HardwareInterruptsInterface* hwInterrupts;
 
 public:
-    SpeedComputer( HardwareClockInterface* _clock, HardwareInterruptsInterface* _interrupts ): 
-        hwClock(_clock), hwInterrupts(_interrupts)
-    {}
+    void config( HardwareClockInterface* _clock, HardwareInterruptsInterface* _interrupts )        
+    {
+        hwClock = _clock;
+        hwInterrupts = _interrupts;
+    }
 
     virtual void signalStepForwardISR()
     {

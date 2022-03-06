@@ -32,7 +32,7 @@ void testConfigure()
     int maxSpeedCPS = 1234;
     
     MotorSpeedCommander commander;
-    commander.configure( pos, speedRegulator, maxSpeedCPS );
+    commander.config( pos, speedRegulator, maxSpeedCPS );
 
     TEST_ASSERT_EQUAL( pos, commander.currentRotPos );    
     TEST_ASSERT_EQUAL( speedRegulator, commander.speedRegulator );    
@@ -54,7 +54,7 @@ void testComputeTargetSpeedNegativeTimeLeft()
     int maxSpeedCPS = 1234;
     
     MotorSpeedCommander commander;
-    commander.configure( pos, speedRegulator, maxSpeedCPS );
+    commander.config( pos, speedRegulator, maxSpeedCPS );
 
     long timeLeftMicros = -1000;    
     long clicksLeft = 1000;
@@ -68,7 +68,7 @@ void testComputeTargetSpeedCapSpeed()
     int maxSpeedCPS = 123;
     
     MotorSpeedCommander commander;
-    commander.configure( pos, speedRegulator, maxSpeedCPS );
+    commander.config( pos, speedRegulator, maxSpeedCPS );
 
     long timeLeftMicros = 1000;    
     long clicksLeft = 1000;
@@ -85,7 +85,7 @@ void testRunAlreadyPassedGoal()
     long timeGoalMicros = 4321 + 200;
 
     MotorSpeedCommander commander;
-    commander.configure( &posNow, &speedRegulator, maxSpeedCPS );    
+    commander.config( &posNow, &speedRegulator, maxSpeedCPS );    
 
     commander.setGoal( posGoal, timeGoalMicros );
     
@@ -105,7 +105,7 @@ void testRunSimple()
     long timeGoalMicros = 4321 + 250;
 
     MotorSpeedCommander commander;
-    commander.configure( &posNow, &speedRegulator, maxSpeedCPS );    
+    commander.config( &posNow, &speedRegulator, maxSpeedCPS );    
 
     commander.setGoal( posGoal, timeGoalMicros );
     
@@ -125,7 +125,7 @@ void testRunOverTime()
     long timeGoalMicros = 4321 - 250;
 
     MotorSpeedCommander commander;
-    commander.configure( &posNow, &speedRegulator, maxSpeedCPS );    
+    commander.config( &posNow, &speedRegulator, maxSpeedCPS );    
 
     commander.setGoal( posGoal, timeGoalMicros );
     

@@ -24,7 +24,7 @@ private:
     }
 
 public:
-    void configure( RotationalPositionProvider* _rotPos, SpeedRegulatorInterface* _speedRegulator, int _maxSpeedCPS )
+    void config( RotationalPositionProvider* _rotPos, SpeedRegulatorInterface* _speedRegulator, int _maxSpeedCPS )
     {
         currentRotPos = _rotPos;
         speedRegulator = _speedRegulator;
