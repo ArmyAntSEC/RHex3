@@ -26,9 +26,11 @@ public:
     
     virtual int getSpeedCPS()
     {
+        
         HWInterrupts->disableInterrupts();
-        return speedCPS;
+        int rValue = speedCPS;
         HWInterrupts->enableInterrupts();
+        return rValue;
     }
 
     virtual void signalHomingISR()

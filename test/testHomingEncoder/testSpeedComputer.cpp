@@ -1,6 +1,7 @@
 #include <unityEx.h>
 #include <HardwareClock.h>
 #include <HardwareInterrupts.h>
+#include <util/atomic.h>
 #define private public
 
 #include <SpeedComputer.h>
@@ -25,8 +26,8 @@ void testShouldComputeSpeedAfterClicks()
 
 void runAllTestsSpeedComputer()
 {    
-    UNITY_BEGIN_INT();
-    RUN_TEST( testShouldComputeZeroSpeedIfNothingHappens );
+    UNITY_BEGIN_INT();        
+    RUN_TEST( testShouldComputeZeroSpeedIfNothingHappens );    
     RUN_TEST( testShouldComputeSpeedAfterClicks );
     UNITY_END_INT();
 }

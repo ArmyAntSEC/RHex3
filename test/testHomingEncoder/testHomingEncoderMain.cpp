@@ -4,6 +4,7 @@ void runAllTestsBasicEncoder();
 void runAllTestsLinearPositionEncoder();
 void runAllTestsSpeedComputer();
 void runAllTestRotationalPosition();
+void runAllTestMeasurePerformance();
 
 void process()
 {
@@ -12,6 +13,7 @@ void process()
     runAllTestsLinearPositionEncoder();
     runAllTestsSpeedComputer();
     runAllTestRotationalPosition();
+    runAllTestMeasurePerformance();
     UNITY_END_EXT();
 }
 

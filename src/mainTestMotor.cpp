@@ -60,7 +60,8 @@ void setup()
 
     driver.config( MOTOR_EN1, MOTOR_EN2, MOTOR_PWM, &hwPins );
     
-    encoder = encoderFactory.config<0>( ENCODER_1, ENCODER_2, OPTO, &listener, &hwPins );
+    encoder = encoderFactory.config<0>( ENCODER_1, ENCODER_2, OPTO, &hwPins );
+    encoder->addListener( &listener );
 
     driver.setMotorPWM( 32 );
 

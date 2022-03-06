@@ -68,25 +68,6 @@ void testRotationalPositionEncoder()
     TEST_ASSERT_EQUAL( 1234, sut.getLinearPosition() );
 }
 
-void testPerformanceGetClicks()
-{    
-#ifdef ARDUINO
-    RotationalPosition sut ( 40000000 );
-    HardwareClock hwClock;
-
-    unsigned long startTimeMicros = hwClock.getMicrosecondsSinceBoot();
-    for ( int i = 0; i < 100; i++ )
-    {
-        volatile long value = sut.getClicks();
-    }
-    unsigned long endTimeMicros = hwClock.getMicrosecondsSinceBoot();
-    TEST_ASSERT_LESS_THAN_INT32( 1000, endTimeMicros - startTimeMicros );
-
-#else
-    TEST_IGNORE_MESSAGE( "No performance measurements on Native" );
-#endif
-}
-
 void runAllTestRotationalPosition()
 {    
     UNITY_BEGIN_INT();
@@ -95,7 +76,6 @@ void runAllTestRotationalPosition()
     RUN_TEST( testShouldHandleWrapAround );
     RUN_TEST( testShouldHandleLargeWrapAround );
     RUN_TEST( testSupportsEquality );
-    RUN_TEST( testRotationalPositionEncoder );
-    RUN_TEST( testPerformanceGetClicks );
+    RUN_TEST( testRotationalPositionEncoder );    
     UNITY_END_INT();
 }

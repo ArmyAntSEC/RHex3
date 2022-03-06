@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SerialStream.h>
 
 struct HardwareClockInterface
 {
@@ -10,11 +11,13 @@ struct HardwareClockInterface
 
 #ifdef ARDUINO
 #include <Arduino.h>
+#include <HardwareInterrupts.h>
 
 class HardwareClock: public HardwareClockInterface
 {
 private:    
     unsigned long timeOffset = 0;
+    HardwareInterrupts hwInterrupts;
 
 public:    
     virtual void resetMicrosecondsSinceBoot()
@@ -24,7 +27,9 @@ public:
     
     virtual unsigned long getMicrosecondsSinceBoot()
     {
-        return micros() - timeOffset;
+        unsigned long rValue = micros() - timeOffset;        
+        //hwInterrupts.enableInterrupts(); //Workaround for something....        
+        return rValue;
     }    
 
     virtual void delayMicroseconds( unsigned long us )
