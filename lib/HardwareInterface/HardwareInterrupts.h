@@ -1,17 +1,23 @@
 #pragma once
 
+struct HardwareInterruptsInterface
+{
+    virtual void enableInterrupts() = 0;    
+    virtual void disableInterrupts() = 0;    
+};
+
 #ifdef ARDUINO
 
 #include <Arduino.h>
 
-class HardwareInterrupts
+class HardwareInterrupts: public HardwareInterruptsInterface
 {
 public:
-    void enableInterrupts()
+    virtual void enableInterrupts()
     {
         interrupts();
     }
-    void disableInterrupts()
+    virtual void disableInterrupts()
     {
         noInterrupts();
     }
@@ -19,16 +25,20 @@ public:
 
 #else
 
-class HardwareInterrupts
+class HardwareInterruptsMock: public HardwareInterruptsInterface
 {
 public:
+    int interruptsEnabledCount = 0;
+    int interruptsDisabledCount = 0;
+
     void enableInterrupts()
     {
-        //Test context, so no iterrupts.
+        interruptsEnabledCount++;
     }
+    
     void disableInterrupts()
     {
-        //Test context, so no interrupts
+        interruptsDisabledCount++;
     }
 };
 

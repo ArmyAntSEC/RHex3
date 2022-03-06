@@ -8,10 +8,10 @@ class LinearPositionEncoder: public BasicEncoderListener, LinearPositionProvider
 private:
     volatile long linearPosition = 0;
     volatile bool isHomed = false;
-    HardwareInterrupts* hwInterrupts;
+    HardwareInterruptsInterface* hwInterrupts;
 public:
 
-    LinearPositionEncoder( HardwareInterrupts* _interrupts ): hwInterrupts(_interrupts)
+    LinearPositionEncoder( HardwareInterruptsInterface* _interrupts ): hwInterrupts(_interrupts)
     {}
 
     virtual void signalStepForwardISR()

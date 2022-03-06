@@ -9,17 +9,17 @@ class SpeedComputer: public BasicEncoderListener, CanProvideSpeed
 private:
     volatile long timeSinceLastStepUS = 0;
     volatile long speedCPS = 0;
-    HardwareClockInterface* HWClock;
-    HardwareInterrupts* HWInterrupts;
+    HardwareClockInterface* hwClock;
+    HardwareInterruptsInterface* hwInterrupts;
 
 public:
-    SpeedComputer( HardwareClockInterface* _clock, HardwareInterrupts* _interrupts ): 
-        HWClock(_clock), HWInterrupts(_interrupts)
+    SpeedComputer( HardwareClockInterface* _clock, HardwareInterruptsInterface* _interrupts ): 
+        hwClock(_clock), hwInterrupts(_interrupts)
     {}
 
     virtual void signalStepForwardISR()
     {
-        long thisTimeUS = HWClock->getMicrosecondsSinceBoot();
+        long thisTimeUS = hwClock->getMicrosecondsSinceBoot();
         long timeDiff = thisTimeUS - timeSinceLastStepUS;
         speedCPS = 1e6 / timeDiff;
     }
@@ -27,9 +27,9 @@ public:
     virtual int getSpeedCPS()
     {
         
-        HWInterrupts->disableInterrupts();
+        hwInterrupts->disableInterrupts();
         int rValue = speedCPS;
-        HWInterrupts->enableInterrupts();
+        hwInterrupts->enableInterrupts();
         return rValue;
     }
 
