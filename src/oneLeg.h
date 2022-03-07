@@ -10,6 +10,16 @@
 #include <MotorSpeedCommander.h>
 #include <MotorDriver.h>
 
+struct MotorPinDefinition
+{
+    int EncoderOne;
+    int EncoderTwo;
+    int EncoderHoming;
+    int MotorOne;
+    int MotorTwo;
+    int MotorPWM;
+};
+
 template <int N>
 class OneLeg: public MotorSpeedCommanderInterface, public RunnableInterface
 {
@@ -22,17 +32,26 @@ private:
     SpeedRegulator speedRegulator;
     MotorSpeedCommander speedCommander;
     MotorDriver driver;
-
-
-    
 public:    
-    OneLeg( int encoderPin1, int encoderPin2, int homingPin )
+    OneLeg( const MotorPinDefinition& motorPinDefinition )
     {
-        encoder = BasicEncoderFactory::config<N>(encoderPin1, encoderPin2, homingPin, &hwPins);
+        encoder = BasicEncoderFactory::config<N>(
+            motorPinDefinition.EncoderOne, 
+            motorPinDefinition.EncoderTwo, 
+            motorPinDefinition.EncoderHoming, 
+            &hwPins
+        );
+
+        driver.config( 
+            motorPinDefinition.MotorOne, 
+            motorPinDefinition.MotorTwo,
+            motorPinDefinition.MotorPWM,
+            &hwPins
+        );
+        
         encoder->addListener( &linPos );
         encoder->addListener ( &speedComp );
         rotPos.config( &linPos );        
-
         speedRegulator.config( &speedComp, &driver, 1, 1, 0, 10 );
         speedCommander.config( &rotPos, &speedRegulator, 3000 );
     }

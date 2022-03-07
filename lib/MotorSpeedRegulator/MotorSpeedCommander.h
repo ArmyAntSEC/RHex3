@@ -2,6 +2,7 @@
 
 #include <MotorSpeedRegulatorInterfaces.h>
 #include <RunnableInterface.h>
+#include <SerialStream.h>
 
 class MotorSpeedCommander: public MotorSpeedCommanderInterface, RunnableInterface
 {
@@ -48,6 +49,8 @@ public:
 
     virtual void run(unsigned long int nowMicros)
     {
+        Log << "Running: " << nowMicros << endl;
+
         long int clicksLeft = positionGoal.getLinearPosition() - currentRotPos->getLinearPosition();
         if ( clicksLeft < 0 )
         {

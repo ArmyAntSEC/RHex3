@@ -1,18 +1,19 @@
 #pragma once
 
 #include <RunnableInterface.h>
+#include <SerialStream.h>
 
 template<int MaxTasks> class RecurringTaskGroup: public RunnableAtTimeInterface
 {
 private:
     RunnableInterface* taskList[MaxTasks];
     int numTasks = 0;
-    unsigned periodMicros;
-    unsigned nextRunTimeMicros = 0;
+    unsigned long periodMicros;
+    unsigned long nextRunTimeMicros = 0;
 
 public:
 
-    RecurringTaskGroup( unsigned _periodMicros = 1000 ): periodMicros(_periodMicros), nextRunTimeMicros(_periodMicros)
+    RecurringTaskGroup( unsigned long _periodMicros = 1000 ): periodMicros(_periodMicros), nextRunTimeMicros(_periodMicros)
     {
 
     }
@@ -35,7 +36,8 @@ public:
     virtual bool canRun( unsigned long nowMicros )
     {
         if ( nowMicros > nextRunTimeMicros ) {
-            nextRunTimeMicros += periodMicros;        
+            Log << "Can run: " << nowMicros << " / " << nextRunTimeMicros << " / " << periodMicros << endl;
+            nextRunTimeMicros += periodMicros;                    
             return true;
         } else {
             return false;

@@ -1,5 +1,6 @@
 #pragma once
 #include <RunnableInterface.h>
+#include <SerialStream.h>
 
 
 template<int MaxTasks> class TaskScheduler: public RunnableInterface
@@ -24,12 +25,14 @@ template<int MaxTasks> class TaskScheduler: public RunnableInterface
             return taskList[n];
         }
 
-        void run( unsigned long now )
-        {            
+        void run( unsigned long nowMicros )
+        {                        
             for ( int i = 0; i < numTasks; i++ ) 
             {                
-                if ( taskList[i]->canRun( now ) )
-                    taskList[i]->run( now );
+                if ( taskList[i]->canRun( nowMicros ) ) {
+                    taskList[i]->run( nowMicros );
+                    Log << "Running task: " << i << " at time: " << nowMicros << endl;
+                }
             }   
         }
 };

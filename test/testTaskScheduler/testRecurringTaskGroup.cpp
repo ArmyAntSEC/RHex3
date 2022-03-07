@@ -39,11 +39,11 @@ void testRunRecurringTasks()
 
 void testCanRunAndIncrementsNextTime()
 {
-    RecurringTaskGroup<3> group;
-    group.nextRunTimeMicros = 1000;
+    RecurringTaskGroup<3> group( 1000*1000L );
+    group.nextRunTimeMicros = 1000*1000L;
 
-    TEST_ASSERT_TRUE( group.canRun(1500) );
-    TEST_ASSERT_FALSE( group.canRun(1500) );
+    TEST_ASSERT_TRUE( group.canRun(1500*1000L) );
+    TEST_ASSERT_FALSE( group.canRun(1500*1000L) );
 }
 
 void runAllRecurringTaskGroupTests()
