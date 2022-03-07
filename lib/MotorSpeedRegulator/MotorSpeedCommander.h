@@ -58,7 +58,7 @@ public:
             long timeLeft = timeGoalMicros - nowMicros;
             long targetSpeed = computeTargetSpeedCPS( timeLeft, clicksLeft ); 
             speedRegulator->setSetPoint( targetSpeed );            
-        }
+        }        
     }
 
     bool hasArrived()

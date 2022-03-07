@@ -2,8 +2,9 @@
 
 #include <SpeedComputer.h>
 #include <MotorSpeedRegulatorInterfaces.h>
+#include <RunnableInterface.h>
 
-class SpeedRegulator: public SpeedRegulatorInterface
+class SpeedRegulator: public SpeedRegulatorInterface, public RunnableInterface
 {
 private:
     const int maxOutput = 255;
@@ -68,7 +69,7 @@ public:
         setPoint = _setPoint;
     }
 
-    void step()
+    void run( unsigned long ) 
     {
         if ( this->isOn ) {
             int input = speedSource->getSpeedCPS();

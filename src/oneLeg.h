@@ -11,7 +11,7 @@
 #include <MotorDriver.h>
 
 template <int N>
-class OneLeg
+class OneLeg: public MotorSpeedCommanderInterface, public RunnableInterface
 {
 private:
     HardwarePins hwPins;
@@ -37,4 +37,15 @@ public:
         speedCommander.config( &rotPos, &speedRegulator, 3000 );
     }
 
+    virtual void setGoal( RotationalPosition _pos, unsigned long _time )
+    {
+        speedCommander.setGoal( _pos, _time );
+    }
+
+    virtual void run( unsigned long _nowMicros )
+    {
+        speedCommander.run( _nowMicros );
+        speedRegulator.run( _nowMicros );
+    }
+    
 };

@@ -110,7 +110,7 @@ void testStop()
 void testStepWhenStopped()
 {
     regulator.stop();    
-    regulator.step();
+    regulator.run(0);
     TEST_ASSERT_EQUAL( 5, target.driveSignal ); //Should not change from starting value
 }
 
@@ -127,7 +127,7 @@ void testStepWithSimpleProportionalTerm()
     regulator.start();    
     regulator.integratorCumulativeValue = 0;
 
-    regulator.step();
+    regulator.run(0);
     TEST_ASSERT_EQUAL( 28, target.driveSignal );
 }
 
@@ -143,7 +143,7 @@ void testStepWithSimpleProportionalTermAndLargeDiff()
     regulator.start();    
     regulator.integratorCumulativeValue = 0;
 
-    regulator.step();
+    regulator.run(0);
     TEST_ASSERT_EQUAL( 255, target.driveSignal ); //Should not change from starting value
 }
 
@@ -159,7 +159,7 @@ void testStepWithSimpleDerivativeTerm()
     regulator.integratorCumulativeValue = 0;
     speedometer.speed = 5;
 
-    regulator.step();
+    regulator.run(0);
     TEST_ASSERT_EQUAL( 10, target.driveSignal ); 
 }
 
@@ -174,7 +174,7 @@ void testStepWithSimpleIntegralTerm()
     regulator.start();    
     TEST_ASSERT_EQUAL( 5, regulator.integratorCumulativeValue );
     
-    regulator.step();
+    regulator.run(0);
     TEST_ASSERT_EQUAL( 47, target.driveSignal ); 
 }
 
