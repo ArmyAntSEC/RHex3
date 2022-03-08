@@ -17,7 +17,7 @@ void setup()
   while (!Serial) {}    
   Log << "Hello World!" << endl;  
 
-  //recurringGroup.addTask( &leg );
+  recurringGroup.addTask( &leg );
   sched.addTask( &recurringGroup );  
 }
 

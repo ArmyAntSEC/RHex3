@@ -48,10 +48,9 @@ public:
     }
 
     virtual void run(unsigned long int nowMicros)
-    {
-        Log << "Running: " << nowMicros << endl;
-
-        long int clicksLeft = positionGoal.getLinearPosition() - currentRotPos->getLinearPosition();
+    {                        
+        long clicksLeft = positionGoal.getLinearPosition() - currentRotPos->getLinearPosition();
+        
         if ( clicksLeft < 0 )
         {
             arrived = true;
@@ -61,7 +60,7 @@ public:
             long timeLeft = timeGoalMicros - nowMicros;
             long targetSpeed = computeTargetSpeedCPS( timeLeft, clicksLeft ); 
             speedRegulator->setSetPoint( targetSpeed );            
-        }        
+        }                
     }
 
     bool hasArrived()

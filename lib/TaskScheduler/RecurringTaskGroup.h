@@ -35,8 +35,7 @@ public:
     
     virtual bool canRun( unsigned long nowMicros )
     {
-        if ( nowMicros > nextRunTimeMicros ) {
-            Log << "Can run: " << nowMicros << " / " << nextRunTimeMicros << " / " << periodMicros << endl;
+        if ( nowMicros > nextRunTimeMicros ) {            
             nextRunTimeMicros += periodMicros;                    
             return true;
         } else {

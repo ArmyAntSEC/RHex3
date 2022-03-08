@@ -1,6 +1,7 @@
 #pragma once
 
 #include <HardwarePins.h>
+#include <HardwareInterrupts.h>
 #include <BasicEncoder.h>
 #include <LinearPositionalEncoder.h>
 #include <RotationalPosition.h>
@@ -25,6 +26,7 @@ class OneLeg: public MotorSpeedCommanderInterface, public RunnableInterface
 {
 private:
     HardwarePins hwPins;
+    HardwareInterrupts hwInterrupts;
     BasicEncoder* encoder;
     LinearPositionEncoder linPos;
     SpeedComputer speedComp;
@@ -51,7 +53,10 @@ public:
         
         encoder->addListener( &linPos );
         encoder->addListener ( &speedComp );
+        
+        linPos.config( &hwInterrupts );
         rotPos.config( &linPos );        
+        
         speedRegulator.config( &speedComp, &driver, 1, 1, 0, 10 );
         speedCommander.config( &rotPos, &speedRegulator, 3000 );
     }

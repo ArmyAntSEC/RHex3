@@ -30,8 +30,7 @@ template<int MaxTasks> class TaskScheduler: public RunnableInterface
             for ( int i = 0; i < numTasks; i++ ) 
             {                
                 if ( taskList[i]->canRun( nowMicros ) ) {
-                    taskList[i]->run( nowMicros );
-                    Log << "Running task: " << i << " at time: " << nowMicros << endl;
+                    taskList[i]->run( nowMicros );                
                 }
             }   
         }
