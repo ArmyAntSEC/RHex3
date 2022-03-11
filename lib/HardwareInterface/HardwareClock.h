@@ -28,7 +28,6 @@ public:
     virtual unsigned long getMicrosecondsSinceBoot()
     {
         unsigned long rValue = micros() - timeOffset;        
-        //hwInterrupts.enableInterrupts(); //Workaround for something....        
         return rValue;
     }    
 

@@ -24,7 +24,7 @@ struct MotorPinDefinition
 template <int N>
 class OneLeg: public MotorSpeedCommanderInterface, public RunnableInterface
 {
-private:
+public:
     HardwarePins hwPins;
     HardwareInterrupts hwInterrupts;
     BasicEncoder* encoder;

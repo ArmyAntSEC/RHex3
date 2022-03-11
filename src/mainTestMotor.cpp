@@ -63,7 +63,7 @@ void setup()
     encoder = encoderFactory.config<0>( ENCODER_1, ENCODER_2, OPTO, &hwPins );
     encoder->addListener( &listener );
 
-    driver.setMotorPWM( 32 );
+    driver.setMotorPWM( 64 );
 
     delay(10000);
 
