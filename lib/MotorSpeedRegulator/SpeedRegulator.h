@@ -79,7 +79,7 @@ public:
             integratorCumulativeValue += integratorTerm * error;            
             int clampedOutput = clampOutput( proportionalOutput + derivateiveOutput + integratorCumulativeValue );
             target->setMotorPWM( clampedOutput ); 
-            Log << "Reg time: " << nowMicros << ": " << input << endl;
+            Log << "Reg time: " << nowMicros << ": " << input << ": " << error << endl;
         }
     }
 };

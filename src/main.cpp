@@ -1,17 +1,12 @@
 #ifdef ARDUINO
 #include <HardwareClock.h>
-#include <HardwareInterrupts.h>
-#include <HardwarePins.h>
 #include <SerialStream.h>
 #include <TaskScheduler.h>
 #include <TaskAwareDelay.h>
 #include <RecurringTaskGroup.h>
 #include <oneLeg.h>
 
-
 HardwareClock hwClock;
-HardwareInterrupts hwInterrupts;
-HardwarePins hwPins;
 
 TaskScheduler<1> sched;
 RecurringTaskGroup<1> recurringGroup( 10*1000L );
@@ -27,9 +22,10 @@ void setup()
   Log << "Hello World!" << endl;  
   
   leftLeg.config();
+  leftLeg.setSpeedSetpoint( 1000 );
   
   sched.addTask( &recurringGroup );
-  recurringGroup.addTask( &leftLeg.regulator );
+  recurringGroup.addTask( &leftLeg );
   
   Log << "Starting" << endl;
   awareDelay.delayMicros( 1000*1000L );
