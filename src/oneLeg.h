@@ -40,7 +40,7 @@ struct OneLeg : public RunnableInterface
         encoder->addListener(&speed);
 
         driver.config(pinList->motorEnable1, pinList->motorEnable2, pinList->motorPWM, &hwPins);
-        driver.setMotorPWM(128);
+        //driver.setMotorPWM(128);
 
         speed.config(&hwClock, &hwInterrupts);
 

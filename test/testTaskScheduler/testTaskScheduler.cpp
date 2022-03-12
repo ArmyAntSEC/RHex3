@@ -67,9 +67,20 @@ void testRunTasksBeforeTime()
     TEST_ASSERT_EQUAL( 0, task2.runCount );    
 }
 
-void testDelayWithScheduler()
+void testMeasureIdleTime()
 {
-    TaskScheduler<6> scheduler;    
+    TaskScheduler<6> scheduler;
+    RunnableAtTimeMock task;   
+    scheduler.addTask( &task );
+    task.lastRunTime = 1000;
+
+    //Increment idle count when not running a task.
+    scheduler.run( 500 );
+    TEST_ASSERT_EQUAL( 1, scheduler.getIdleCount() );
+
+    //Do not increment idle count when running task.
+    scheduler.run( 1500 );
+    TEST_ASSERT_EQUAL( 1, scheduler.getIdleCount() );
 }
 
 void runAllTaskSchedulerTests()
@@ -78,5 +89,6 @@ void runAllTaskSchedulerTests()
     RUN_TEST( testAddTask );
     RUN_TEST( testRunTasksAfterTime );
     RUN_TEST( testRunTasksBeforeTime );
+    RUN_TEST( testMeasureIdleTime );
     UNITY_END_INT();
 }

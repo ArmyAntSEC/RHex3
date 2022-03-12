@@ -1,3 +1,5 @@
+//TODO: MEASURE IDLE CPU TIME
+
 #ifdef ARDUINO
 #include <HardwareClock.h>
 #include <SerialStream.h>
@@ -52,8 +54,9 @@ void setup()
   
   Log << "Starting" << endl;
   awareDelay.delayMicros( 1000*1000L );
-  Log << "Done: " << leftLeg.linPos.getLinearPosition() << endl;  
-  Log << "Done: " << rightLeg.linPos.getLinearPosition() << endl;  
+  Log << "Left Leg: " << leftLeg.linPos.getLinearPosition() << endl;  
+  Log << "Right Leg: " << rightLeg.linPos.getLinearPosition() << endl;  
+  Log << "CPU Idle fraction: " << sched.getIdleCount()/(float)61028 << endl;  
 
   leftLeg.driver.setMotorPWM( 0 );
   rightLeg.driver.setMotorPWM( 0 );
