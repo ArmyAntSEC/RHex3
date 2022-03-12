@@ -9,11 +9,19 @@
 #define MOTOR1_EN1 3
 #define MOTOR1_EN2 4
 #define MOTOR1_PWM 5
-#define MOTOR1_ENCODER1 14
-#define MOTOR1_ENCODER2 15
+#define MOTOR1_ENCODER2 14
+#define MOTOR1_ENCODER1 15
 #define MOTOR1_OPTO 16
-
 LegPinList leftLegPins = { MOTOR1_EN1, MOTOR1_EN2, MOTOR1_PWM, MOTOR1_ENCODER1, MOTOR1_ENCODER2, MOTOR1_OPTO };
+
+#define MOTOR2_EN1 7
+#define MOTOR2_EN2 8
+#define MOTOR2_PWM 9
+#define MOTOR2_ENCODER2 10
+#define MOTOR2_ENCODER1 11
+#define MOTOR2_OPTO 12
+LegPinList rightLegPins = { MOTOR2_EN1, MOTOR2_EN2, MOTOR2_PWM, MOTOR2_ENCODER1, MOTOR2_ENCODER2, MOTOR2_OPTO };
+
 OneLeg leftLeg;
 
 HardwareClock hwClock;
@@ -31,8 +39,8 @@ void setup()
   while (!Serial) {}    
   Log << "Hello World!" << endl;  
   
-  leftLeg.config(&leftLegPins);
-  leftLeg.setSpeedSetpoint( 1000 );
+  leftLeg.config(&rightLegPins);
+  leftLeg.setSpeedSetpoint( 3000 );
   
   sched.addTask( &recurringGroup );
   recurringGroup.addTask( &leftLeg );
