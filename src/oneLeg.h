@@ -31,10 +31,11 @@ struct OneLeg : public RunnableInterface
     SpeedComputer speed;
     SpeedRegulator regulator;
 
+    template <int EncoderChannel>
     void config( LegPinList* pinList )
     {
         linPos.config(&hwInterrupts);
-        encoder = factory.config<0>(pinList->encoder1, pinList->encoder2, pinList->homing, &hwPins);
+        encoder = factory.config<EncoderChannel>(pinList->encoder1, pinList->encoder2, pinList->homing, &hwPins);
         encoder->addListener(&linPos);
         encoder->addListener(&speed);
 
