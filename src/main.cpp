@@ -6,6 +6,16 @@
 #include <RecurringTaskGroup.h>
 #include <oneLeg.h>
 
+#define MOTOR1_EN1 3
+#define MOTOR1_EN2 4
+#define MOTOR1_PWM 5
+#define MOTOR1_ENCODER1 14
+#define MOTOR1_ENCODER2 15
+#define MOTOR1_OPTO 16
+
+LegPinList leftLegPins = { MOTOR1_EN1, MOTOR1_EN2, MOTOR1_PWM, MOTOR1_ENCODER1, MOTOR1_ENCODER2, MOTOR1_OPTO };
+OneLeg leftLeg;
+
 HardwareClock hwClock;
 
 TaskScheduler<1> sched;
@@ -13,7 +23,7 @@ RecurringTaskGroup<1> recurringGroup( 10*1000L );
 
 TaskAwareDelay awareDelay(&hwClock, &sched);
 
-OneLeg leftLeg;
+
 
 void setup()
 {
@@ -21,7 +31,7 @@ void setup()
   while (!Serial) {}    
   Log << "Hello World!" << endl;  
   
-  leftLeg.config();
+  leftLeg.config(&leftLegPins);
   leftLeg.setSpeedSetpoint( 1000 );
   
   sched.addTask( &recurringGroup );
