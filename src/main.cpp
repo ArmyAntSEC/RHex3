@@ -1,5 +1,3 @@
-//TODO: MEASURE IDLE CPU TIME
-
 #ifdef ARDUINO
 #include <HardwareClock.h>
 #include <SerialStream.h>

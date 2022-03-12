@@ -3,17 +3,24 @@
 #include <SerialStream.h>
 #include <IdleCounter.h>
 
-template<int MaxTasks> class TaskScheduler: public RunnableInterface
+class TaskScheduler: public RunnableInterface
 {
     private:
+        static const int MaxTasks = 6;
         RunnableAtTimeInterface* taskList[MaxTasks];
         int numTasks = 0;
-        IdleCounter idleCounter;
-
+        IdleCounter* idleCounter = 0;
+        
     public:
+        
         void addTask( RunnableAtTimeInterface* task )
         {            
             taskList[numTasks++] = task;
+        }
+
+        void setIdleCounter( IdleCounter* _idleCounter )
+        {
+            idleCounter = _idleCounter;
         }
 
         int getNumberOfTasks( )
@@ -32,14 +39,9 @@ template<int MaxTasks> class TaskScheduler: public RunnableInterface
             {                
                 if ( taskList[i]->canRun( nowMicros ) ) {
                     taskList[i]->run( nowMicros );                
-                    idleCounter.SignalOneTaskWasRun();
+                    idleCounter->SignalOneTaskWasRun();
                 }
             }
-            idleCounter.SignelOneCycleRunAndResetTaskRunStatus();                           
-        }
-
-        unsigned long getIdleCount()
-        {
-            return idleCounter.getIdleCounter();   
-        }
+            idleCounter->SignalOneCycleRunAndResetTaskRunStatus();                           
+        }        
 };

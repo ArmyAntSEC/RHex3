@@ -2,6 +2,7 @@
 
 #define private public
 #include <TaskScheduler.h>
+#include <IdleCounter.h>
 
 struct RunnableAtTimeMock: public RunnableAtTimeInterface
 {
@@ -24,7 +25,7 @@ struct RunnableAtTimeMock: public RunnableAtTimeInterface
 
 void testAddTask()
 {
-    TaskScheduler<6> scheduler;
+    TaskScheduler scheduler;
     RunnableAtTimeInterface* task;
     RunnableAtTimeInterface* task2;
     
@@ -38,7 +39,9 @@ void testAddTask()
 
 void testRunTasksAfterTime()
 {
-    TaskScheduler<6> scheduler;
+    TaskScheduler scheduler;
+    IdleCounter idleCounter;
+    scheduler.setIdleCounter( &idleCounter );
     RunnableAtTimeMock task;   
     RunnableAtTimeMock task2;    
     scheduler.addTask( &task );
@@ -54,7 +57,9 @@ void testRunTasksAfterTime()
 
 void testRunTasksBeforeTime()
 {
-    TaskScheduler<6> scheduler;
+    TaskScheduler scheduler;
+    IdleCounter idleCounter;
+    scheduler.setIdleCounter( &idleCounter );
     RunnableAtTimeMock task;   
     RunnableAtTimeMock task2;  
     task2.nextRun = 2000;  
@@ -69,18 +74,20 @@ void testRunTasksBeforeTime()
 
 void testMeasureIdleTime()
 {
-    TaskScheduler<6> scheduler;
+    TaskScheduler scheduler;
+    IdleCounter idleCounter;
+    scheduler.setIdleCounter( &idleCounter );
     RunnableAtTimeMock task;   
     scheduler.addTask( &task );
     task.lastRunTime = 1000;
 
     //Increment idle count when not running a task.
     scheduler.run( 500 );
-    TEST_ASSERT_EQUAL( 1, scheduler.getIdleCount() );
+    TEST_ASSERT_EQUAL( 1, idleCounter.getIdleCounter() );
 
     //Do not increment idle count when running task.
     scheduler.run( 1500 );
-    TEST_ASSERT_EQUAL( 1, scheduler.getIdleCount() );
+    TEST_ASSERT_EQUAL( 1, idleCounter.getIdleCounter() );
 }
 
 void runAllTaskSchedulerTests()

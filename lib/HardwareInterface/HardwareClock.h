@@ -42,13 +42,11 @@ public:
 
 #endif
 
-class HardwareClockMock: public HardwareClockInterface
+struct HardwareClockMock: public HardwareClockInterface
 {
-private:
     unsigned long microsSinceStart = 0;   
     unsigned long microsToStepOnRead = 0; 
 
-public:    
     virtual void resetMicrosecondsSinceBoot()
     {
         microsSinceStart = 0;
