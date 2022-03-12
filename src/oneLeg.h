@@ -1,75 +1,47 @@
-#pragma once
-
-#include <HardwarePins.h>
+#include <HardwareClock.h>
 #include <HardwareInterrupts.h>
-#include <BasicEncoder.h>
+#include <HardwarePins.h>
+
 #include <LinearPositionalEncoder.h>
-#include <RotationalPosition.h>
+#include <BasicEncoder.h>
 #include <SpeedComputer.h>
 #include <MotorDriver.h>
 #include <SpeedRegulator.h>
-#include <MotorSpeedCommander.h>
-#include <MotorDriver.h>
 
-struct MotorPinDefinition
+#define MOTOR1_EN1 3
+#define MOTOR1_EN2 4
+#define MOTOR1_PWM 5
+#define MOTOR1_OPTO      16
+#define MOTOR1_ENCODER2 15
+#define MOTOR1_ENCODER1 14
+
+struct OneLeg
 {
-    int EncoderOne;
-    int EncoderTwo;
-    int EncoderHoming;
-    int MotorOne;
-    int MotorTwo;
-    int MotorPWM;
-};
+  HardwareInterrupts hwInterrupts;
+  HardwarePins hwPins;
+  HardwareClock hwClock;
+  LinearPositionEncoder linPos;
+  BasicEncoderFactory factory;
+  BasicEncoder* encoder;
+  MotorDriver driver;
+  SpeedComputer speed;
+  SpeedRegulator regulator;
 
-template <int N>
-class OneLeg: public MotorSpeedCommanderInterface, public RunnableInterface
-{
-public:
-    HardwarePins hwPins;
-    HardwareInterrupts hwInterrupts;
-    BasicEncoder* encoder;
-    LinearPositionEncoder linPos;
-    SpeedComputer speedComp;
-    RotationalPositionEncoder rotPos;
-    SpeedRegulator speedRegulator;
-    MotorSpeedCommander speedCommander;
-    MotorDriver driver;
-public:    
-    OneLeg( const MotorPinDefinition& motorPinDefinition )
-    {
-        encoder = BasicEncoderFactory::config<N>(
-            motorPinDefinition.EncoderOne, 
-            motorPinDefinition.EncoderTwo, 
-            motorPinDefinition.EncoderHoming, 
-            &hwPins
-        );
+  void config()
+  {  
+    linPos.config(&hwInterrupts);
+    encoder = factory.config<0>(MOTOR1_ENCODER1, MOTOR1_ENCODER2, MOTOR1_OPTO, &hwPins );
+    encoder->addListener( &linPos );
+    encoder->addListener( &speed );
 
-        driver.config( 
-            motorPinDefinition.MotorOne, 
-            motorPinDefinition.MotorTwo,
-            motorPinDefinition.MotorPWM,
-            &hwPins
-        );
-        
-        encoder->addListener( &linPos );
-        encoder->addListener ( &speedComp );
-        
-        linPos.config( &hwInterrupts );
-        rotPos.config( &linPos );        
-        
-        speedRegulator.config( &speedComp, &driver, 1, 1, 0, 10 );
-        speedCommander.config( &rotPos, &speedRegulator, 3000 );
-    }
+    driver.config( MOTOR1_EN1, MOTOR1_EN2, MOTOR1_PWM, &hwPins );
+    driver.setMotorPWM( 128 );
 
-    virtual void setGoal( RotationalPosition _pos, unsigned long _time )
-    {
-        speedCommander.setGoal( _pos, _time );
-    }
+    speed.config( &hwClock, &hwInterrupts );
 
-    virtual void run( unsigned long _nowMicros )
-    {
-        speedCommander.run( _nowMicros );
-        speedRegulator.run( _nowMicros );
-    }
+    regulator.config ( &speed, &driver, 1, 0, 0, 10 );
     
+    regulator.setSetPoint( 1000 );
+    regulator.start();
+  }
 };
