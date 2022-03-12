@@ -37,13 +37,27 @@ void testRunRecurringTasks()
     TEST_ASSERT_EQUAL( 1, task2.runCount );
 }
 
-void testCanRunAndIncrementsNextTime()
+void testCanRun()
 {
     RecurringTaskGroup<3> group( 1000*1000L );
     group.nextRunTimeMicros = 1000*1000L;
-
     TEST_ASSERT_TRUE( group.canRun(1500*1000L) );
+    TEST_ASSERT_EQUAL( 1000*1000L, group.nextRunTimeMicros ); //CanRun should not change nextRunTime.
+
+    group.nextRunTimeMicros = 2000*1000L;
     TEST_ASSERT_FALSE( group.canRun(1500*1000L) );
+}
+
+void testRunAndIncrementsNextTime()
+{
+    RecurringTaskGroup<3> group( 1000*1000L );
+    group.nextRunTimeMicros = 1000*1000L;
+    
+    unsigned long thisTime = 1500*1000L;
+
+    TEST_ASSERT_TRUE( group.canRun(thisTime) );
+    group.run(thisTime);    
+    TEST_ASSERT_FALSE( group.canRun(thisTime) );
 }
 
 void runAllRecurringTaskGroupTests()
@@ -51,6 +65,7 @@ void runAllRecurringTaskGroupTests()
     UNITY_BEGIN_INT();
     RUN_TEST( testAddRecurringTaskToGroup );
     RUN_TEST( testRunRecurringTasks );
-    RUN_TEST( testCanRunAndIncrementsNextTime );
+    RUN_TEST( testCanRun );
+    RUN_TEST( testRunAndIncrementsNextTime );
     UNITY_END_INT();
 }

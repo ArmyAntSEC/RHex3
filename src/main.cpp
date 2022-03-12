@@ -1,5 +1,7 @@
 #ifdef ARDUINO
 #include <HardwareClock.h>
+#include <HardwareInterrupts.h>
+#include <HardwarePins.h>
 #include <SerialStream.h>
 #include <TaskScheduler.h>
 #include <TaskAwareDelay.h>
@@ -17,46 +19,49 @@ MotorPinDefinition leftMotor = {
   MOTOR1_EN1, MOTOR1_EN2, MOTOR1_PWM 
 };
 
-#define MOTOR2_EN1 6 /* Should be Pin 7, but not sure why this pin does not work. Is Pin 7 perhaps short-circuited?*/
-#define MOTOR2_EN2 8
-#define MOTOR2_PWM 9
-#define MOTOR2_OPTO     10
-#define MOTOR2_ENCODER2 11
-#define MOTOR2_ENCODER1 12
-MotorPinDefinition rightMotor = { 
-  MOTOR2_ENCODER1, MOTOR2_ENCODER2, MOTOR2_OPTO,
-  MOTOR2_EN1, MOTOR2_EN2, MOTOR2_PWM 
-};
-
 HardwareClock hwClock;
-
-OneLeg<0> leftLeg(leftMotor);
-OneLeg<1> rightLeg(rightMotor);
+HardwareInterrupts hwInterrupts;
+HardwarePins hwPins;
 
 TaskScheduler<1> sched;
-RecurringTaskGroup<2> recurringGroup( 10*1000L );
+RecurringTaskGroup<1> recurringGroup( 10*1000L );
 
 TaskAwareDelay awareDelay(&hwClock, &sched);
+
+LinearPositionEncoder linPos;
+BasicEncoderFactory factory;
+BasicEncoder* encoder;
+MotorDriver driver;
+SpeedComputer speed;
+SpeedRegulator regulator;
 
 void setup()
 {
   Serial.begin(115200);
   while (!Serial) {}    
   Log << "Hello World!" << endl;  
+  
+  sched.addTask( &recurringGroup );
+  linPos.config(&hwInterrupts);
+  encoder = factory.config<0>(MOTOR1_ENCODER1, MOTOR1_ENCODER2, MOTOR1_OPTO, &hwPins );
+  encoder->addListener( &linPos );
+  encoder->addListener( &speed );
 
-  recurringGroup.addTask( &leftLeg );  
-  recurringGroup.addTask( &rightLeg );  
-  
-  sched.addTask( &recurringGroup );    
-  
-  leftLeg.speedRegulator.setSetPoint(128); //Why does this not work?
-  leftLeg.speedRegulator.start(); //This causes a crash.....
-  rightLeg.driver.setMotorPWM(255);
-  Log << "Start delay" << endl;
-  awareDelay.delayMicros ( 1000*1000L );  
-  Log << "End delay" << endl;
-  leftLeg.driver.setMotorPWM(0);
-  rightLeg.driver.setMotorPWM(0);
+  driver.config( MOTOR1_EN1, MOTOR1_EN2, MOTOR1_PWM, &hwPins );
+  driver.setMotorPWM( 128 );
+
+  speed.config( &hwClock, &hwInterrupts );
+
+  regulator.config ( &speed, &driver, 1, 0, 0, 10 );
+  recurringGroup.addTask( &regulator );
+  regulator.setSetPoint( 1000 );
+  regulator.start();
+
+  Log << "Starting" << endl;
+  awareDelay.delayMicros( 1000*1000L );
+  Log << "Done: " << linPos.getLinearPosition() << endl;
+
+  driver.setMotorPWM( 0 );
 }
 
 

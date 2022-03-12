@@ -3,6 +3,7 @@
 #include "HomingEncoderInterfaces.h"
 #include "HardwareClock.h"
 #include "HardwareInterrupts.h"
+#include <SerialStream.h>
 
 class SpeedComputer: public CanProvideSpeed, public BasicEncoderListener 
 {
@@ -34,15 +35,15 @@ public:
         
     }
     
-    virtual int getSpeedCPS()
+    virtual int getSpeedCPS ( )
     {
         
         hwInterrupts->disableInterrupts();
         long lastTime = timeAtLastUpdateMicros;
         long thisTime = timeAtThisUpdateMicros;
-        hwInterrupts->enableInterrupts();
-                
+        hwInterrupts->enableInterrupts();        
         long timeDiff = thisTime - lastTime;
+
 
         if ( timeDiff == 0 )                  
             return 0;

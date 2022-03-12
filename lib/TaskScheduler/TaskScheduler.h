@@ -26,7 +26,7 @@ template<int MaxTasks> class TaskScheduler: public RunnableInterface
         }
 
         void run( unsigned long nowMicros )
-        {                        
+        {                   
             for ( int i = 0; i < numTasks; i++ ) 
             {                
                 if ( taskList[i]->canRun( nowMicros ) ) {

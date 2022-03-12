@@ -69,9 +69,9 @@ public:
         setPoint = _setPoint;
     }
 
-    void run( unsigned long ) 
-    {
-        if ( this->isOn ) {
+    void run( unsigned long nowMicros ) 
+    {     
+        if ( this->isOn ) {            
             int input = speedSource->getSpeedCPS();
             int error = (setPoint - input);
             float proportionalOutput = proportionalTerm * error;
@@ -79,6 +79,7 @@ public:
             integratorCumulativeValue += integratorTerm * error;            
             int clampedOutput = clampOutput( proportionalOutput + derivateiveOutput + integratorCumulativeValue );
             target->setMotorPWM( clampedOutput ); 
+            Log << "Reg time: " << nowMicros << ": " << input << endl;
         }
     }
 };

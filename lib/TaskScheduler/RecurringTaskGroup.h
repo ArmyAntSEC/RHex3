@@ -34,9 +34,8 @@ public:
     }
     
     virtual bool canRun( unsigned long nowMicros )
-    {
-        if ( nowMicros > nextRunTimeMicros ) {            
-            nextRunTimeMicros += periodMicros;                    
+    {        
+        if ( nowMicros > nextRunTimeMicros ) {                        
             return true;
         } else {
             return false;
@@ -44,7 +43,7 @@ public:
     }
 
     virtual void run( unsigned long nowMicros )
-    {                
+    {                                
         nextRunTimeMicros += periodMicros;
         for ( int i = 0; i < numTasks; i++ )
         {
