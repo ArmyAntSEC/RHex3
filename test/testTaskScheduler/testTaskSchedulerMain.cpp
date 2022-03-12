@@ -4,6 +4,7 @@
 void runAllRecurringTaskGroupTests();
 void runAllTaskSchedulerTests();
 void runAllTestsTaskAwareDelay();
+void runAllTestsMeasureIdleTime();
 
 void process()
 {
@@ -11,6 +12,7 @@ void process()
     runAllRecurringTaskGroupTests();
     runAllTaskSchedulerTests();
     runAllTestsTaskAwareDelay();
+    runAllTestsMeasureIdleTime();
     UNITY_END_EXT();
 }
 

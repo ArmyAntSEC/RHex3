@@ -1,14 +1,14 @@
 #pragma once
 #include <RunnableInterface.h>
 #include <SerialStream.h>
-
+#include <IdleCounter.h>
 
 template<int MaxTasks> class TaskScheduler: public RunnableInterface
 {
     private:
         RunnableAtTimeInterface* taskList[MaxTasks];
         int numTasks = 0;
-        unsigned long idleCount = 0;
+        IdleCounter idleCounter;
 
     public:
         void addTask( RunnableAtTimeInterface* task )
@@ -27,25 +27,19 @@ template<int MaxTasks> class TaskScheduler: public RunnableInterface
         }
 
         void run( unsigned long nowMicros )
-        {                   
-            bool didAnyTaskRun = false;
-
+        {                               
             for ( int i = 0; i < numTasks; i++ ) 
             {                
                 if ( taskList[i]->canRun( nowMicros ) ) {
                     taskList[i]->run( nowMicros );                
-                    didAnyTaskRun = true;
+                    idleCounter.SignalOneTaskWasRun();
                 }
             }
-               
-            if ( !didAnyTaskRun )
-            {
-                idleCount++;
-            }
+            idleCounter.SignelOneCycleRunAndResetTaskRunStatus();                           
         }
 
         unsigned long getIdleCount()
         {
-            return idleCount;   
+            return idleCounter.getIdleCounter();   
         }
 };

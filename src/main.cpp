@@ -27,15 +27,12 @@ LegPinList rightLegPins = { MOTOR2_EN1, MOTOR2_EN2, MOTOR2_PWM, MOTOR2_ENCODER1,
 OneLeg leftLeg;
 OneLeg rightLeg;
 
-
 HardwareClock hwClock;
 
 TaskScheduler<1> sched;
 RecurringTaskGroup<2> recurringGroup( 10*1000L );
 
 TaskAwareDelay awareDelay(&hwClock, &sched);
-
-
 
 void setup()
 {
