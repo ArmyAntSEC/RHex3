@@ -10,12 +10,13 @@ class SpeedComputer: public CanProvideSpeed, public BasicEncoderListener
 private:
     volatile long timeAtLastUpdateMicros = 0;
     volatile long timeAtThisUpdateMicros = 0;
-    volatile int clicksSinceLastUpdate = 0;
+    volatile int clicksSinceLastUpdate = 0;    
 
     HardwareClockInterface* hwClock;
     HardwareInterruptsInterface* hwInterrupts;
 
 public:
+    
     void config( HardwareClockInterface* _clock, HardwareInterruptsInterface* _interrupts )        
     {
         hwClock = _clock;
@@ -24,7 +25,7 @@ public:
 
     virtual void signalStepForwardISR()
     {
-        //We measure the speed every 10th click. Gives some filtering and also saves compute time.
+        //We measure the speed every 10th click. Gives some filtering and also saves compute time.        
         if ( clicksSinceLastUpdate < 9 ) { //9 of these and one measurement becomes 10.
             clicksSinceLastUpdate++;
         } else {

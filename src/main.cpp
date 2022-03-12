@@ -29,7 +29,7 @@ void setup()
   
   Log << "Starting" << endl;
   awareDelay.delayMicros( 1000*1000L );
-  Log << "Done: " << leftLeg.linPos.getLinearPosition() << endl;
+  Log << "Done: " << leftLeg.linPos.getLinearPosition() << endl;  
 
   leftLeg.driver.setMotorPWM( 0 );
 }

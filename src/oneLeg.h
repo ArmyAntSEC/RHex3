@@ -40,9 +40,11 @@ struct OneLeg : public RunnableInterface
 
         speed.config(&hwClock, &hwInterrupts);
 
-        regulator.config(&speed, &driver, 1, 0, 0, 10);
+        regulator.config(&speed, &driver, 0.1, 0.015, 0, 10);
         
         regulator.start();
+
+        linPos.forceHomed();
     }
 
     void setSpeedSetpoint( int speed )

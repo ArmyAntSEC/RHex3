@@ -37,5 +37,10 @@ public:
         return rValue;
     }
 
+    void forceHomed()
+    {
+        isHomed = true;
+    }
+
 };
 

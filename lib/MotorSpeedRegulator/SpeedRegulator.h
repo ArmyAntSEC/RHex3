@@ -39,7 +39,7 @@ private:
 public:
     void config( CanProvideSpeed* _speedSource, 
         MotorDriverInterface* _target, 
-        int _P, int _I, int _D, int _filterLength )
+        float _P, float _I, float _D, int _filterLength )
     {
         proportionalTerm = _P;
         integratorTerm = _I;
@@ -79,7 +79,7 @@ public:
             integratorCumulativeValue += integratorTerm * error;            
             int clampedOutput = clampOutput( proportionalOutput + derivateiveOutput + integratorCumulativeValue );
             target->setMotorPWM( clampedOutput ); 
-            Log << "Reg time: " << nowMicros << ": " << input << ": " << error << endl;
+            Log << "Reg time: " << nowMicros << ": " << input << ": " << error << ": " << clampedOutput << endl;
         }
     }
 };
