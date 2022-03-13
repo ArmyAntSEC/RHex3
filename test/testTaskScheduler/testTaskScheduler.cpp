@@ -25,7 +25,9 @@ struct RunnableAtTimeMock: public RunnableAtTimeInterface
 
 void testAddTask()
 {
-    TaskScheduler scheduler;
+    HardwareClockMock hwClock;
+    TaskScheduler scheduler(&hwClock);
+
     RunnableAtTimeInterface* task;
     RunnableAtTimeInterface* task2;
     
@@ -39,8 +41,8 @@ void testAddTask()
 
 void testRunTasksAfterTime()
 {
-    TaskScheduler scheduler;
-    IdleCounter idleCounter;    
+    HardwareClockMock hwClock;
+    TaskScheduler scheduler(&hwClock);    
     RunnableAtTimeMock task;   
     RunnableAtTimeMock task2;    
     scheduler.addTask( &task );
@@ -56,8 +58,8 @@ void testRunTasksAfterTime()
 
 void testRunTasksBeforeTime()
 {
-    TaskScheduler scheduler;
-    IdleCounter idleCounter;    
+    HardwareClockMock hwClock;
+    TaskScheduler scheduler(&hwClock);
     RunnableAtTimeMock task;   
     RunnableAtTimeMock task2;  
     task2.nextRun = 2000;  
@@ -72,7 +74,8 @@ void testRunTasksBeforeTime()
 
 void testMeasureIdleTime()
 {
-    TaskScheduler scheduler;
+    HardwareClockMock hwClock;
+    TaskScheduler scheduler(&hwClock);
     IdleCounter* idleCounter = scheduler.getIdleCounterObject();    
     RunnableAtTimeMock task;   
     scheduler.addTask( &task );

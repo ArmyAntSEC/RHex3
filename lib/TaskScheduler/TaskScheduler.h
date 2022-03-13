@@ -2,6 +2,7 @@
 #include <RunnableInterface.h>
 #include <SerialStream.h>
 #include <IdleCounter.h>
+#include <HardwareClock.h>
 
 class TaskScheduler: public RunnableInterface
 {
@@ -10,9 +11,12 @@ class TaskScheduler: public RunnableInterface
         RunnableAtTimeInterface* taskList[MaxTasks];
         int numTasks = 0;
         IdleCounter idleCounter;
+        HardwareClockInterface* hwClock;
         
     public:
-        
+        TaskScheduler( HardwareClockInterface* _hwClock ): hwClock(_hwClock), idleCounter( this, _hwClock )
+        { }
+
         void addTask( RunnableAtTimeInterface* task )
         {            
             taskList[numTasks++] = task;

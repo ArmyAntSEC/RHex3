@@ -27,7 +27,7 @@ OneLeg rightLeg;
 
 HardwareClock hwClock;
 
-TaskScheduler<1> sched;
+TaskScheduler sched( &hwClock );
 RecurringTaskGroup<2> recurringGroup( 10*1000L );
 
 TaskAwareDelay awareDelay(&hwClock, &sched);
@@ -37,6 +37,9 @@ void setup()
   Serial.begin(115200);
   while (!Serial) {}    
   Log << "Hello World!" << endl;  
+
+  IdleCounter* idleCounter = sched.getIdleCounterObject();  
+  idleCounter->Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond();
   
   leftLeg.config<0>(&leftLegPins);
   leftLeg.setSpeedSetpoint( 3000 );
@@ -51,7 +54,7 @@ void setup()
   awareDelay.delayMicros( 1000*1000L );
   Log << "Left Leg: " << leftLeg.linPos.getLinearPosition() << endl;  
   Log << "Right Leg: " << rightLeg.linPos.getLinearPosition() << endl;  
-  Log << "CPU Idle fraction: " << sched.getIdleCount()/(float)61028 << endl;  
+  Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << endl;  
 
   leftLeg.driver.setMotorPWM( 0 );
   rightLeg.driver.setMotorPWM( 0 );

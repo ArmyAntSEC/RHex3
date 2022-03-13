@@ -11,13 +11,24 @@ private:
     RunnableInterface* taskScheduler;
     HardwareClockInterface* hwClock;    
     unsigned long lastMeasurementTimeMicros = 0;
+    unsigned long maxIdleCountsPerSecond = 1e6; //large number
 
 public:
+
+    IdleCounter( RunnableInterface* _scheduler, HardwareClockInterface* _hwClock ): 
+        taskScheduler(_scheduler), hwClock(_hwClock)
+    {}
+    
     unsigned long getIdleCounter()
     {
         return idleCounter;
     }
 
+    int getCPUFactorPercent()
+    {
+        return idleCounter * 100 / maxIdleCountsPerSecond;
+    }
+    
     unsigned long getIdleCountsPerSecondAndResetCounter()
     {
         unsigned long thisTime = hwClock->getMicrosecondsSinceBoot();
@@ -47,13 +58,13 @@ public:
         hwClock = _hwClock;
     }
 
-    unsigned long Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond()
+    void Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond()
     {            
         getIdleCountsPerSecondAndResetCounter();
         for ( int i = 0; i < 1000; i++ ) {            
             unsigned long thisTime = hwClock->getMicrosecondsSinceBoot();
             taskScheduler->run(thisTime);            
         }
-        return getIdleCountsPerSecondAndResetCounter();
+        maxIdleCountsPerSecond = getIdleCountsPerSecondAndResetCounter();
     }
 };
