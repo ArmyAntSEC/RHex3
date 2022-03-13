@@ -9,13 +9,23 @@ private:
     unsigned long idleCounter = 0;
     bool taskWasRun = false;
     RunnableInterface* taskScheduler;
-    HardwareClockInterface* hwClock;
-    unsigned long maxIdleCountsPerSecond = 0;
+    HardwareClockInterface* hwClock;    
+    unsigned long lastMeasurementTimeMicros = 0;
 
 public:
     unsigned long getIdleCounter()
     {
         return idleCounter;
+    }
+
+    unsigned long getIdleCountsPerSecondAndResetCounter()
+    {
+        unsigned long thisTime = hwClock->getMicrosecondsSinceBoot();
+        unsigned long timeDelta = thisTime - lastMeasurementTimeMicros;
+        lastMeasurementTimeMicros = thisTime;
+        unsigned long thisIdleCounter = idleCounter;
+        idleCounter = 0;
+        return thisIdleCounter * 1e6 / timeDelta;
     }
 
     void SignalOneCycleRunAndResetTaskRunStatus()
@@ -37,19 +47,13 @@ public:
         hwClock = _hwClock;
     }
 
-    void Run1000IdleTaskToCalibrate()
+    unsigned long Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond()
     {            
-        unsigned long startTime = hwClock->getMicrosecondsSinceBoot();
+        getIdleCountsPerSecondAndResetCounter();
         for ( int i = 0; i < 1000; i++ ) {            
             unsigned long thisTime = hwClock->getMicrosecondsSinceBoot();
             taskScheduler->run(thisTime);            
         }
-        unsigned long endTime = hwClock->getMicrosecondsSinceBoot();        
-        maxIdleCountsPerSecond = idleCounter * 1e6 / (endTime - startTime);        
-    }
-
-    unsigned long getMaxIdleCountsPerSecond()
-    {
-        return maxIdleCountsPerSecond;
+        return getIdleCountsPerSecondAndResetCounter();
     }
 };

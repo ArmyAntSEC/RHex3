@@ -37,28 +37,27 @@ void testShallBeAbleToCalibrateWithTaskScheduler()
     hwClock.microsToStepOnRead = 2000;
 
     IdleCounter* sut = sched.getIdleCounterObject();    
-    sut->setTaskSchedulerAndClock( &sched, &hwClock );
+    sut->setTaskSchedulerAndClock( &sched, &hwClock );    
 
-    sut->Run1000IdleTaskToCalibrate();
-
+    TEST_ASSERT_EQUAL( 499, sut->Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond() ); //Timer is off-by-1, but in a hard-to-fix way.
     TEST_ASSERT_EQUAL( 2000*1002, hwClock.getMicrosecondsSinceBoot() );
-    TEST_ASSERT_EQUAL( 499, sut->getMaxIdleCountsPerSecond() ); //Timer is off-by-1, but in a hard-to-fix way.
 }
 
 void testShallBeAbleToResetCounterAndComputeTasksPerSecond()
 {
     TaskScheduler sched;    
-    HardwareClockMock hwClock;
-    hwClock.microsToStepOnRead = 2000;
+    HardwareClockMock hwClock;    
 
     IdleCounter* sut = sched.getIdleCounterObject();    
     sut->setTaskSchedulerAndClock( &sched, &hwClock );
+        
+    sut->SignalOneCycleRunAndResetTaskRunStatus();    
     
-    sut->SignalOneCycleRunAndResetTaskRunStatus();
+    hwClock.microsSinceStart = 100;
 
-    TEST_ASSERT_EQUAL( 1, sut->getIdleCounter() );
-    
-    TEST_FAIL_MESSAGE("Implementme");
+    TEST_ASSERT_EQUAL( 10000, sut->getIdleCountsPerSecondAndResetCounter() );
+
+    TEST_ASSERT_EQUAL( 0, sut->getIdleCounter() );    
 }
 
 void runAllTestsMeasureIdleTime()
