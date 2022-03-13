@@ -1,5 +1,3 @@
-//TODO: Add and test the MotorCommander
-
 #ifdef ARDUINO
 #include <HardwareClock.h>
 #include <SerialStream.h>

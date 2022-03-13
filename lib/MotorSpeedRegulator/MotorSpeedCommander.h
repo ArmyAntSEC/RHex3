@@ -25,10 +25,12 @@ private:
     }
 
 public:
-    void config( RotationalPositionProvider* _rotPos, SpeedRegulatorInterface* _speedRegulator, int _maxSpeedCPS )
-    {
-        currentRotPos = _rotPos;
-        speedRegulator = _speedRegulator;
+    MotorSpeedCommander(RotationalPositionProvider* _rotPos, SpeedRegulatorInterface* _speedRegulator):
+        currentRotPos(_rotPos), speedRegulator(_speedRegulator)
+    {}
+    
+    void config( int _maxSpeedCPS )
+    {        
         maxSpeedCPS = _maxSpeedCPS;
     }
 

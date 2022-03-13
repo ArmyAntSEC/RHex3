@@ -1,16 +1,12 @@
 #include <unityEx.h>
 
 void processMotorSpeedRegulator();
-void processInterpolator();
-void processSpeedToPowerConverter();
 void runAllTestsMotorSpeedCommander();
 
 void process()
 {
     UNITY_BEGIN_EXT();  
-    processMotorSpeedRegulator();    
-    processInterpolator();
-    processSpeedToPowerConverter();    
+    processMotorSpeedRegulator();              
     runAllTestsMotorSpeedCommander();
     UNITY_END_EXT();  
 }

@@ -8,6 +8,9 @@
 #include <MotorDriver.h>
 #include <SpeedRegulator.h>
 #include <RunnableInterface.h>
+#include <RotationalPosition.h>
+#include <MotorSpeedCommander.h>
+
 
 struct LegPinList
 {
@@ -25,15 +28,17 @@ struct OneLeg : public RunnableInterface
     HardwarePins* hwPins;
     HardwareClock* hwClock;
     LinearPositionEncoder linPos;
+    RotationalPositionEncoder rotPos;
     BasicEncoderFactory factory;
     BasicEncoder *encoder;
     MotorDriver driver;
     SpeedComputer speed;
-    SpeedRegulator regulator;
+    SpeedRegulator regulator;    
+    MotorSpeedCommander commander;
 
     OneLeg( HardwareInterrupts* _hwInterrupts, HardwarePins* _hwPins, HardwareClock* _hwClock ):
         hwInterrupts(_hwInterrupts), hwPins(_hwPins), hwClock(_hwClock),
-        linPos(_hwInterrupts), speed(_hwClock, _hwInterrupts)
+        linPos(_hwInterrupts), speed(_hwClock, _hwInterrupts), rotPos(&linPos), commander(&rotPos, &regulator)
     {}
     
     void config( LegPinList* pinList )
