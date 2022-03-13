@@ -30,20 +30,35 @@ void testShallResetTaskStatusOnEachCycle()
     TEST_ASSERT_EQUAL( 1, sut.getIdleCounter() );
 }
 
-void testShallCalibrateWithTaskScheduler()
+void testShallBeAbleToCalibrateWithTaskScheduler()
 {
     TaskScheduler sched;    
     HardwareClockMock hwClock;
     hwClock.microsToStepOnRead = 2000;
 
-    IdleCounter sut;
-    sched.setIdleCounter( &sut );
-    sut.setTaskSchedulerAndClock( &sched, &hwClock );
+    IdleCounter* sut = sched.getIdleCounterObject();    
+    sut->setTaskSchedulerAndClock( &sched, &hwClock );
 
-    sut.Run1000IdleTaskToCalibrate();
+    sut->Run1000IdleTaskToCalibrate();
 
     TEST_ASSERT_EQUAL( 2000*1002, hwClock.getMicrosecondsSinceBoot() );
-    TEST_ASSERT_EQUAL( 499, sut.getMaxIdleCountsPerSecond() ); //Timer is off-by-1, but in a hard-to-fix way.
+    TEST_ASSERT_EQUAL( 499, sut->getMaxIdleCountsPerSecond() ); //Timer is off-by-1, but in a hard-to-fix way.
+}
+
+void testShallBeAbleToResetCounterAndComputeTasksPerSecond()
+{
+    TaskScheduler sched;    
+    HardwareClockMock hwClock;
+    hwClock.microsToStepOnRead = 2000;
+
+    IdleCounter* sut = sched.getIdleCounterObject();    
+    sut->setTaskSchedulerAndClock( &sched, &hwClock );
+    
+    sut->SignalOneCycleRunAndResetTaskRunStatus();
+
+    TEST_ASSERT_EQUAL( 1, sut->getIdleCounter() );
+    
+    TEST_FAIL_MESSAGE("Implementme");
 }
 
 void runAllTestsMeasureIdleTime()
@@ -52,6 +67,7 @@ void runAllTestsMeasureIdleTime()
     RUN_TEST( testShallCountIfNothingRan );
     RUN_TEST( testShallNotCountIfSomethingRan );
     RUN_TEST( testShallResetTaskStatusOnEachCycle );
-    RUN_TEST( testShallCalibrateWithTaskScheduler );
+    RUN_TEST( testShallBeAbleToCalibrateWithTaskScheduler );
+    RUN_TEST( testShallBeAbleToResetCounterAndComputeTasksPerSecond );
     UNITY_END_INT();
 }

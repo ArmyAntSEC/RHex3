@@ -9,7 +9,7 @@ class TaskScheduler: public RunnableInterface
         static const int MaxTasks = 6;
         RunnableAtTimeInterface* taskList[MaxTasks];
         int numTasks = 0;
-        IdleCounter* idleCounter = 0;
+        IdleCounter idleCounter;
         
     public:
         
@@ -18,9 +18,9 @@ class TaskScheduler: public RunnableInterface
             taskList[numTasks++] = task;
         }
 
-        void setIdleCounter( IdleCounter* _idleCounter )
+        IdleCounter* getIdleCounterObject( )
         {
-            idleCounter = _idleCounter;
+            return &idleCounter;
         }
 
         int getNumberOfTasks( )
@@ -39,9 +39,9 @@ class TaskScheduler: public RunnableInterface
             {                
                 if ( taskList[i]->canRun( nowMicros ) ) {
                     taskList[i]->run( nowMicros );                
-                    idleCounter->SignalOneTaskWasRun();
+                    idleCounter.SignalOneTaskWasRun();
                 }
             }
-            idleCounter->SignalOneCycleRunAndResetTaskRunStatus();                           
+            idleCounter.SignalOneCycleRunAndResetTaskRunStatus();                           
         }        
 };

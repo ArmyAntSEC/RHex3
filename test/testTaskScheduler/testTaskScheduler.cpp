@@ -40,8 +40,7 @@ void testAddTask()
 void testRunTasksAfterTime()
 {
     TaskScheduler scheduler;
-    IdleCounter idleCounter;
-    scheduler.setIdleCounter( &idleCounter );
+    IdleCounter idleCounter;    
     RunnableAtTimeMock task;   
     RunnableAtTimeMock task2;    
     scheduler.addTask( &task );
@@ -58,8 +57,7 @@ void testRunTasksAfterTime()
 void testRunTasksBeforeTime()
 {
     TaskScheduler scheduler;
-    IdleCounter idleCounter;
-    scheduler.setIdleCounter( &idleCounter );
+    IdleCounter idleCounter;    
     RunnableAtTimeMock task;   
     RunnableAtTimeMock task2;  
     task2.nextRun = 2000;  
@@ -75,19 +73,18 @@ void testRunTasksBeforeTime()
 void testMeasureIdleTime()
 {
     TaskScheduler scheduler;
-    IdleCounter idleCounter;
-    scheduler.setIdleCounter( &idleCounter );
+    IdleCounter* idleCounter = scheduler.getIdleCounterObject();    
     RunnableAtTimeMock task;   
     scheduler.addTask( &task );
     task.lastRunTime = 1000;
 
     //Increment idle count when not running a task.
     scheduler.run( 500 );
-    TEST_ASSERT_EQUAL( 1, idleCounter.getIdleCounter() );
+    TEST_ASSERT_EQUAL( 1, idleCounter->getIdleCounter() );
 
     //Do not increment idle count when running task.
     scheduler.run( 1500 );
-    TEST_ASSERT_EQUAL( 1, idleCounter.getIdleCounter() );
+    TEST_ASSERT_EQUAL( 1, idleCounter->getIdleCounter() );
 }
 
 void runAllTaskSchedulerTests()
