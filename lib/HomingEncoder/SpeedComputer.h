@@ -17,11 +17,9 @@ private:
 
 public:
     
-    void config( HardwareClockInterface* _clock, HardwareInterruptsInterface* _interrupts )        
-    {
-        hwClock = _clock;
-        hwInterrupts = _interrupts;
-    }
+    SpeedComputer( HardwareClockInterface* _clock, HardwareInterruptsInterface* _interrupts ):
+        hwClock(_clock), hwInterrupts(_interrupts)
+    {}
 
     virtual void signalStepForwardISR()
     {

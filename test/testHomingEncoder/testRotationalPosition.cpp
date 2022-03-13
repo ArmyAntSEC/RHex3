@@ -63,8 +63,7 @@ void testRotationalPositionEncoder()
     LinearPositionProviderMock linPos;
     linPos.linearPos = 1234;
 
-    RotationalPositionEncoder sut;
-    sut.config( &linPos );
+    RotationalPositionEncoder sut(&linPos);    
 
     TEST_ASSERT_EQUAL( 1234, sut.getLinearPosition() );
 }

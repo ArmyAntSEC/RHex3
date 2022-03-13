@@ -18,12 +18,12 @@ struct LegPinList
     int encoder2;
     int homing;
 };
-
+template <int EncoderChannel>
 struct OneLeg : public RunnableInterface
 {
-    HardwareInterrupts hwInterrupts;
-    HardwarePins hwPins;
-    HardwareClock hwClock;
+    HardwareInterrupts* hwInterrupts;
+    HardwarePins* hwPins;
+    HardwareClock* hwClock;
     LinearPositionEncoder linPos;
     BasicEncoderFactory factory;
     BasicEncoder *encoder;
@@ -31,18 +31,18 @@ struct OneLeg : public RunnableInterface
     SpeedComputer speed;
     SpeedRegulator regulator;
 
-    template <int EncoderChannel>
+    OneLeg( HardwareInterrupts* _hwInterrupts, HardwarePins* _hwPins, HardwareClock* _hwClock ):
+        hwInterrupts(_hwInterrupts), hwPins(_hwPins), hwClock(_hwClock),
+        linPos(_hwInterrupts), speed(_hwClock, _hwInterrupts)
+    {}
+    
     void config( LegPinList* pinList )
-    {
-        linPos.config(&hwInterrupts);
-        encoder = factory.config<EncoderChannel>(pinList->encoder1, pinList->encoder2, pinList->homing, &hwPins);
+    {        
+        encoder = factory.config<EncoderChannel>(pinList->encoder1, pinList->encoder2, pinList->homing, hwPins);
         encoder->addListener(&linPos);
         encoder->addListener(&speed);
 
-        driver.config(pinList->motorEnable1, pinList->motorEnable2, pinList->motorPWM, &hwPins);
-        //driver.setMotorPWM(128);
-
-        speed.config(&hwClock, &hwInterrupts);
+        driver.config(pinList->motorEnable1, pinList->motorEnable2, pinList->motorPWM, hwPins);
 
         regulator.config(&speed, &driver, 0.1, 0.015, 0, 10);
         

@@ -22,10 +22,12 @@ LegPinList leftLegPins = { MOTOR1_EN1, MOTOR1_EN2, MOTOR1_PWM, MOTOR1_ENCODER1, 
 #define MOTOR2_OPTO 12
 LegPinList rightLegPins = { MOTOR2_EN1, MOTOR2_EN2, MOTOR2_PWM, MOTOR2_ENCODER1, MOTOR2_ENCODER2, MOTOR2_OPTO };
 
-OneLeg leftLeg;
-OneLeg rightLeg;
-
 HardwareClock hwClock;
+HardwareInterrupts hwInterrupts;
+HardwarePins hwPins;
+
+OneLeg<0> leftLeg(&hwInterrupts, &hwPins, &hwClock);
+OneLeg<0> rightLeg(&hwInterrupts, &hwPins, &hwClock);
 
 TaskScheduler sched( &hwClock );
 RecurringTaskGroup<2> recurringGroup( 10*1000L );
@@ -41,9 +43,9 @@ void setup()
   IdleCounter* idleCounter = sched.getIdleCounterObject();  
   idleCounter->Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond();
   
-  leftLeg.config<0>(&leftLegPins);
+  leftLeg.config(&leftLegPins);
   leftLeg.setSpeedSetpoint( 3000 );
-  rightLeg.config<1>(&rightLegPins);
+  rightLeg.config(&rightLegPins);
   rightLeg.setSpeedSetpoint( 3000 );
   
   sched.addTask( &recurringGroup );

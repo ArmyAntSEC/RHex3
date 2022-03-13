@@ -6,8 +6,7 @@
 void testShouldStepForward()
 {
     HardwareInterruptsMock hwInterrupts;    
-    LinearPositionEncoder sut;
-    sut.config( &hwInterrupts );
+    LinearPositionEncoder sut(&hwInterrupts);    
     TEST_ASSERT_EQUAL( 0, sut.getLinearPosition() );
 
     sut.signalStepForwardISR();
@@ -18,8 +17,7 @@ void testShouldStepForward()
 void testShouldHomeIfNotHomed()
 {
     HardwareInterruptsMock hwInterrupts;    
-    LinearPositionEncoder sut;
-    sut.config( &hwInterrupts );
+    LinearPositionEncoder sut(&hwInterrupts);    
 
     sut.linearPosition = 100;
 
@@ -32,8 +30,7 @@ void testShouldHomeIfNotHomed()
 void testShouldNotHomeIfHomed()
 {
     HardwareInterruptsMock hwInterrupts;    
-    LinearPositionEncoder sut;
-    sut.config( &hwInterrupts );
+    LinearPositionEncoder sut(&hwInterrupts);    
 
     sut.linearPosition = 100;
     sut.isHomed = true;
@@ -46,8 +43,7 @@ void testShouldNotHomeIfHomed()
 void testShouldRestoreInterruptFlags()
 {
     HardwareInterruptsMock hwInterrupts;    
-    LinearPositionEncoder sut;
-    sut.config( &hwInterrupts );
+    LinearPositionEncoder sut(&hwInterrupts);    
 
     sut.getLinearPosition();
 

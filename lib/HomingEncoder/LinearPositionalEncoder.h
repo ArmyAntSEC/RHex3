@@ -10,11 +10,8 @@ private:
     volatile bool isHomed = false;
     HardwareInterruptsInterface* hwInterrupts;
 public:
-
-    void config( HardwareInterruptsInterface* _interrupts )
-    {
-        hwInterrupts = _interrupts;
-    }
+    LinearPositionEncoder( HardwareInterruptsInterface* _interrupts ): hwInterrupts(_interrupts)    
+    { }
 
     virtual void signalStepForwardISR()
     {

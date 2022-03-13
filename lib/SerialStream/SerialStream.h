@@ -7,6 +7,8 @@
 #include <iostream>
 #endif
 
+#define PRINTVAR(var) " " << #var << ": " << var
+
 enum _EndlCode { endl };
 
 class SerialStream

@@ -60,9 +60,6 @@ private:
     }
 
 public:
-    void config( LinearPositionProvider* _linPos )
-    { 
-        linPos = _linPos;
-    }
-
+    RotationalPositionEncoder( LinearPositionProvider* _linPos ): linPos(_linPos)
+    {}
 };
