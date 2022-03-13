@@ -36,12 +36,13 @@ TaskAwareDelay awareDelay(&hwClock, &sched);
 
 void setup()
 {
+
   Serial.begin(115200);
   while (!Serial) {}    
   Log << "Hello World!" << endl;  
 
   IdleCounter* idleCounter = sched.getIdleCounterObject();  
-  idleCounter->Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond();
+  idleCounter->Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond();  
   
   leftLeg.config(&leftLegPins);
   leftLeg.setSpeedSetpoint( 4000 );
@@ -53,6 +54,7 @@ void setup()
   recurringGroup.addTask( &rightLeg );
   
   Log << "Starting" << endl;
+  
   awareDelay.delayMicros( 1000*1000L );
   Log << "Left Leg: " << leftLeg.linPos.getLinearPosition() << endl;  
   Log << "Right Leg: " << rightLeg.linPos.getLinearPosition() << endl;  
@@ -60,6 +62,21 @@ void setup()
 
   leftLeg.driver.setMotorPWM( 0 );
   rightLeg.driver.setMotorPWM( 0 );
+
+  RotationalPosition startSlow( 0 );
+  RotationalPosition endSlow( 1000 );
+  
+  leftLeg.commander.start();
+  //rightLeg.commander.start();      
+  unsigned long thisTime = hwClock.getMicrosecondsSinceBoot();
+  leftLeg.commander.setGoal( startSlow, thisTime + 1000*1000L );
+  awareDelay.delayMicros( 1000*1000L );
+  
+  
+  
+  leftLeg.driver.setMotorPWM( 0 );
+  rightLeg.driver.setMotorPWM( 0 );
+  Log << "Exit" << endl;
 }
 
 

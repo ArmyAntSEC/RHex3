@@ -64,5 +64,6 @@ struct OneLeg : public RunnableInterface
     virtual void run(unsigned long _nowMicros)
     {
         regulator.run(_nowMicros);
+        commander.run(_nowMicros);        
     }
 };

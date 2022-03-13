@@ -9,21 +9,30 @@ private:
     static const long clicksPerLapDen = 3000;
 
 public:
-    virtual long getLinearPosition() = 0;          
+    virtual long getLinearPosition() const = 0;          
 
-    virtual long getLaps()
+    virtual long getLaps() const
     {
         long long clickPosRaw = getLinearPosition();
         return clickPosRaw * clicksPerLapDen / clicksPerLapNum;
     }
 
-    virtual long getClicks()
+    virtual long getClicks() const
     {
         long long laps = getLaps();
         long long clickPosRaw = getLinearPosition();
         long clicksRemain = clickPosRaw - laps * clicksPerLapNum / clicksPerLapDen;
         return clicksRemain;
     }      
+
+    int angularDifference( const RotationalPositionProvider& pos )
+    {
+        long difference = this->getClicks() - pos.getClicks();
+        if ( difference < 0 ) { //TODO: This should be possible with a modulo operator as well.
+            difference = difference + clicksPerLapNum/clicksPerLapDen;
+        }
+        return difference;
+    }
 };
 
 class RotationalPosition: public RotationalPositionProvider
@@ -35,7 +44,7 @@ public:
     RotationalPosition( long _linPos = 0 ): linPos(_linPos)
     {}
 
-    virtual long getLinearPosition() {
+    virtual long getLinearPosition() const {
         return linPos;
     }
 
@@ -55,7 +64,7 @@ class RotationalPositionEncoder: public RotationalPositionProvider
 private:
     LinearPositionProvider* linPos;
 
-    virtual long getLinearPosition() {
+    virtual long getLinearPosition() const {
         return linPos->getLinearPosition();
     }
 
