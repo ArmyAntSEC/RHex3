@@ -27,7 +27,7 @@ HardwareInterrupts hwInterrupts;
 HardwarePins hwPins;
 
 OneLeg<0> leftLeg(&hwInterrupts, &hwPins, &hwClock);
-OneLeg<0> rightLeg(&hwInterrupts, &hwPins, &hwClock);
+OneLeg<1> rightLeg(&hwInterrupts, &hwPins, &hwClock);
 
 TaskScheduler sched( &hwClock );
 RecurringTaskGroup<2> recurringGroup( 10*1000L );
@@ -44,9 +44,9 @@ void setup()
   idleCounter->Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond();
   
   leftLeg.config(&leftLegPins);
-  leftLeg.setSpeedSetpoint( 3000 );
+  leftLeg.setSpeedSetpoint( 4000 );
   rightLeg.config(&rightLegPins);
-  rightLeg.setSpeedSetpoint( 3000 );
+  rightLeg.setSpeedSetpoint( 4000 );
   
   sched.addTask( &recurringGroup );
   recurringGroup.addTask( &leftLeg );
