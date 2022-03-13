@@ -52,7 +52,7 @@ void testShallBeAbleToCalibrateWithTaskScheduler()
     sut->Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond();
 
     TEST_ASSERT_EQUAL( 499, sut->maxIdleCountsPerSecond ); //Timer is off-by-1, but in a hard-to-fix way.
-    TEST_ASSERT_EQUAL( 2000*1002, hwClock.getMicrosecondsSinceBoot() );
+    TEST_ASSERT_EQUAL( 2000*1002L, hwClock.getMicrosecondsSinceBoot() );
 }
 
 void testShallBeAbleToResetCounterAndComputeTasksPerSecond()

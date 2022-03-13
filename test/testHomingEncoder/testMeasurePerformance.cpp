@@ -65,11 +65,9 @@ void testBasicEncoderWithLinearAndSpeedMeasurementPerformance()
     HardwareInterrupts hwInterrupts;
     HardwareClock hwClock;
     BasicEncoder* encoder =  BasicEncoderFactory::config<0>( 1, 2, 3, &hwPins );
-    LinearPositionEncoder linear;
-    linear.config ( &hwInterrupts );
+    LinearPositionEncoder linear( &hwInterrupts );    
     linear.signalHomingISR(); //To ensure we are homed before starting.
-    SpeedComputer speed;
-    speed.config ( &hwClock, &hwInterrupts );
+    SpeedComputer speed( &hwClock, &hwInterrupts );
     encoder->addListener( &linear );
     encoder->addListener ( &speed );    
     
