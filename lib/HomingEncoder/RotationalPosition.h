@@ -36,6 +36,11 @@ public:
     RotationalPosition( long _linPos = 0 ): linPos(_linPos)
     {}
 
+    RotationalPosition( long laps, int clicks )
+    {
+        linPos = (laps * clicksPerLapNum) / clicksPerLapDen + clicks;
+    }
+
     virtual long getLinearPosition() const {
         return linPos;
     }
@@ -52,11 +57,12 @@ public:
 
     void moveToLapBeforeRounded( int _clicks )
     {                        
-        long clicksDiff = getClicks() - _clicks;                
+        int thisClicks = getClicks();
+        long clicksDiff = thisClicks - _clicks;                
         if ( clicksDiff < 0 )
         {            
-            linPos += clicksPerLapNum/clicksPerLapDen;
-        }        
+            linPos = (getLaps()+1)*10775776/3000 + thisClicks;
+        }       
     }
 };
 

@@ -74,7 +74,24 @@ void testShouldBeAbleToJumpToTheLapBeforeAnother()
     
     pos.moveToLapBeforeRounded( 2000 );
     TEST_ASSERT_EQUAL( 3, pos.getLaps() );
-    TEST_ASSERT_EQUAL( 999, pos.getClicks() ); //Rounds off by one. This is OK.
+    TEST_ASSERT_EQUAL( 1000, pos.getClicks() );
+}
+
+void testShouldBeAbleToJumpToTheLapBeforeAnotherReverse()
+{ 
+    RotationalPosition pos( 2000 + 2*10775776L/3000 ); //Two laps + 2000 clicks
+    
+    pos.moveToLapBeforeRounded( 1000 );
+    TEST_ASSERT_EQUAL( 2, pos.getLaps() );
+    TEST_ASSERT_EQUAL( 2000, pos.getClicks() );
+}
+
+void shouldBeConstructableFromLapsAndClicks()
+{
+    RotationalPosition pos( 2, 2000 ); //Two laps + 2000 clicks
+    
+    TEST_ASSERT_EQUAL( 2, pos.getLaps() );
+    TEST_ASSERT_EQUAL( 2000, pos.getClicks() );
 }
 
 void runAllTestRotationalPosition()
@@ -87,5 +104,7 @@ void runAllTestRotationalPosition()
     RUN_TEST( testSupportsEquality );
     RUN_TEST( testRotationalPositionEncoder );    
     RUN_TEST( testShouldBeAbleToJumpToTheLapBeforeAnother );
+    RUN_TEST( testShouldBeAbleToJumpToTheLapBeforeAnotherReverse );
+    RUN_TEST( shouldBeConstructableFromLapsAndClicks );
     UNITY_END_INT();
 }

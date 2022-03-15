@@ -36,7 +36,6 @@ TaskAwareDelay awareDelay(&hwClock, &sched);
 
 void setup()
 {
-
   Serial.begin(115200);
   while (!Serial) {}    
   Log << "Hello World!" << endl;  
@@ -59,23 +58,22 @@ void setup()
   Log << "Left Leg: " << leftLeg.linPos.getLinearPosition() << endl;  
   Log << "Right Leg: " << rightLeg.linPos.getLinearPosition() << endl;  
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << endl;  
-
+  
   leftLeg.driver.setMotorPWM( 0 );
   rightLeg.driver.setMotorPWM( 0 );
 
-  RotationalPosition startSlow( 0 );
-  RotationalPosition endSlow( 1000 );
+  int startSlow = 0;
+  int endSlow = 1000;
   
   leftLeg.commander.start();
-  //rightLeg.commander.start();      
+  
   unsigned long thisTime = hwClock.getMicrosecondsSinceBoot();
   leftLeg.commander.setGoal( startSlow, thisTime + 1000*1000L );
   awareDelay.delayMicros( 1000*1000L );
   
-  
-  
   leftLeg.driver.setMotorPWM( 0 );
   rightLeg.driver.setMotorPWM( 0 );
+  Log << "Left Leg: " << leftLeg.linPos.getLinearPosition() << endl;  
   Log << "Exit" << endl;
 }
 

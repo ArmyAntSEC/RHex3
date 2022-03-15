@@ -37,8 +37,13 @@ public:
 
     virtual void setGoal( int _clicks, unsigned long _time )
     {                
-        goalPos = RotationalPosition(_clicks);        
-        goalPos.moveToLapBeforeRounded( currentRotPos->getLinearPosition() );
+        int thisClicks = currentRotPos->getClicks();
+        if ( thisClicks > _clicks )
+            goalPos = RotationalPosition(currentRotPos->getLaps()+1, _clicks);                
+        else
+            goalPos = RotationalPosition(currentRotPos->getLaps(), _clicks);                
+
+        Log << PRINTVAR( _clicks ) << PRINTVAR(currentRotPos->getLinearPosition() ) << PRINTVAR(goalPos.getLinearPosition()) << endl;
         timeGoalMicros = _time;
     }        
 
@@ -70,7 +75,7 @@ public:
     {                                
         if ( isRunning ) {            
             long clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();
-            
+            Log << PRINTVAR(goalPos.getLinearPosition()) << PRINTVAR(currentRotPos->getLinearPosition()) << PRINTVAR(clicksLeft) << endl;
             if ( clicksLeft < 0 )
             {                
                 arrived = true;                
