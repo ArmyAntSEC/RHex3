@@ -62,8 +62,8 @@ void testComputeTargetSpeed()
     SpeedRegulatorInterface* speedRegulator = (SpeedRegulatorInterface*)4321;
     MotorSpeedCommander commander(posProvider, speedRegulator);   
     long timeLeftMicros = 1e6;    
-    long clicksLeft = 1000;
-    TEST_ASSERT_EQUAL( 1000, commander.computeTargetSpeedCPS( timeLeftMicros, clicksLeft ) );
+    long clicksLeft = 3000;
+    TEST_ASSERT_EQUAL( 3000, commander.computeTargetSpeedCPS( timeLeftMicros, clicksLeft ) );
 }
 
 void testComputeTargetSpeedNegativeTimeLeft()

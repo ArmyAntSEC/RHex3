@@ -17,8 +17,7 @@ private:
 
     long cappedSpeedCPS( long speedCPS )
     {
-        if ( speedCPS < 0 || speedCPS > maxSpeedCPS )
-        {
+        if ( speedCPS < 0 || speedCPS > maxSpeedCPS ) {
             return maxSpeedCPS;
         } else {
             return speedCPS;
@@ -38,12 +37,11 @@ public:
     virtual void setGoal( int _clicks, unsigned long _time )
     {                
         int thisClicks = currentRotPos->getClicks();
-        if ( thisClicks > _clicks )
+        if ( thisClicks > _clicks ) {
             goalPos = RotationalPosition(currentRotPos->getLaps()+1, _clicks);                
-        else
+        } else {
             goalPos = RotationalPosition(currentRotPos->getLaps(), _clicks);                
-
-        Log << PRINTVAR( _clicks ) << PRINTVAR(currentRotPos->getLinearPosition() ) << PRINTVAR(goalPos.getLinearPosition()) << endl;
+        }
         timeGoalMicros = _time;
     }        
 
@@ -64,8 +62,9 @@ public:
 
     long computeTargetSpeedCPS( long timeLeftMicros, long clicksLeft )
     {        
-        long clicksLeftScaled = 1e6L * clicksLeft;        
-        long targetSpeedCPS = clicksLeftScaled / timeLeftMicros;
+        long clicksLeftScaled = 1e3L * clicksLeft;        
+        long timeLeftMillis = timeLeftMicros / 1e3;
+        long targetSpeedCPS = clicksLeftScaled / timeLeftMillis;
         long targetSpeedCPSCapped = cappedSpeedCPS( targetSpeedCPS );
         
         return targetSpeedCPSCapped;
@@ -74,8 +73,7 @@ public:
     virtual void run(unsigned long int nowMicros)
     {                                
         if ( isRunning ) {            
-            long clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();
-            Log << PRINTVAR(goalPos.getLinearPosition()) << PRINTVAR(currentRotPos->getLinearPosition()) << PRINTVAR(clicksLeft) << endl;
+            long clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();            
             if ( clicksLeft < 0 )
             {                
                 arrived = true;                
@@ -85,6 +83,7 @@ public:
                 long timeLeft = timeGoalMicros - nowMicros;
                 long targetSpeed = computeTargetSpeedCPS( timeLeft, clicksLeft ); 
                 speedRegulator->setSetPoint( targetSpeed );                            
+                Log << PRINTVAR(currentRotPos->getLinearPosition()) << PRINTVAR(timeLeft) << PRINTVAR(clicksLeft) << PRINTVAR(targetSpeed) << endl;
             }                  
         }     
            
