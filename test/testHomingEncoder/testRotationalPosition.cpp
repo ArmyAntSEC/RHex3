@@ -68,14 +68,13 @@ void testRotationalPositionEncoder()
     TEST_ASSERT_EQUAL( 1234, sut.getLinearPosition() );
 }
 
-void testShouldComputeAngularDifference()
-{
-    RotationalPosition pos1( 1000 );
-    RotationalPosition pos2( 2000 );
-
-    TEST_ASSERT_EQUAL( 1000, pos2.angularDifference(pos1) );
-
-    TEST_ASSERT_EQUAL( 2591, pos1.angularDifference(pos2) );
+void testShouldBeAbleToJumpToTheLapBeforeAnother()
+{ 
+    RotationalPosition pos( 1000 + 2*10775776L/3000 ); //Two laps + 1000 clicks
+    
+    pos.moveToLapBeforeRounded( 2000 );
+    TEST_ASSERT_EQUAL( 3, pos.getLaps() );
+    TEST_ASSERT_EQUAL( 999, pos.getClicks() ); //Rounds off by one. This is OK.
 }
 
 void runAllTestRotationalPosition()
@@ -87,6 +86,6 @@ void runAllTestRotationalPosition()
     RUN_TEST( testShouldHandleLargeWrapAround );
     RUN_TEST( testSupportsEquality );
     RUN_TEST( testRotationalPositionEncoder );    
-    RUN_TEST( testShouldComputeAngularDifference );
+    RUN_TEST( testShouldBeAbleToJumpToTheLapBeforeAnother );
     UNITY_END_INT();
 }

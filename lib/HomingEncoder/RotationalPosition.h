@@ -1,10 +1,11 @@
 #pragma once
 
 #include "HomingEncoderInterfaces.h"
+#include <SerialStream.h>
 
 class RotationalPositionProvider
 {
-private:
+protected:
     static const long clicksPerLapNum = 10775776;
     static const long clicksPerLapDen = 3000;
 
@@ -24,15 +25,6 @@ public:
         long clicksRemain = clickPosRaw - laps * clicksPerLapNum / clicksPerLapDen;
         return clicksRemain;
     }      
-
-    int angularDifference( const RotationalPositionProvider& pos )
-    {
-        long difference = this->getClicks() - pos.getClicks();
-        if ( difference < 0 ) { //TODO: This should be possible with a modulo operator as well.
-            difference = difference + clicksPerLapNum/clicksPerLapDen;
-        }
-        return difference;
-    }
 };
 
 class RotationalPosition: public RotationalPositionProvider
@@ -48,14 +40,23 @@ public:
         return linPos;
     }
 
-    bool operator==( const RotationalPosition& pos )
+    bool operator==( const RotationalPositionProvider& pos )
     {
-        return linPos == pos.linPos;
+        return linPos == pos.getLinearPosition();
     }
 
-    bool operator!=( const RotationalPosition& pos )
+    bool operator!=( const RotationalPositionProvider& pos )
     {
         return !this->operator==( pos );        
+    }
+
+    void moveToLapBeforeRounded( int _clicks )
+    {                        
+        long clicksDiff = getClicks() - _clicks;                
+        if ( clicksDiff < 0 )
+        {            
+            linPos += clicksPerLapNum/clicksPerLapDen;
+        }        
     }
 };
 

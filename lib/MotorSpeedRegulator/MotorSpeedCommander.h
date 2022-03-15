@@ -9,7 +9,7 @@ class MotorSpeedCommander: public MotorSpeedCommanderInterface, RunnableInterfac
 private:
     RotationalPositionProvider* currentRotPos;
     SpeedRegulatorInterface* speedRegulator;
-    RotationalPosition positionGoal;
+    RotationalPosition goalPos;
     unsigned long timeGoalMicros;
     int maxSpeedCPS = 5000;
     bool arrived = false;
@@ -35,10 +35,12 @@ public:
         maxSpeedCPS = _maxSpeedCPS;
     }
 
-    virtual void setGoal( RotationalPosition _pos, unsigned long _time )
+    virtual void setGoal( int _clicks, unsigned long _time )
     {        
         //TODO: Convert to better handle positions on different laps.         
-        positionGoal = _pos;
+        goalPos = RotationalPosition(_clicks);
+        Log << PRINTVAR(goalPos.getLinearPosition()) << PRINTVAR(currentRotPos->getLinearPosition()) << endl;
+        goalPos.moveToLapBeforeRounded( currentRotPos->getLinearPosition() );
         timeGoalMicros = _time;
     }        
 
@@ -69,20 +71,17 @@ public:
     virtual void run(unsigned long int nowMicros)
     {                                
         if ( isRunning ) {            
-            long clicksLeft = positionGoal.getLinearPosition() - currentRotPos->getLinearPosition();
+            long clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();
             
             if ( clicksLeft < 0 )
-            {
-                if ( !arrived )
-                    Log << "Comander Arrived" << endl;
+            {                
                 arrived = true;                
                 speedRegulator->setSetPoint( 0 );                        
             } else {
                 arrived = false;
                 long timeLeft = timeGoalMicros - nowMicros;
                 long targetSpeed = computeTargetSpeedCPS( timeLeft, clicksLeft ); 
-                speedRegulator->setSetPoint( targetSpeed );            
-                Log << PRINTVAR(currentRotPos->getClicks()) << PRINTVAR(clicksLeft) << PRINTVAR(timeLeft) << PRINTVAR(targetSpeed) << endl;      
+                speedRegulator->setSetPoint( targetSpeed );                            
             }                  
         }     
            

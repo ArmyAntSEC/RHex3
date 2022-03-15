@@ -15,30 +15,30 @@ struct SpeedRegulatorMock: public SpeedRegulatorInterface
 
 
 void testSetGoal()
-{
+{    
     RotationalPosition currentPos ( 1234 );    
     SpeedRegulatorInterface* speedRegulator;
     MotorSpeedCommander commander( &currentPos, speedRegulator);        
-    RotationalPosition goalPos ( 4321 );
+    int goalPos = 3210;
 
     commander.setGoal( goalPos, 5432 );
 
-    TEST_ASSERT( goalPos == commander.positionGoal );
+    TEST_ASSERT_EQUAL( goalPos, commander.goalPos.getLinearPosition() );
     TEST_ASSERT_EQUAL( 5432, commander.timeGoalMicros );
 }
 
 void testSetGoalBehindCurrentPosition()
-{
-    RotationalPosition currentPos ( 4321 );    
+{    
+    RotationalPosition currentPos ( 3210 );    
     SpeedRegulatorInterface* speedRegulator;
     MotorSpeedCommander commander( &currentPos, speedRegulator);        
-    RotationalPosition goalPos ( 1234 );
+    int goalPos = 1234;
 
     commander.setGoal( goalPos, 5432 );
 
     long forwardGoalPosLinear = 1234 + 10775776L / 3000;
 
-    TEST_ASSERT_EQUAL( forwardGoalPosLinear, commander.positionGoal.getLinearPosition() );
+    TEST_ASSERT_EQUAL( forwardGoalPosLinear, commander.goalPos.getLinearPosition() );
     TEST_ASSERT_EQUAL( 5432, commander.timeGoalMicros );
 }
 
@@ -95,9 +95,9 @@ void testComputeTargetSpeedCapSpeed()
 }
 
 void testRunAlreadyPassedGoal()
-{
-    RotationalPosition posNow(1234);
-    RotationalPosition posGoal ( 1234 - 500 );
+{    
+    RotationalPosition posNow( 1234 );
+    int posGoal = 1234 + 500;
     SpeedRegulatorMock speedRegulator;
     int maxSpeedCPS = 5000;    
     long timeNow = 4321;
@@ -108,7 +108,8 @@ void testRunAlreadyPassedGoal()
     commander.start();
 
     commander.setGoal( posGoal, timeGoalMicros );
-    
+    commander.goalPos.linPos = 100;
+
     commander.run(timeNow);
 
     TEST_ASSERT_EQUAL( 0, speedRegulator.setPoint );
@@ -118,7 +119,7 @@ void testRunAlreadyPassedGoal()
 void testRunSimple()
 {
     RotationalPosition posNow(1234);
-    RotationalPosition posGoal ( 1234 + 500 );
+    int posGoal = 1234 + 500;
     SpeedRegulatorMock speedRegulator;
     int maxSpeedCPS = 5000;    
     long timeNow = 4321;
@@ -139,9 +140,9 @@ void testRunSimple()
 }
 
 void testRunOverTime()
-{
+{    
     RotationalPosition posNow(1234);
-    RotationalPosition posGoal ( 1234 + 500 );
+    int posGoal = 1234+100;
     SpeedRegulatorMock speedRegulator;
     int maxSpeedCPS = 5000;    
     long timeNow = 4321;
@@ -151,7 +152,7 @@ void testRunOverTime()
     commander.config( maxSpeedCPS );    
     commander.start();    
 
-    commander.setGoal( posGoal, timeGoalMicros );
+    commander.setGoal( posGoal, timeGoalMicros );    
     
     commander.run(timeNow);
 
