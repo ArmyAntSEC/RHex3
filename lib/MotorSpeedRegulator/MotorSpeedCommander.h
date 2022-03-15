@@ -36,10 +36,8 @@ public:
     }
 
     virtual void setGoal( int _clicks, unsigned long _time )
-    {        
-        //TODO: Convert to better handle positions on different laps.         
-        goalPos = RotationalPosition(_clicks);
-        Log << PRINTVAR(goalPos.getLinearPosition()) << PRINTVAR(currentRotPos->getLinearPosition()) << endl;
+    {                
+        goalPos = RotationalPosition(_clicks);        
         goalPos.moveToLapBeforeRounded( currentRotPos->getLinearPosition() );
         timeGoalMicros = _time;
     }        

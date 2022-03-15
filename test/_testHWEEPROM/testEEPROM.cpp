@@ -15,10 +15,6 @@ void process()
 #include <HardwareClock.h>
 
 void setup() {
-    // NOTE!!! Wait for >2 secs
-    // if board doesn't support software reset via Serial.DTR/RTS
-    HardwareClock clock;
-    clock.delayMicroseconds(2000);
 
     process();
 }
