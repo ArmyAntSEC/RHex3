@@ -169,20 +169,17 @@ void testStepMoveBeforeStep() {
     leg.init( millis(), stepTime, slowTime, slowAngle, LegController::BeforeStep );    
 
     unsigned long int slowTimestamp = millis() + slowTime;
-    unsigned long int fastTimestamp = millis() + stepTime;
-    //Log << "Slow time: " << slowTimestamp << " Fast Time: " << fastTimestamp << endl;
+    unsigned long int fastTimestamp = millis() + stepTime;    
 
     unsigned long int nextTime = millis() + 100;
-    //Log << millis() << ": Slow started: " << millis() << endl;
+
     while ( millis() < slowTimestamp )
     {        
         sched.run();
         if ( millis() > nextTime ) {
             nextTime += 100;
-            //Log << millis() << ": Slow: " << encoder.getPosComp() << endl;
         }
-    }
-    //Log << millis() << ": Slow ended: " << millis() << endl;
+    }    
 
     unsigned long int pos = encoder.getPosComp();
     unsigned long int expectedPos = slowAngle/2;        
@@ -194,11 +191,9 @@ void testStepMoveBeforeStep() {
     {        
         sched.run();
         if ( millis() > nextTime ) {
-            nextTime += 100;
-            //Log << millis() << ": Fast: " << encoder.getPosComp() << endl;
+            nextTime += 100;            
         }
     }
-    //Log << millis() << ": Fast ended: " << millis() << endl;
 
     pos = encoder.getPosComp();
     expectedPos = 3592 - slowAngle/2;    

@@ -43,8 +43,6 @@ public:
   }
   
   virtual void setMotorPWM( int motorPWM ) {			  
-    //Log << PRINTVAR(motorPWM) << endl;
-
     if ( motorPWM < 0 || 
       (motorPWM == 0 && lastMotorPWM > 0) ) //Actively break when setting the speed to 0
     {

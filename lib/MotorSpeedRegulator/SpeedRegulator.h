@@ -78,8 +78,7 @@ public:
             float derivateiveOutput = derivativeTerm * (input - lastInput); 
             integratorCumulativeValue += integratorTerm * error;            
             int clampedOutput = clampOutput( proportionalOutput + derivateiveOutput + integratorCumulativeValue );
-            target->setMotorPWM( clampedOutput ); 
-            //Log << PRINTVAR( input ) <<  PRINTVAR(error) << PRINTVAR(clampedOutput) << endl;
+            target->setMotorPWM( clampedOutput );             
         }
     }
 };

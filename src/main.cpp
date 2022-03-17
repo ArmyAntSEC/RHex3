@@ -68,15 +68,15 @@ void setup()
   leftLeg.commander.start();
   
   Log << "Doing the fast move" << endl;
-  leftLeg.commander.setGoal( startSlow, hwClock.getMicrosecondsSinceBoot() + 1000*1000L );
+  leftLeg.setGoal( startSlow, hwClock.getMicrosecondsSinceBoot() + 1000*1000L );
   awareDelay.delayMicros( 1000*1000L );
   
   Log << "Doing the slow move" << endl;
-  leftLeg.commander.setGoal( endSlow, hwClock.getMicrosecondsSinceBoot() + 1000*1000L );
+  leftLeg.setGoal( endSlow, hwClock.getMicrosecondsSinceBoot() + 1000*1000L );
   awareDelay.delayMicros( 1000*1000L );
   
   Log << "Doing the fast move a second time" << endl;
-  leftLeg.commander.setGoal( startSlow, hwClock.getMicrosecondsSinceBoot() + 1000*1000L );
+  leftLeg.setGoal( startSlow, hwClock.getMicrosecondsSinceBoot() + 1000*1000L );
   awareDelay.delayMicros( 1000*1000L );
   
   leftLeg.driver.setMotorPWM( 0 );

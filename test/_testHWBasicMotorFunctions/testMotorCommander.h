@@ -59,8 +59,7 @@ void testSimpleMoveToAPositionAtTime()
 
     unsigned long int endTime = millis() + timeToMove;
     commander.init(endTime, posToMoveTo);
-
-    //Log << "Phase 1: Goal pos: " << posToMoveTo << " at time " << endTime << endl;
+    
     boolean hasArrived = false;
     while (!hasArrived)
     {
@@ -85,8 +84,7 @@ void testSimpleMoveToAPositionAtTime()
     endTime = millis() + timeToMove;
 
     commander.init(endTime, posToMoveTo);
-
-    //Log << "Phase 2: Goal pos: " << posToMoveTo << " at time " << endTime << endl;
+    
     hasArrived = false;
     while (!hasArrived)
     {

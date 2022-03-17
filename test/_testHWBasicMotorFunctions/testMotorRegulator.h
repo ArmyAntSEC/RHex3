@@ -42,17 +42,14 @@ void testSimpleMoveAtConstantSpeed( unsigned int speedToMoveAt) {
             //Compute STD        
             n++;
             S += speedRel;
-            S2 += speedRel*speedRel;
-            //Log << "speedRel: " << speedRel << " n: " << n << " S: " << S << " S2: " << S2 << endl;
+            S2 += speedRel*speedRel;            
         }
     }
 
     unsigned long int speed = encoder->getSpeedCPS();                                    
-    //Log << "Speed: " << speed << " SetPoint: " << speedToMoveAt << endl;
     TEST_ASSERT_INT_WITHIN( 200, speedToMoveAt, speed );            
     
-    float stdDev = sqrt( (n*S2-S*S)/(n*(n-1)) );
-    //Log << "Standard deviation: " << stdDev << endl;
+    float stdDev = sqrt( (n*S2-S*S)/(n*(n-1)) );    
     TEST_ASSERT_FLOAT_WITHIN( 100, 0, stdDev );            
 
 }

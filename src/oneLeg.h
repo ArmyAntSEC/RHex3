@@ -21,8 +21,9 @@ struct LegPinList
     int encoder2;
     int homing;
 };
+
 template <int EncoderChannel>
-struct OneLeg : public RunnableInterface
+struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
 {
     HardwareInterrupts* hwInterrupts;
     HardwarePins* hwPins;
@@ -65,5 +66,10 @@ struct OneLeg : public RunnableInterface
     {
         regulator.run(_nowMicros);
         commander.run(_nowMicros);        
+    }
+
+    virtual void setGoal( int _goal, unsigned long _time )
+    {
+        commander.setGoal( _goal, _time);
     }
 };

@@ -66,6 +66,19 @@ void testComputeTargetSpeed()
     TEST_ASSERT_EQUAL( 3000, commander.computeTargetSpeedCPS( timeLeftMicros, clicksLeft ) );
 }
 
+void testComputeTargetSpeedAtTimeZero()
+{
+    RotationalPositionProvider* posProvider = (RotationalPositionProvider*)1234;
+    SpeedRegulatorInterface* speedRegulator = (SpeedRegulatorInterface*)4321;
+    MotorSpeedCommander commander(posProvider, speedRegulator);   
+    int maxSpeedCPS = 1234;
+    commander.config( maxSpeedCPS );
+
+    long timeLeftMicros = 0;    
+    long clicksLeft = 3000;
+    TEST_ASSERT_EQUAL( maxSpeedCPS, commander.computeTargetSpeedCPS( timeLeftMicros, clicksLeft ) );
+}
+
 void testComputeTargetSpeedNegativeTimeLeft()
 {
     RotationalPositionProvider* posProvider = (RotationalPositionProvider*)1234;
@@ -141,20 +154,19 @@ void testRunSimple()
 
 void testRunOverTime()
 {    
+    
     RotationalPosition posNow(1234);
     int posGoal = 1234+100;
     SpeedRegulatorMock speedRegulator;
     int maxSpeedCPS = 5000;    
     long timeNow = 4321;
-    long timeGoalMicros = 4321 - 250;
+    long timeGoalMicros = 4321 - 250;    
 
-    MotorSpeedCommander commander(&posNow, &speedRegulator);
+    MotorSpeedCommander commander(&posNow, &speedRegulator);    
     commander.config( maxSpeedCPS );    
-    commander.start();    
-
-    commander.setGoal( posGoal, timeGoalMicros );    
-    
-    commander.run(timeNow);
+    commander.start();        
+    commander.setGoal( posGoal, timeGoalMicros );                
+    commander.run(timeNow);    
 
     TEST_ASSERT_EQUAL( maxSpeedCPS, speedRegulator.setPoint );
     TEST_ASSERT_FALSE( commander.hasArrived() );    
@@ -167,6 +179,7 @@ void runAllTestsMotorSpeedCommander()
     RUN_TEST( testSetGoalBehindCurrentPosition );
     RUN_TEST( testConfigure );
     RUN_TEST( testComputeTargetSpeed );
+    RUN_TEST( testComputeTargetSpeedAtTimeZero );
     RUN_TEST( testComputeTargetSpeedNegativeTimeLeft );
     RUN_TEST( testComputeTargetSpeedCapSpeed );
     RUN_TEST( testRunAlreadyPassedGoal );

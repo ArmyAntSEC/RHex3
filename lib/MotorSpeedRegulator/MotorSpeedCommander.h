@@ -61,29 +61,28 @@ public:
     }
 
     long computeTargetSpeedCPS( long timeLeftMicros, long clicksLeft )
-    {        
+    {       
         long clicksLeftScaled = 1e3L * clicksLeft;        
         long timeLeftMillis = timeLeftMicros / 1e3;
+        if ( timeLeftMillis == 0) { timeLeftMillis = 1; } //Avoid divide by zero;        
         long targetSpeedCPS = clicksLeftScaled / timeLeftMillis;
         long targetSpeedCPSCapped = cappedSpeedCPS( targetSpeedCPS );
-        
         return targetSpeedCPSCapped;
     }
 
     virtual void run(unsigned long int nowMicros)
-    {                                
-        if ( isRunning ) {            
-            long clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();            
+    {                                        
+        if ( isRunning ) {                          
+            long clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();                        
             if ( clicksLeft < 0 )
-            {                
+            {                                
                 arrived = true;                
-                speedRegulator->setSetPoint( 0 );                        
-            } else {
+                speedRegulator->setSetPoint( 0 );                                                        
+            } else {            
                 arrived = false;
-                long timeLeft = timeGoalMicros - nowMicros;
-                long targetSpeed = computeTargetSpeedCPS( timeLeft, clicksLeft ); 
-                speedRegulator->setSetPoint( targetSpeed );                            
-                Log << PRINTVAR(currentRotPos->getLinearPosition()) << PRINTVAR(timeLeft) << PRINTVAR(clicksLeft) << PRINTVAR(targetSpeed) << endl;
+                long timeLeft = timeGoalMicros - nowMicros;                
+                long targetSpeed = computeTargetSpeedCPS( timeLeft, clicksLeft );                                 
+                speedRegulator->setSetPoint( targetSpeed );                                                            
             }                  
         }     
            

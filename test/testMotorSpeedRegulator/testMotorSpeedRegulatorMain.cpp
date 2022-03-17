@@ -1,13 +1,16 @@
 #include <unityEx.h>
+#include <SerialStream.h>
 
 void processMotorSpeedRegulator();
 void runAllTestsMotorSpeedCommander();
+void runAllTestGaitCommander();
 
 void process()
 {
     UNITY_BEGIN_EXT();  
     processMotorSpeedRegulator();              
-    runAllTestsMotorSpeedCommander();
+    runAllTestsMotorSpeedCommander();    
+    runAllTestGaitCommander();
     UNITY_END_EXT();  
 }
 
