@@ -18,3 +18,14 @@ struct SpeedRegulatorInterface
 {
     virtual void setSetPoint( int _setPoint ) = 0;
 };
+
+struct LegCommandParserInterface
+{
+    struct LegCommand
+    {
+        int targetPositionClicks = 0;
+        long targetTimeMicros = 0;
+    };
+
+    virtual void receiveLegCommand(LegCommand) = 0;
+};
