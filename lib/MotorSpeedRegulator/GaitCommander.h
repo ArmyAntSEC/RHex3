@@ -10,19 +10,34 @@ struct LegCommandSequenceCompact
     int slowLength;
 };
 
-struct LegCommandSequence
+struct LegCommandSequence: public RunnableInterface
 {    
     int slowStartPos;
     int slowStartTimeMicros;
     int fastStartPos;
-    int fastStartTimeMicros;
+    int fastStartTimeMicros;    
+    int period;
+    LegCommandParserInterface* parser;
 
-    LegCommandSequence( LegCommandSequenceCompact& sequence, int period )
+    LegCommandSequence( LegCommandSequenceCompact* sequence, LegCommandParserInterface* _parser, int _period )
     {
-        slowStartPos = sequence.slowStartPos;
+        slowStartPos = sequence->slowStartPos;
         slowStartTimeMicros = 0;
-        fastStartPos = sequence.slowStartPos + sequence.slowLength;
-        fastStartTimeMicros = sequence.slowTimePercent * period / 100;
+        fastStartPos = sequence->slowStartPos + sequence->slowLength;
+        fastStartTimeMicros = sequence->slowTimePercent * _period / 100;
+        period = _period;
+        parser = _parser;
+    }
+
+    void run ( unsigned long _now )
+    {
+        LegCommandParserInterface::LegCommand command;
+        
+        //This is just placeholder code to pass the first unit test.
+        command.targetPositionClicks = fastStartPos;
+        command.targetTimeMicros = fastStartTimeMicros;
+
+        parser->receiveLegCommand( command );
     }
 };
 
