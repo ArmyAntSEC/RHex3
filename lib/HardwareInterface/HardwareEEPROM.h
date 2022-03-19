@@ -4,8 +4,8 @@
 
 struct HardwareEEPROMInterface
 {
-    virtual void UpdateEEPROM(unsigned address, unsigned value) = 0;
-    virtual uint16_t ReadEEPROM(unsigned address) = 0;
+    virtual void UpdateEEPROM(int16_t address, int16_t value) = 0;
+    virtual uint16_t ReadEEPROM(int16_t address) = 0;
 };
 
 
@@ -24,7 +24,7 @@ struct HardwareEEPROMMock: public HardwareEEPROMInterface
         memset(EEPROMData, 0, EEPROMSize);
     }
 
-    virtual void UpdateEEPROM(unsigned address, unsigned value)
+    virtual void UpdateEEPROM(int16_t address, int16_t value)
     {
         if (address < EEPROMSize)
         {
@@ -33,7 +33,7 @@ struct HardwareEEPROMMock: public HardwareEEPROMInterface
         }
     }
 
-    virtual uint16_t ReadEEPROM(unsigned address)
+    virtual uint16_t ReadEEPROM(int16_t address)
     {
         if (address < EEPROMSize)
         {
@@ -50,12 +50,12 @@ struct HardwareEEPROMMock: public HardwareEEPROMInterface
 #include <EEPROM.h>
 struct HardwareEEPROM: public HardwareEEPROMInterface
 {
-    virtual void UpdateEEPROM(unsigned address, unsigned value)
+    virtual void UpdateEEPROM(int16_t address, int16_t value)
     {
         EEPROM.update(address, value);
     }
 
-    virtual unsigned int16_t ReadEEPROM(unsigned address) 
+    virtual int16_t int16_t ReadEEPROM(int16_t address) 
     {
         return EEPROM.read(address);
     }

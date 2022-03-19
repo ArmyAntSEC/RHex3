@@ -105,7 +105,7 @@ void testSimpleMoveWithSpeed() {
     TEST_ASSERT_INT_WITHIN( 200, endPosTarget, endPos );
 }
 
-void doTestMoveWithPredictedSpeed( unsigned int16_t power );
+void doTestMoveWithPredictedSpeed( int16_t power );
 
 void testMoveWithPredictedSpeedPower32()
 {
@@ -131,7 +131,7 @@ void testMoveWithPredictedSpeedPower255()
 }
 
 
-void doTestMoveWithPredictedSpeed( unsigned int16_t power ) {        
+void doTestMoveWithPredictedSpeed( int16_t power ) {        
 
     int32_t int16_t motorSettlingTime = 1000;      
     
@@ -139,7 +139,7 @@ void doTestMoveWithPredictedSpeed( unsigned int16_t power ) {
     
     converter.initFromEEPROM();    
     
-    unsigned int16_t predictedSpeed = converter.GetFreeSpeedForPower( power );    
+    int16_t predictedSpeed = converter.GetFreeSpeedForPower( power );    
 
     //Spin up the motor
     driver.setMotorPWM(255);     

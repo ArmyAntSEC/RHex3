@@ -10,7 +10,7 @@
 #include "testBasicMotorFunctions.h"
 
 
-void testSimpleMoveAtConstantSpeed( unsigned int16_t speedToMoveAt) {    
+void testSimpleMoveAtConstantSpeed( int16_t speedToMoveAt) {    
 
     int32_t int16_t timeToMove = 2000;  
     int32_t int16_t timeToSettle = 1000;
