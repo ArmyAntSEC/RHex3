@@ -5,8 +5,8 @@
 struct HardwareClockInterface
 {
     virtual void resetMicrosecondsSinceBoot() = 0;
-    virtual unsigned long getMicrosecondsSinceBoot() = 0;        
-    virtual void delayMicroseconds( unsigned long us ) = 0;    
+    virtual uint32_t getMicrosecondsSinceBoot() = 0;        
+    virtual void delayMicroseconds( uint32_t us ) = 0;    
 };
 
 #ifdef ARDUINO
@@ -16,7 +16,7 @@ struct HardwareClockInterface
 class HardwareClock: public HardwareClockInterface
 {
 private:    
-    unsigned long timeOffset = 0;
+    uint32_t timeOffset = 0;
     HardwareInterrupts hwInterrupts;
 
 public:    
@@ -25,13 +25,13 @@ public:
         timeOffset = micros();
     }
     
-    virtual unsigned long getMicrosecondsSinceBoot()
+    virtual uint32_t getMicrosecondsSinceBoot()
     {
-        unsigned long rValue = micros() - timeOffset;        
+        uint32_t rValue = micros() - timeOffset;        
         return rValue;
     }    
 
-    virtual void delayMicroseconds( unsigned long us )
+    virtual void delayMicroseconds( uint32_t us )
     {
         if ( us > 10000 )
             delay( us / 1000 );
@@ -44,32 +44,32 @@ public:
 
 struct HardwareClockMock: public HardwareClockInterface
 {
-    unsigned long microsSinceStart = 0;   
-    unsigned long microsToStepOnRead = 0; 
+    uint32_t microsSinceStart = 0;   
+    uint32_t microsToStepOnRead = 0; 
 
     virtual void resetMicrosecondsSinceBoot()
     {
         microsSinceStart = 0;
     }
 
-    virtual unsigned long getMicrosecondsSinceBoot()
+    virtual uint32_t getMicrosecondsSinceBoot()
     {
-        unsigned long oldMicros = microsSinceStart;
+        uint32_t oldMicros = microsSinceStart;
         microsSinceStart += microsToStepOnRead;        
         return oldMicros;
     }
     
-    virtual void setMicrosToStepOnRead( unsigned long micros )
+    virtual void setMicrosToStepOnRead( uint32_t micros )
     {
         microsToStepOnRead = micros;
     }
 
-    virtual void stepMicrosecondsSinceBoot( unsigned long us )
+    virtual void stepMicrosecondsSinceBoot( uint32_t us )
     {
         microsSinceStart += us;
     }
 
-    virtual void delayMicroseconds( unsigned long us )
+    virtual void delayMicroseconds( uint32_t us )
     {
         //Do nothing.
     }

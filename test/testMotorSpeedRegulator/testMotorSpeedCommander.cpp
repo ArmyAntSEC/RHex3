@@ -161,7 +161,7 @@ void testRunOverTime()
     int16_t maxSpeedCPS = 5000;    
     long timeNow = 4321;
     long timeGoalMicros = 4321 - 250;    
-
+ 
     MotorSpeedCommander commander(&posNow, &speedRegulator);    
     commander.config( maxSpeedCPS );    
     commander.start();        

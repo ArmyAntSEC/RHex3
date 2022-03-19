@@ -10,7 +10,7 @@ private:
     RotationalPositionProvider* currentRotPos;
     SpeedRegulatorInterface* speedRegulator;
     RotationalPosition goalPos;
-    unsigned long timeGoalMicros;
+    uint32_t timeGoalMicros;
     int16_t maxSpeedCPS = 5000;
     bool arrived = false;
     bool isRunning = false;
@@ -34,7 +34,7 @@ public:
         maxSpeedCPS = _maxSpeedCPS;
     }
 
-    virtual void setGoal( int16_t _clicks, unsigned long _time )
+    virtual void setGoal( int16_t _clicks, uint32_t _time )
     {                
         int16_t thisClicks = currentRotPos->getClicks();
         if ( thisClicks > _clicks ) {
@@ -71,17 +71,17 @@ public:
     }
 
     virtual void run(uint32_t nowMicros)
-    {                                        
+    {                                                
         if ( isRunning ) {                          
-            long clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();                        
+            long clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();                                    
             if ( clicksLeft < 0 )
             {                                
                 arrived = true;                
                 speedRegulator->setSetPoint( 0 );                                                        
             } else {            
                 arrived = false;
-                long timeLeft = timeGoalMicros - nowMicros;                
-                long targetSpeed = computeTargetSpeedCPS( timeLeft, clicksLeft );                                 
+                long timeLeft = (int32_t)timeGoalMicros - (int32_t)nowMicros;                                
+                long targetSpeed = computeTargetSpeedCPS( timeLeft, clicksLeft );                                                 
                 speedRegulator->setSetPoint( targetSpeed );                                                            
             }                  
         }     

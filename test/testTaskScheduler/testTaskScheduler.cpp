@@ -7,8 +7,8 @@
 struct RunnableAtTimeMock: public RunnableAtTimeInterface
 {
     int16_t runCount = 0;
-    unsigned long lastRunTime = 0;
-    unsigned long nextRun = 1000;
+    uint32_t lastRunTime = 0;
+    uint32_t nextRun = 1000;
 
     virtual void run(uint32_t now)
     {

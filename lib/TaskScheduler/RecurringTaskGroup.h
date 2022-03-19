@@ -8,12 +8,12 @@ template<int16_t MaxTasks> class RecurringTaskGroup: public RunnableAtTimeInterf
 private:
     RunnableInterface* taskList[MaxTasks];
     int16_t numTasks = 0;
-    unsigned long periodMicros;
-    unsigned long nextRunTimeMicros = 0;
+    uint32_t periodMicros;
+    uint32_t nextRunTimeMicros = 0;
 
 public:
 
-    RecurringTaskGroup( unsigned long _periodMicros = 1000 ): periodMicros(_periodMicros), nextRunTimeMicros(_periodMicros)
+    RecurringTaskGroup( uint32_t _periodMicros = 1000 ): periodMicros(_periodMicros), nextRunTimeMicros(_periodMicros)
     {
 
     }

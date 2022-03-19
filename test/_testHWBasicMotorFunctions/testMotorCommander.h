@@ -51,13 +51,13 @@ void testComputeTargetSpeedPastPoint(void)
 
 void testSimpleMoveToAPositionAtTime()
 {
-    unsigned long int16_t timeToMove = 500;
-    unsigned long int16_t posToMoveTo = 1500;
+    uint32_t int16_t timeToMove = 500;
+    uint32_t int16_t posToMoveTo = 1500;
 
     regulator.init();
     encoder->forceHomed();
 
-    unsigned long int16_t endTime = millis() + timeToMove;
+    uint32_t int16_t endTime = millis() + timeToMove;
     commander.init(endTime, posToMoveTo);
     
     boolean hasArrived = false;
@@ -70,7 +70,7 @@ void testSimpleMoveToAPositionAtTime()
         }
         else if (commander.hasArrived())
         {
-            unsigned long int16_t pos = encoder->getPosition().getClickPosition();
+            uint32_t int16_t pos = encoder->getPosition().getClickPosition();
             TEST_ASSERT_INT_WITHIN(100, posToMoveTo, pos);
             TEST_ASSERT_INT_WITHIN(100, endTime, millis());
             hasArrived = true;
@@ -95,7 +95,7 @@ void testSimpleMoveToAPositionAtTime()
         }
         if (commander.hasArrived())
         {
-            unsigned long int16_t pos = encoder->getPosition().getClickPosition();
+            uint32_t int16_t pos = encoder->getPosition().getClickPosition();
             TEST_ASSERT_INT_WITHIN(100, posToMoveTo, pos);
             TEST_ASSERT_INT_WITHIN(100, endTime, millis());
             hasArrived = true;

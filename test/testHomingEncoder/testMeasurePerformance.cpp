@@ -15,13 +15,13 @@ void testRotationalPositionGetClicksPerformance()
     HardwareClock hwClock;
     HardwareInterrupts hwInterrupts;
 
-    unsigned long startTimeMicros = hwClock.getMicrosecondsSinceBoot();    
+    uint32_t startTimeMicros = hwClock.getMicrosecondsSinceBoot();    
     volatile long value = 0;
     for ( int16_t i = 0; i < 100; i++ )
     {
         value = sut.getClicks();
     }
-    unsigned long endTimeMicros = hwClock.getMicrosecondsSinceBoot();    
+    uint32_t endTimeMicros = hwClock.getMicrosecondsSinceBoot();    
     
     TEST_ASSERT_LESS_THAN_INT32( 20*1000L, endTimeMicros - startTimeMicros );
     TEST_ASSERT_GREATER_THAN_INT32( 15*1000L, endTimeMicros - startTimeMicros );
@@ -42,12 +42,12 @@ void testBasicEncoderWithMockListenersPerformance()
     encoder->addListener( &listenerMock1 );    
     //hwInterrupts.enableInterrupts();
 
-    unsigned long startTimeMicros = hwClock.getMicrosecondsSinceBoot();
+    uint32_t startTimeMicros = hwClock.getMicrosecondsSinceBoot();
     for ( int16_t i = 0; i < 10000; i++ ) //Max number of clicks per second
     {
         BasicEncoderFactory::isr_encoder<0>();        
     }
-    unsigned long endTimeMicros = hwClock.getMicrosecondsSinceBoot();
+    uint32_t endTimeMicros = hwClock.getMicrosecondsSinceBoot();
     
     TEST_ASSERT_LESS_THAN_INT32( 70*1000L, endTimeMicros - startTimeMicros );    
     TEST_ASSERT_GREATER_THAN_INT32( 65*1000L, endTimeMicros - startTimeMicros );    
@@ -71,12 +71,12 @@ void testBasicEncoderWithLinearAndSpeedMeasurementPerformance()
     encoder->addListener( &linear );
     encoder->addListener ( &speed );    
     
-    unsigned long startTimeMicros = hwClock.getMicrosecondsSinceBoot();
+    uint32_t startTimeMicros = hwClock.getMicrosecondsSinceBoot();
     for ( int16_t i = 0; i < 10000; i++ ) //Max clicks per second
     {
         BasicEncoderFactory::isr_encoder<0>();        
     }    
-    unsigned long endTimeMicros = hwClock.getMicrosecondsSinceBoot();    
+    uint32_t endTimeMicros = hwClock.getMicrosecondsSinceBoot();    
 
     TEST_ASSERT_LESS_THAN_INT32( 120*1000L, endTimeMicros - startTimeMicros );    
     TEST_ASSERT_GREATER_THAN_INT32( 110*1000L, endTimeMicros - startTimeMicros );    

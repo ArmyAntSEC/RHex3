@@ -11,7 +11,7 @@ class MotorDriverInterface
 
 struct MotorSpeedCommanderInterface
 {
-    virtual void setGoal( int16_t _goal, unsigned long _time ) = 0;
+    virtual void setGoal( int16_t _goal, uint32_t _time ) = 0;
 };
 
 struct SpeedRegulatorInterface

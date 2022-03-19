@@ -62,13 +62,13 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         regulator.setSetPoint( speed );
     }
 
-    virtual void run(unsigned long _nowMicros)
+    virtual void run(uint32_t _nowMicros)
     {
         regulator.run(_nowMicros);
         commander.run(_nowMicros);        
     }
 
-    virtual void setGoal( int16_t _goal, unsigned long _time )
+    virtual void setGoal( int16_t _goal, uint32_t _time )
     {
         commander.setGoal( _goal, _time);
     }

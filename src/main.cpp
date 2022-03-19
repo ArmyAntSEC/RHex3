@@ -88,7 +88,7 @@ void setup()
 
 void loop()
 {
-  unsigned long nowMicros = micros();
+  uint32_t nowMicros = micros();
   //sched.run(nowMicros);  
 }
 
