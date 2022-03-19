@@ -6,23 +6,23 @@
 class RotationalPositionProvider
 {
 protected:
-    static const long clicksPerLapNum = 10775776;
-    static const long clicksPerLapDen = 3000;
+    static const int32_t clicksPerLapNum = 10775776;
+    static const int32_t clicksPerLapDen = 3000;
 
 public:
-    virtual long getLinearPosition() const = 0;          
+    virtual int32_t getLinearPosition() const = 0;          
 
-    virtual long getLaps() const
+    virtual int32_t getLaps() const
     {
-        long long clickPosRaw = getLinearPosition();
+        int64_t clickPosRaw = getLinearPosition();
         return clickPosRaw * clicksPerLapDen / clicksPerLapNum;
     }
 
-    virtual long getClicks() const
+    virtual int32_t getClicks() const
     {
-        long long laps = getLaps();
-        long long clickPosRaw = getLinearPosition();
-        long clicksRemain = clickPosRaw - laps * clicksPerLapNum / clicksPerLapDen;
+        int64_t laps = getLaps();
+        int64_t clickPosRaw = getLinearPosition();
+        int32_t clicksRemain = clickPosRaw - laps * clicksPerLapNum / clicksPerLapDen;
         return clicksRemain;
     }      
 };
@@ -30,18 +30,18 @@ public:
 class RotationalPosition: public RotationalPositionProvider
 {
 private:
-    long linPos;
+    int32_t linPos;
 
 public:
-    RotationalPosition( long _linPos = 0 ): linPos(_linPos)
+    RotationalPosition( int32_t _linPos = 0 ): linPos(_linPos)
     {}
 
-    RotationalPosition( long laps, int16_t clicks )
+    RotationalPosition( int32_t laps, int16_t clicks )
     {
         linPos = (laps * clicksPerLapNum) / clicksPerLapDen + clicks;
     }
 
-    virtual long getLinearPosition() const {
+    virtual int32_t getLinearPosition() const {
         return linPos;
     }
 
@@ -58,7 +58,7 @@ public:
     void moveToLapBeforeRounded( int16_t _clicks )
     {                        
         int16_t thisClicks = getClicks();
-        long clicksDiff = thisClicks - _clicks;                
+        int32_t clicksDiff = thisClicks - _clicks;                
         if ( clicksDiff < 0 )
         {            
             linPos = (getLaps()+1)*10775776/3000 + thisClicks;
@@ -71,7 +71,7 @@ class RotationalPositionEncoder: public RotationalPositionProvider
 private:
     LinearPositionProvider* linPos;
 
-    virtual long getLinearPosition() const {
+    virtual int32_t getLinearPosition() const {
         return linPos->getLinearPosition();
     }
 

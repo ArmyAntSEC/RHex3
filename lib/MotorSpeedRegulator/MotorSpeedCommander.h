@@ -15,7 +15,7 @@ private:
     bool arrived = false;
     bool isRunning = false;
 
-    long cappedSpeedCPS( long speedCPS )
+    int32_t cappedSpeedCPS( int32_t speedCPS )
     {
         if ( speedCPS < 0 || speedCPS > maxSpeedCPS ) {
             return maxSpeedCPS;
@@ -60,28 +60,28 @@ public:
         return isRunning;
     }
 
-    long computeTargetSpeedCPS( long timeLeftMicros, long clicksLeft )
+    int32_t computeTargetSpeedCPS( int32_t timeLeftMicros, int32_t clicksLeft )
     {       
-        long clicksLeftScaled = 1e3L * clicksLeft;        
-        long timeLeftMillis = timeLeftMicros / 1e3;
+        int32_t clicksLeftScaled = 1e3L * clicksLeft;        
+        int32_t timeLeftMillis = timeLeftMicros / 1e3;
         if ( timeLeftMillis == 0) { timeLeftMillis = 1; } //Avoid divide by zero;        
-        long targetSpeedCPS = clicksLeftScaled / timeLeftMillis;
-        long targetSpeedCPSCapped = cappedSpeedCPS( targetSpeedCPS );
+        int32_t targetSpeedCPS = clicksLeftScaled / timeLeftMillis;
+        int32_t targetSpeedCPSCapped = cappedSpeedCPS( targetSpeedCPS );
         return targetSpeedCPSCapped;
     }
 
     virtual void run(uint32_t nowMicros)
     {                                                
         if ( isRunning ) {                          
-            long clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();                                    
+            int32_t clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();                                    
             if ( clicksLeft < 0 )
             {                                
                 arrived = true;                
                 speedRegulator->setSetPoint( 0 );                                                        
             } else {            
                 arrived = false;
-                long timeLeft = (int32_t)timeGoalMicros - (int32_t)nowMicros;                                
-                long targetSpeed = computeTargetSpeedCPS( timeLeft, clicksLeft );                                                 
+                int32_t timeLeft = (int32_t)timeGoalMicros - (int32_t)nowMicros;                                
+                int32_t targetSpeed = computeTargetSpeedCPS( timeLeft, clicksLeft );                                                 
                 speedRegulator->setSetPoint( targetSpeed );                                                            
             }                  
         }     

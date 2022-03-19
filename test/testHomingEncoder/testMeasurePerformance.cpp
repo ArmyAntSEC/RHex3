@@ -16,7 +16,7 @@ void testRotationalPositionGetClicksPerformance()
     HardwareInterrupts hwInterrupts;
 
     uint32_t startTimeMicros = hwClock.getMicrosecondsSinceBoot();    
-    volatile long value = 0;
+    volatile int32_t value = 0;
     for ( int16_t i = 0; i < 100; i++ )
     {
         value = sut.getClicks();

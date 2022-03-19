@@ -8,8 +8,8 @@
 class SpeedComputer: public CanProvideSpeed, public BasicEncoderListener 
 {
 private:
-    volatile long timeAtLastUpdateMicros = 0;
-    volatile long timeAtThisUpdateMicros = 0;
+    volatile int32_t timeAtLastUpdateMicros = 0;
+    volatile int32_t timeAtThisUpdateMicros = 0;
     volatile int16_t clicksSinceLastUpdate = 0;    
 
     HardwareClockInterface* hwClock;
@@ -38,10 +38,10 @@ public:
     {
         
         hwInterrupts->disableInterrupts();
-        long lastTime = timeAtLastUpdateMicros;
-        long thisTime = timeAtThisUpdateMicros;
+        int32_t lastTime = timeAtLastUpdateMicros;
+        int32_t thisTime = timeAtThisUpdateMicros;
         hwInterrupts->enableInterrupts();        
-        long timeDiff = thisTime - lastTime;
+        int32_t timeDiff = thisTime - lastTime;
 
 
         if ( timeDiff == 0 )                  

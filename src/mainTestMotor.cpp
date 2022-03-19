@@ -21,7 +21,7 @@ HardwarePins hwPins;
 class BasicEncoderStore: public BasicEncoderListener
 {
 private:
-    volatile long clickPosition = 0;
+    volatile int32_t clickPosition = 0;
 
 public:
     void signalStepForwardISR()
@@ -36,9 +36,9 @@ public:
 
     }
 
-    long getClickPosition()
+    int32_t getClickPosition()
     {
-        long rValue = 0;
+        int32_t rValue = 0;
         hwInterrupts.disableInterrupts();
         rValue = this->clickPosition;
         hwInterrupts.enableInterrupts();

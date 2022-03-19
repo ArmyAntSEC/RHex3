@@ -9,7 +9,7 @@ public:
 
 struct LinearPositionProvider
 {
-    virtual long getLinearPosition() = 0;    
+    virtual int32_t getLinearPosition() = 0;    
 };
 
 class CanProvideSpeed

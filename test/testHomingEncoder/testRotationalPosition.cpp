@@ -8,9 +8,9 @@
 
 struct LinearPositionProviderMock: public LinearPositionProvider
 {
-    long linearPos = 0;
+    int32_t linearPos = 0;
 
-    virtual long getLinearPosition()
+    virtual int32_t getLinearPosition()
     {
         return linearPos;
     }

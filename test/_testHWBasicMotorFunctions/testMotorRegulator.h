@@ -37,7 +37,7 @@ void testSimpleMoveAtConstantSpeed( unsigned int16_t speedToMoveAt) {
         if ( millis() > nextRun ) {
             nextRun+=10;
             uint32_t int16_t speed = encoder->getSpeedCPS();                        
-            long int16_t speedRel = speed - speedToMoveAt;
+            int32_t int16_t speedRel = speed - speedToMoveAt;
             
             //Compute STD        
             n++;

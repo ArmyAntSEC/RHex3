@@ -6,7 +6,7 @@
 class LinearPositionEncoder: public BasicEncoderListener, public LinearPositionProvider
 {
 private:
-    volatile long linearPosition = 0;
+    volatile int32_t linearPosition = 0;
     volatile bool isHomed = false;
     HardwareInterruptsInterface* hwInterrupts;
 public:
@@ -25,9 +25,9 @@ public:
         isHomed = true;
     }
 
-    virtual long getLinearPosition()
+    virtual int32_t getLinearPosition()
     {
-        long rValue = 0;
+        int32_t rValue = 0;
         hwInterrupts->disableInterrupts();
         rValue = linearPosition;
         hwInterrupts->enableInterrupts();

@@ -24,7 +24,7 @@ struct LegCommandControllerInterface
     struct LegCommand
     {
         int16_t targetPositionClicks = 0;
-        long targetTimeMicros = 0;
+        int32_t targetTimeMicros = 0;
     };
 
     virtual void receiveLegCommand(LegCommand) = 0;

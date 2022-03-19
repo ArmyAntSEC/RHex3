@@ -31,7 +31,7 @@ void testCreateLegCommandSequence()
     int16_t slowStartPos = 100;    
     int16_t slowTimePercent = 50;
     int16_t slowLength = 1000;
-    long period = 2e6L;
+    int32_t period = 2e6L;
     sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
     TEST_ASSERT_EQUAL( 100, sut.slowStartPos );    
@@ -49,7 +49,7 @@ void testRunLegCommandSequence()
     int16_t slowStartPos = 100;    
     int16_t slowTimePercent = 50;
     int16_t slowLength = 1000;
-    long period = 2e6L;
+    int32_t period = 2e6L;
     sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
     sut.run( 0 );
@@ -75,7 +75,7 @@ void testRunLegCommandSequenceThirdStep()
     int16_t slowStartPos = 100;    
     int16_t slowTimePercent = 50;
     int16_t slowLength = 1000;
-    long period = 2e6;
+    int32_t period = 2e6;
     sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
     sut.run( 4e6 - 1 );
@@ -94,7 +94,7 @@ void testGaitCommanderWithOneLeg()
     int16_t slowStartPos = 100;    
     int16_t slowTimePercent = 50;
     int16_t slowLength = 1000;
-    long period = 2e6;
+    int32_t period = 2e6;
     leg.config( slowStartPos, slowTimePercent, slowLength, period );
 
     GaitCommander<2> sut;

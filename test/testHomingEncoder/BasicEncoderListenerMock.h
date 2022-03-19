@@ -4,8 +4,8 @@
 
 struct BasicEncoderListenerMock: public BasicEncoderListener
 {
-    volatile long stepCounter = 0;
-    volatile long homingCounter = 0;
+    volatile int32_t stepCounter = 0;
+    volatile int32_t homingCounter = 0;
 
     void signalStepForwardISR() 
     {

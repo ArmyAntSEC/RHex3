@@ -23,8 +23,8 @@ void testSimpleMove() {
     encoder->forceHomed();  
     sched.delayWithScheduler(timeToMove);
     
-    long int16_t endPos = encoder->getPosition().getSerialPosition();                        
-    long int16_t endPosTarget = 3000; //Aproximately how far it should move in 1 second        
+    int32_t int16_t endPos = encoder->getPosition().getSerialPosition();                        
+    int32_t int16_t endPosTarget = 3000; //Aproximately how far it should move in 1 second        
     TEST_ASSERT_INT_WITHIN( 1000, endPosTarget, endPos ); //rather generous tolerances as we are just testing basic functionality here.
     
 }
@@ -100,8 +100,8 @@ void testSimpleMoveWithSpeed() {
     encoder->forceHomed();        
     sched.delayWithScheduler( timeToMove );
 
-    long int16_t endPosTarget = (timeToMove*speed)/1000;    
-    long int16_t endPos = encoder->getPosition().getSerialPosition();                
+    int32_t int16_t endPosTarget = (timeToMove*speed)/1000;    
+    int32_t int16_t endPos = encoder->getPosition().getSerialPosition();                
     TEST_ASSERT_INT_WITHIN( 200, endPosTarget, endPos );
 }
 
