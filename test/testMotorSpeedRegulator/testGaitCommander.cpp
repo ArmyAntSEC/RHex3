@@ -15,6 +15,12 @@ struct LegCommandParserMock: public LegCommandControllerInterface
         lastCommand = command;
         commandReceived = true;
     }
+
+    void reset()
+    {
+        lastCommand = LegCommand();
+        commandReceived = false;
+    }
 };
 
 void testCreateLegCommandSequence()
@@ -47,14 +53,16 @@ void testRunLegCommandSequence()
     sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
     sut.run( 0 );
+    TEST_ASSERT_TRUE( parser.commandReceived );    
     TEST_ASSERT_EQUAL( 1100, parser.lastCommand.targetPositionClicks );
     TEST_ASSERT_EQUAL( 1e6, parser.lastCommand.targetTimeMicros );
+    
+    parser.reset(); 
+    sut.run( 1e6 - 1 ); //Should not issue a new command.
+    TEST_ASSERT_FALSE( parser.commandReceived );    
 
-    sut.run( 1e6 - 1 );
-    TEST_ASSERT_EQUAL( 1100, parser.lastCommand.targetPositionClicks );
-    TEST_ASSERT_EQUAL( 1e6, parser.lastCommand.targetTimeMicros );
-
-    sut.run( 1e6 );
+    sut.run( 1e6 ); //Should issue a new command.
+    TEST_ASSERT_TRUE( parser.commandReceived );    
     TEST_ASSERT_EQUAL( 100, parser.lastCommand.targetPositionClicks );
     TEST_ASSERT_EQUAL( 2e6, parser.lastCommand.targetTimeMicros );    
 }

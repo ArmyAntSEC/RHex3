@@ -9,6 +9,8 @@ struct LegCommandSequence: public RunnableInterface
     int fastStartPos;
     int fastStartTimeMicros;    
     int periodMicros;
+    bool firstCommandSent = false;
+    bool inFastSegment = true;
     LegCommandControllerInterface* parser;
 
     LegCommandSequence( LegCommandControllerInterface* _parser ): parser(_parser)
@@ -30,15 +32,21 @@ struct LegCommandSequence: public RunnableInterface
 
         LegCommandControllerInterface::LegCommand command;                
         
-        if ( timeInLoop >= fastStartTimeMicros ) {
-            command.targetPositionClicks = slowStartPos;
-            command.targetTimeMicros = periodMicros*(loopNumber+1);
-        } else {
-            command.targetPositionClicks = fastStartPos;
-            command.targetTimeMicros = fastStartTimeMicros + periodMicros*loopNumber;            
-        }        
+        bool inFastSegmentNow = timeInLoop >= fastStartTimeMicros;
+        if ( inFastSegmentNow != inFastSegment || !firstCommandSent ) {
+            firstCommandSent = true;
+            inFastSegment = inFastSegmentNow;
 
-        parser->receiveLegCommand( command );
+            if ( inFastSegmentNow ) {
+                command.targetPositionClicks = slowStartPos;
+                command.targetTimeMicros = periodMicros*(loopNumber+1);
+            } else {
+                command.targetPositionClicks = fastStartPos;
+                command.targetTimeMicros = fastStartTimeMicros + periodMicros*loopNumber;            
+            }        
+
+            parser->receiveLegCommand( command );
+        }
     }
 };
 
