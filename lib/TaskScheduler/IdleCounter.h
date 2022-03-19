@@ -67,4 +67,10 @@ public:
         }
         maxIdleCountsPerSecond = getIdleCountsPerSecondAndResetCounter();
     }
+
+    int32_t getMaxIdleCountsPerSecond()
+    {
+        return maxIdleCountsPerSecond;
+    }
+    
 };

@@ -31,14 +31,14 @@ OneLeg<0> leftLeg(&hwInterrupts, &hwPins, &hwClock);
 OneLeg<1> rightLeg(&hwInterrupts, &hwPins, &hwClock);
 
 TaskScheduler sched( &hwClock );
-RecurringTaskGroup<2> recurringGroup( 10*1000L );
+RecurringTaskGroup<3> recurringGroup( 10*1000L );
 
 TaskAwareDelay awareDelay(&hwClock, &sched);
 
 GaitCommander<2> gaitCommander;
 
-//LegCommandSequence leftLegSequence;
-//LegCommandSequence rightLegSequence;
+LegCommandSequence leftLegSequence(&leftLeg);
+LegCommandSequence rightLegSequence(&rightLeg);
 
 void warmUpLegs()
 {
@@ -65,6 +65,18 @@ void warmUpLegs()
 
 void startWalking()
 {
+  Log << "Start walking" << endl;
+  gaitCommander.addLegSchedule( &leftLegSequence );
+  gaitCommander.addLegSchedule( &rightLegSequence );
+  
+  recurringGroup.addTask( &gaitCommander );
+
+  awareDelay.delayMicros( 1e6L );  
+
+  Log << "Done walking" << endl;
+  
+  leftLeg.stop();
+  rightLeg.stop();  
 
 }
 
@@ -76,10 +88,12 @@ void setup()
   
   IdleCounter* idleCounter = sched.getIdleCounterObject();    
   idleCounter->Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond();  
+  Log << "Max idle counts per second: " << idleCounter->getMaxIdleCountsPerSecond() << endl;
   
-  void warmUpLegs();
-  Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << endl;  
-  
+  warmUpLegs();
+
+  Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;  
+    
   startWalking();
   
   Log << "Exit" << endl;
@@ -87,9 +101,7 @@ void setup()
 
 
 void loop()
-{
-  int32_t nowMicros = micros();
-  //sched.run(nowMicros);  
+{  
 }
 
 #else

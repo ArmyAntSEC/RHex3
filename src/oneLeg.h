@@ -72,4 +72,9 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
     {
         commander.setGoal( goal );
     }
+
+    void stop()
+    {
+        driver.setMotorPWM(0);
+    }
 };
