@@ -1,5 +1,8 @@
 #pragma once
+#ifndef ARDUINO
 #include <cstdint>
+#endif
+
 #include <RunnableInterface.h>
 #include <SerialStream.h>
 #include <IdleCounter.h>

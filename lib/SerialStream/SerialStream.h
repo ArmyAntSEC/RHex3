@@ -19,7 +19,7 @@ public:
   SerialStream& operator<< ( T arg )
   {    
     #ifdef ARDUINO
-    Serial.print16_t ( arg );
+    Serial.print ( arg );
     #else
     std::cout << arg;
     #endif

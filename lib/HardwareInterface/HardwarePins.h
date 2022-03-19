@@ -1,9 +1,9 @@
 #pragma once
-#include <cstdint>
 #ifdef ARDUINO
 #include <Arduino.h>
 #else
 #include <string.h> //For memset();
+#include <cstdint>
 #endif
 
 struct HardwarePinsInterface
@@ -33,12 +33,12 @@ struct HardwarePinsInterface
 
 struct HardwarePins: public HardwarePinsInterface
 {    
-    void configurePin ( unsigned int16_t pin, PinMode mode )
+    void configurePin (  uint16_t pin, PinMode mode )
     {
         pinMode(pin, (uint8_t)mode );
     }
 
-    void attachAnInterrupt(unsigned int16_t pin, void(*isr)(), PinStatus status )
+    void attachAnInterrupt( uint16_t pin, void(*isr)(), PinStatus status )
     {            
         attachInterrupt(digitalPinToInterrupt(pin), isr, ::PinStatus(status) );    
     }
