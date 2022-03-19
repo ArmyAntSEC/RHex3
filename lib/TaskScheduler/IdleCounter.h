@@ -6,12 +6,12 @@
 class IdleCounter
 {
 private:
-    uint32_t idleCounter = 0;
+    int32_t idleCounter = 0;
     bool taskWasRun = false;
     RunnableInterface* taskScheduler;
     HardwareClockInterface* hwClock;    
-    uint32_t lastMeasurementTimeMicros = 0;
-    uint32_t maxIdleCountsPerSecond = 1e6; //large number
+    int32_t lastMeasurementTimeMicros = 0;
+    int32_t maxIdleCountsPerSecond = 1e6; //large number
 
 public:
 
@@ -19,7 +19,7 @@ public:
         taskScheduler(_scheduler), hwClock(_hwClock)
     {}
     
-    uint32_t getIdleCounter()
+    int32_t getIdleCounter()
     {
         return idleCounter;
     }
@@ -29,12 +29,12 @@ public:
         return idleCounter * 100 / maxIdleCountsPerSecond;
     }
     
-    uint32_t getIdleCountsPerSecondAndResetCounter()
+    int32_t getIdleCountsPerSecondAndResetCounter()
     {
-        uint32_t thisTime = hwClock->getMicrosecondsSinceBoot();
-        uint32_t timeDelta = thisTime - lastMeasurementTimeMicros;
+        int32_t thisTime = hwClock->getMicrosecondsSinceBoot();
+        int32_t timeDelta = thisTime - lastMeasurementTimeMicros;
         lastMeasurementTimeMicros = thisTime;
-        uint32_t thisIdleCounter = idleCounter;
+        int32_t thisIdleCounter = idleCounter;
         idleCounter = 0;
         return thisIdleCounter * 1e6 / timeDelta;
     }
@@ -62,7 +62,7 @@ public:
     {            
         getIdleCountsPerSecondAndResetCounter();
         for ( int16_t i = 0; i < 1000; i++ ) {            
-            uint32_t thisTime = hwClock->getMicrosecondsSinceBoot();
+            int32_t thisTime = hwClock->getMicrosecondsSinceBoot();
             taskScheduler->run(thisTime);            
         }
         maxIdleCountsPerSecond = getIdleCountsPerSecondAndResetCounter();

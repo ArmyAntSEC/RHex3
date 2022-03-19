@@ -24,7 +24,7 @@ struct LegCommandSequence: public RunnableInterface
         periodMicros = _period;        
     }
 
-    void run ( uint32_t _nowMicros )
+    void run ( int32_t _nowMicros )
     {
         //Find out where we are in our loop
         int32_t timeInLoop = _nowMicros % periodMicros;
@@ -65,7 +65,7 @@ public:
         legSequenceList[legCount++] = _sequence;
     }
 
-    void run( uint32_t _nowMicros )
+    void run( int32_t _nowMicros )
     {
         for ( int16_t i = 0; i < legCount; i++ )
         {

@@ -12,7 +12,7 @@
 
 void testSimpleMove() {        
     
-    uint32_t int16_t timeToMove = 1000;  
+    int32_t int16_t timeToMove = 1000;  
     
     //First spin up the motor
     driver.setMotorPWM(128);     
@@ -30,8 +30,8 @@ void testSimpleMove() {
 }
 
 void testSimpleHoming() {    
-    uint32_t int16_t maxTimeToMove = 5000;  
-    uint32_t int16_t endTime = millis() + maxTimeToMove;    
+    int32_t int16_t maxTimeToMove = 5000;  
+    int32_t int16_t endTime = millis() + maxTimeToMove;    
 
     driver.setMotorPWM(128);    
     encoder->unHome(); //And reset the homing flag.    
@@ -40,13 +40,13 @@ void testSimpleHoming() {
     while ( millis() < endTime ) {   
         if ( encoder->isHomed() ) {
             if ( firstRound ) {
-                uint32_t int16_t endPos = encoder->getPosAtLastHome().getClickPosition();
+                int32_t int16_t endPos = encoder->getPosAtLastHome().getClickPosition();
                 TEST_ASSERT_LESS_THAN( 1796, endPos ); //Make sure we home within one rotation            
                 encoder->unHome(); //Then we unhome the encoder to keep moving
                 firstRound = false;                    
             } else {
                 driver.setMotorPWM(0);
-                uint32_t int16_t endPos = encoder->getPosAtLastHome().getClickPosition();                
+                int32_t int16_t endPos = encoder->getPosAtLastHome().getClickPosition();                
                 TEST_ASSERT_INT_WITHIN( 10, 1796, endPos ); //Make sure we have gone exactly 1 round                                            
                 return;
             }
@@ -57,7 +57,7 @@ void testSimpleHoming() {
 }
 
 void testWrapAroundAndOffset() {
-    uint32_t int16_t timeToMove = 1500;  
+    int32_t int16_t timeToMove = 1500;  
 
     driver.setMotorPWM(128);    
         
@@ -70,7 +70,7 @@ void testWrapAroundAndOffset() {
 
 void testEncoderForStandingStill()
 {
-    uint32_t int16_t timeToMove = 1500;  
+    int32_t int16_t timeToMove = 1500;  
     driver.setMotorPWM(0);            
     sched.delayWithScheduler( timeToMove );    
     
@@ -85,7 +85,7 @@ void testEncoderForStandingStill()
 void testSimpleMoveWithSpeed() {        
     TEST_IGNORE();
 
-    uint32_t int16_t timeToMove = 1000;  
+    int32_t int16_t timeToMove = 1000;  
 
     //First spin up the motor    
     driver.setMotorPWM(128);     
@@ -133,7 +133,7 @@ void testMoveWithPredictedSpeedPower255()
 
 void doTestMoveWithPredictedSpeed( unsigned int16_t power ) {        
 
-    uint32_t int16_t motorSettlingTime = 1000;      
+    int32_t int16_t motorSettlingTime = 1000;      
     
     SpeedToPowerConverterProduction converter;
     

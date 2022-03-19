@@ -13,10 +13,10 @@ public:
     TaskAwareDelay( HardwareClockInterface* _clock, RunnableInterface* _runnable ): clock(_clock), runnable(_runnable)
     {}
 
-    void delayMicros( uint32_t micros )
+    void delayMicros( int32_t micros )
     {
-        uint32_t now = clock->getMicrosecondsSinceBoot();
-        uint32_t endTime =  now + micros;
+        int32_t now = clock->getMicrosecondsSinceBoot();
+        int32_t endTime =  now + micros;
         while ( endTime > now ) {
             now = clock->getMicrosecondsSinceBoot();
             runnable->run( now );

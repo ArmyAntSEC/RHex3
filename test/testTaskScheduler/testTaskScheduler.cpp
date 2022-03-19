@@ -7,16 +7,16 @@
 struct RunnableAtTimeMock: public RunnableAtTimeInterface
 {
     int16_t runCount = 0;
-    uint32_t lastRunTime = 0;
-    uint32_t nextRun = 1000;
+    int32_t lastRunTime = 0;
+    int32_t nextRun = 1000;
 
-    virtual void run(uint32_t now)
+    virtual void run(int32_t now)
     {
         runCount++;
         lastRunTime = now;
     }
 
-    virtual bool canRun( uint32_t now)
+    virtual bool canRun( int32_t now)
     {
         return now > nextRun;
     }

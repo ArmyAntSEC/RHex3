@@ -64,16 +64,16 @@ void testStepMoveAfterStep() {
 
     leg.init( millis(), stepTime, slowTime, slowAngle, LegController::AfterStep );    
 
-    uint32_t int16_t fastTimestamp = millis() + stepTime - slowTime;
-    uint32_t int16_t slowTimestamp = millis() + stepTime;
+    int32_t int16_t fastTimestamp = millis() + stepTime - slowTime;
+    int32_t int16_t slowTimestamp = millis() + stepTime;
     
     while ( millis() < fastTimestamp )
     {        
         sched.run();
     }
 
-    uint32_t int16_t pos = encoder.getPosComp();
-    uint32_t int16_t expectedPos = 3592-slowAngle/2;        
+    int32_t int16_t pos = encoder.getPosComp();
+    int32_t int16_t expectedPos = 3592-slowAngle/2;        
     TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
     TEST_ASSERT_EQUAL ( 0, encoder.getLaps() );
 
@@ -97,15 +97,15 @@ void testStepMoveAfterStepTwice() {
     //Take a first step.
     leg.init( millis(), stepTime, slowTime, slowAngle, LegController::AfterStep );    
 
-    uint32_t int16_t endTime = millis() + stepTime;    
+    int32_t int16_t endTime = millis() + stepTime;    
     
     while ( millis() < endTime )
     {        
         sched.run();
     }
 
-    uint32_t int16_t pos = encoder.getPosComp();
-    uint32_t int16_t expectedPos = slowAngle/2;        
+    int32_t int16_t pos = encoder.getPosComp();
+    int32_t int16_t expectedPos = slowAngle/2;        
     TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
     TEST_ASSERT_EQUAL ( 1, encoder.getLaps() );
 
@@ -134,14 +134,14 @@ void testStepMoveBeforeStepTwice() {
     //Take a first step.
     leg.init( millis(), stepTime, slowTime, slowAngle, LegController::BeforeStep );    
 
-    uint32_t int16_t endTime = millis() + stepTime;        
+    int32_t int16_t endTime = millis() + stepTime;        
     while ( millis() < endTime )
     {        
         sched.run();
     }
 
-    uint32_t int16_t pos = encoder.getPosComp();
-    uint32_t int16_t expectedPos = 3592-slowAngle/2;        
+    int32_t int16_t pos = encoder.getPosComp();
+    int32_t int16_t expectedPos = 3592-slowAngle/2;        
     TEST_ASSERT_INT_WITHIN( 40, expectedPos, pos );    
     TEST_ASSERT_EQUAL ( 0, encoder.getLaps() );
 
@@ -168,10 +168,10 @@ void testStepMoveBeforeStep() {
 
     leg.init( millis(), stepTime, slowTime, slowAngle, LegController::BeforeStep );    
 
-    uint32_t int16_t slowTimestamp = millis() + slowTime;
-    uint32_t int16_t fastTimestamp = millis() + stepTime;    
+    int32_t int16_t slowTimestamp = millis() + slowTime;
+    int32_t int16_t fastTimestamp = millis() + stepTime;    
 
-    uint32_t int16_t nextTime = millis() + 100;
+    int32_t int16_t nextTime = millis() + 100;
 
     while ( millis() < slowTimestamp )
     {        
@@ -181,8 +181,8 @@ void testStepMoveBeforeStep() {
         }
     }    
 
-    uint32_t int16_t pos = encoder.getPosComp();
-    uint32_t int16_t expectedPos = slowAngle/2;        
+    int32_t int16_t pos = encoder.getPosComp();
+    int32_t int16_t expectedPos = slowAngle/2;        
     //TEST_ASSERT_INT_WITHIN( 20, expectedPos, pos );    
     //TEST_ASSERT_EQUAL ( 0, encoder.getLaps() );
 

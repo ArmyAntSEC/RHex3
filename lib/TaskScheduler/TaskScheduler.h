@@ -41,7 +41,7 @@ class TaskScheduler: public RunnableInterface
             return taskList[n];
         }
 
-        void run( uint32_t nowMicros )
+        void run( int32_t nowMicros )
         {                               
             for ( int16_t i = 0; i < numTasks; i++ ) 
             {                

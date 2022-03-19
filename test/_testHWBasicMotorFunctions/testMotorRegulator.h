@@ -12,9 +12,9 @@
 
 void testSimpleMoveAtConstantSpeed( unsigned int16_t speedToMoveAt) {    
 
-    uint32_t int16_t timeToMove = 2000;  
-    uint32_t int16_t timeToSettle = 1000;
-    uint32_t int16_t endTime = 0;    
+    int32_t int16_t timeToMove = 2000;  
+    int32_t int16_t timeToSettle = 1000;
+    int32_t int16_t endTime = 0;    
 
     
     regulator.setSetPoint( speedToMoveAt );
@@ -32,11 +32,11 @@ void testSimpleMoveAtConstantSpeed( unsigned int16_t speedToMoveAt) {
     float S2 = 0.0;    
 
     endTime = millis() + timeToMove;
-    uint32_t int16_t nextRun = millis() + 10;
+    int32_t int16_t nextRun = millis() + 10;
     while ( millis() < endTime ) {                                    
         if ( millis() > nextRun ) {
             nextRun+=10;
-            uint32_t int16_t speed = encoder->getSpeedCPS();                        
+            int32_t int16_t speed = encoder->getSpeedCPS();                        
             int32_t int16_t speedRel = speed - speedToMoveAt;
             
             //Compute STD        
@@ -46,7 +46,7 @@ void testSimpleMoveAtConstantSpeed( unsigned int16_t speedToMoveAt) {
         }
     }
 
-    uint32_t int16_t speed = encoder->getSpeedCPS();                                    
+    int32_t int16_t speed = encoder->getSpeedCPS();                                    
     TEST_ASSERT_INT_WITHIN( 200, speedToMoveAt, speed );            
     
     float stdDev = sqrt( (n*S2-S*S)/(n*(n-1)) );    
@@ -73,13 +73,13 @@ void testSimpleMoveAtConstantSpeed500() {
 void testRegulatorHardBreak()
 {
     TEST_IGNORE();
-    uint32_t int16_t timeToSettle = 100;      
+    int32_t int16_t timeToSettle = 100;      
     int16_t speedToMoveAt = 3000;
     
     regulator.setSetPoint( speedToMoveAt );
     regulator.init();                
     //Run to settle the speed.
-    uint32_t int16_t endTime = millis() + timeToSettle;
+    int32_t int16_t endTime = millis() + timeToSettle;
     while ( millis() < endTime ) {
         sched.run();        
     }

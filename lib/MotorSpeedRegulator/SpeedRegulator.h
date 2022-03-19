@@ -69,7 +69,7 @@ public:
         setPoint = _setPoint;
     }
 
-    void run( uint32_t nowMicros ) 
+    void run( int32_t nowMicros ) 
     {     
         if ( this->isOn ) {            
             int16_t input = speedSource->getSpeedCPS();

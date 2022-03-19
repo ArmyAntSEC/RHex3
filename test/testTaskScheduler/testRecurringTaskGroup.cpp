@@ -7,7 +7,7 @@
 struct MockRunnable: public RunnableInterface
 {
     int16_t runCount = 0;
-    virtual void run( uint32_t now)
+    virtual void run( int32_t now)
     {
         runCount++;
     }
@@ -53,7 +53,7 @@ void testRunAndIncrementsNextTime()
     RecurringTaskGroup<3> group( 1000*1000L );
     group.nextRunTimeMicros = 1000*1000L;
     
-    uint32_t thisTime = 1500*1000L;
+    int32_t thisTime = 1500*1000L;
 
     TEST_ASSERT_TRUE( group.canRun(thisTime) );
     group.run(thisTime);    

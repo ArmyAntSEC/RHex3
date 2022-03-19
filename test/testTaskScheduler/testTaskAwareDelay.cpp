@@ -8,8 +8,8 @@
 struct RunnableMock: public RunnableInterface
 {
     int16_t runCount = 0;
-    uint32_t lastRunTime = 0;
-    virtual void run(uint32_t nowMillis)
+    int32_t lastRunTime = 0;
+    virtual void run(int32_t nowMillis)
     {
         runCount++;
         lastRunTime = nowMillis;
