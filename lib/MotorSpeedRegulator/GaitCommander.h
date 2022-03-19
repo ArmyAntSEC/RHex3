@@ -25,11 +25,13 @@ struct LegCommandSequence: public RunnableInterface
     }
 
     void run ( int32_t _nowMicros )
-    {
+    {        
         //Find out where we are in our loop
         int32_t timeInLoop = _nowMicros % periodMicros;
         int32_t loopNumber = _nowMicros / periodMicros;
-
+        
+        //Log << "Gait commander running: " << PRINTVAR( _nowMicros ) << PRINTVAR( timeInLoop ) << PRINTVAR(loopNumber) << PRINTVAR( periodMicros ) << endl;
+        
         MotorSpeedCommanderInterface::LegCommand command;                
         
         bool inFastSegmentNow = timeInLoop >= fastStartTimeMicros;        
@@ -47,6 +49,7 @@ struct LegCommandSequence: public RunnableInterface
             }        
 
             parser->setGoal( command );
+            //Log << "Goal sent: " << PRINTVAR( command.targetPositionClicks ) << PRINTVAR( command.targetTimeMicros ) << endl;
         }
     }
 };

@@ -44,9 +44,9 @@ void warmUpLegs()
 {
   //Warm things up a bit.
   leftLeg.config(&leftLegPins);
-  leftLeg.setSpeedSetpoint( 4000 );
+  leftLeg.setSpeedSetpoint( 3500 );
   rightLeg.config(&rightLegPins);
-  rightLeg.setSpeedSetpoint( 4000 );
+  rightLeg.setSpeedSetpoint( 3500 );
   
   sched.addTask( &recurringGroup );
   recurringGroup.addTask( &leftLeg );
@@ -58,26 +58,34 @@ void warmUpLegs()
   Log << "Left Leg: " << leftLeg.linPos.getLinearPosition() << endl;  
   Log << "Right Leg: " << rightLeg.linPos.getLinearPosition() << endl;    
   
-  leftLeg.driver.setMotorPWM( 0 );
-  rightLeg.driver.setMotorPWM( 0 );
+  leftLeg.stop();
+  rightLeg.stop();
   //End warmup
+}
+
+void configLegGait()
+{
+  int16_t slowStartPos = 0;
+  int16_t slowTimePercent = 50;
+  int16_t slowLength = 1000;
+  int32_t period = 15e5;
+
+  leftLegSequence.config( slowStartPos, slowTimePercent, slowLength, period );
 }
 
 void startWalking()
 {
-  Log << "Start walking" << endl;
-  gaitCommander.addLegSchedule( &leftLegSequence );
-  gaitCommander.addLegSchedule( &rightLegSequence );
-  
+  Log << "Start walking" << endl;  
+  gaitCommander.addLegSchedule( &leftLegSequence );    
   recurringGroup.addTask( &gaitCommander );
-
-  awareDelay.delayMicros( 1e6L );  
-
-  Log << "Done walking" << endl;
   
-  leftLeg.stop();
-  rightLeg.stop();  
+  leftLeg.start();
 
+  awareDelay.delayMicros( 6e6L );   
+  
+  leftLeg.stop();  
+  
+  Log << "Done walking" << endl;
 }
 
 void setup()
@@ -91,9 +99,11 @@ void setup()
   Log << "Max idle counts per second: " << idleCounter->getMaxIdleCountsPerSecond() << endl;
   
   warmUpLegs();
-
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;  
-    
+  
+  awareDelay.delayMicros( 1e6L );  
+  
+  configLegGait();  
   startWalking();
   
   Log << "Exit" << endl;

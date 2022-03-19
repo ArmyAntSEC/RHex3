@@ -68,12 +68,14 @@ public:
         if ( timeLeftMillis == 0) { timeLeftMillis = 1; } //Avoid divide by zero;        
         int32_t targetSpeedCPS = clicksLeftScaled / timeLeftMillis;
         int32_t targetSpeedCPSCapped = cappedSpeedCPS( targetSpeedCPS );
+        //Log << PRINTVAR(clicksLeft) << PRINTVAR(timeLeftMicros) << PRINTVAR( targetSpeedCPSCapped ) << endl;
         return targetSpeedCPSCapped;
     }
 
     virtual void run(int32_t nowMicros)
     {                                                
         if ( isRunning ) {                          
+            //Log << "Commander running" << endl;
             int32_t clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();                                    
             if ( clicksLeft < 0 )
             {                                

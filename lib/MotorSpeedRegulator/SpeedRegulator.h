@@ -71,14 +71,15 @@ public:
 
     void run( int32_t nowMicros ) 
     {     
-        if ( this->isOn ) {            
+        if ( this->isOn ) {                        
             int16_t input = speedSource->getSpeedCPS();
             int16_t error = (setPoint - input);
             float proportionalOutput = proportionalTerm * error;
             float derivateiveOutput = derivativeTerm * (input - lastInput); 
             integratorCumulativeValue += integratorTerm * error;            
-            int16_t clampedOutput = clampOutput( proportionalOutput + derivateiveOutput + integratorCumulativeValue );
+            int16_t clampedOutput = clampOutput( proportionalOutput + derivateiveOutput + integratorCumulativeValue );            
             target->setMotorPWM( clampedOutput );             
+            Log << PRINTVAR( input ) << PRINTVAR(setPoint) << PRINTVAR(clampedOutput) << endl;
         }
     }
 };

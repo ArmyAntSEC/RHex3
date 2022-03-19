@@ -49,8 +49,9 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         encoder->addListener(&speed);
 
         driver.config(pinList->motorEnable1, pinList->motorEnable2, pinList->motorPWM, hwPins);
-
-        regulator.config(&speed, &driver, 0.1, 0.015, 0, 10);
+        
+        //Wait with the integrating term for now until fully trimmed.
+        regulator.config(&speed, &driver, 0.1, 0*0.015, 0, 10); 
         
         regulator.start();
 
@@ -70,11 +71,20 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
 
     virtual void setGoal( LegCommand goal )
     {
+        Log << "Setting goal: Clicks: " << goal.targetPositionClicks << " Time: " << goal.targetTimeMicros << endl;
         commander.setGoal( goal );
+    }
+
+    void start()
+    {
+        regulator.start();
+        commander.start();        
     }
 
     void stop()
     {
+        commander.stop();
+        regulator.stop();
         driver.setMotorPWM(0);
     }
 };
