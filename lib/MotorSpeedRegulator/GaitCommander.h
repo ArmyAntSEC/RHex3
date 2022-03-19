@@ -12,30 +12,36 @@ struct LegCommandSequenceCompact
 
 struct LegCommandSequence: public RunnableInterface
 {    
-    int slowStartPos;
-    int slowStartTimeMicros;
+    int slowStartPos;    
     int fastStartPos;
     int fastStartTimeMicros;    
-    int period;
+    int periodMicros;
     LegCommandParserInterface* parser;
 
     LegCommandSequence( LegCommandSequenceCompact* sequence, LegCommandParserInterface* _parser, int _period )
     {
-        slowStartPos = sequence->slowStartPos;
-        slowStartTimeMicros = 0;
+        slowStartPos = sequence->slowStartPos;        
         fastStartPos = sequence->slowStartPos + sequence->slowLength;
         fastStartTimeMicros = sequence->slowTimePercent * _period / 100;
-        period = _period;
+        periodMicros = _period;
         parser = _parser;
     }
 
-    void run ( unsigned long _now )
+    void run ( unsigned long _nowMicros )
     {
-        LegCommandParserInterface::LegCommand command;
+        //Find out where we are in our loop
+        int timeInLoop = _nowMicros % periodMicros;
+        long loopNumber = _nowMicros / periodMicros;
+
+        LegCommandParserInterface::LegCommand command;                
         
-        //This is just placeholder code to pass the first unit test.
-        command.targetPositionClicks = fastStartPos;
-        command.targetTimeMicros = fastStartTimeMicros;
+        if ( timeInLoop >= fastStartTimeMicros ) {
+            command.targetPositionClicks = slowStartPos;
+            command.targetTimeMicros = periodMicros*(loopNumber+1);
+        } else {
+            command.targetPositionClicks = fastStartPos;
+            command.targetTimeMicros = fastStartTimeMicros + periodMicros*loopNumber;            
+        }        
 
         parser->receiveLegCommand( command );
     }
