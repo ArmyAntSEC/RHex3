@@ -31,7 +31,7 @@ void testCreateLegCommandSequence()
     int slowStartPos = 100;    
     int slowTimePercent = 50;
     int slowLength = 1000;
-    long period = 2e6;
+    long period = 2e6L;
     sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
     TEST_ASSERT_EQUAL( 100, sut.slowStartPos );    
@@ -49,16 +49,16 @@ void testRunLegCommandSequence()
     int slowStartPos = 100;    
     int slowTimePercent = 50;
     int slowLength = 1000;
-    long period = 2e6;
+    long period = 2e6L;
     sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
     sut.run( 0 );
     TEST_ASSERT_TRUE( parser.commandReceived );    
     TEST_ASSERT_EQUAL( 1100, parser.lastCommand.targetPositionClicks );
-    TEST_ASSERT_EQUAL( 1e6, parser.lastCommand.targetTimeMicros );
+    TEST_ASSERT_EQUAL( 1e6L, parser.lastCommand.targetTimeMicros );
     
     parser.reset(); 
-    sut.run( 1e6 - 1 ); //Should not issue a new command.
+    sut.run( 1e6 - 1 ); //Should not issue a new command as there is no change.
     TEST_ASSERT_FALSE( parser.commandReceived );    
 
     sut.run( 1e6 ); //Should issue a new command.

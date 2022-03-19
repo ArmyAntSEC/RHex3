@@ -7,8 +7,8 @@ struct LegCommandSequence: public RunnableInterface
 {    
     int slowStartPos;    
     int fastStartPos;
-    int fastStartTimeMicros;    
-    int periodMicros;
+    long fastStartTimeMicros;    
+    long periodMicros;
     bool firstCommandSent = false;
     bool inFastSegment = true;
     LegCommandControllerInterface* parser;
@@ -16,11 +16,11 @@ struct LegCommandSequence: public RunnableInterface
     LegCommandSequence( LegCommandControllerInterface* _parser ): parser(_parser)
     {}
 
-    void config( int _slowStartPos, int _slowTimePercent, int _slowLength, int _period )
+    void config( int _slowStartPos, int _slowTimePercent, int _slowLength, long _period )
     {
         slowStartPos = _slowStartPos;        
         fastStartPos = _slowStartPos + _slowLength;
-        fastStartTimeMicros = _slowTimePercent * _period / 100;
+        fastStartTimeMicros = _slowTimePercent * _period / 100L;
         periodMicros = _period;        
     }
 
