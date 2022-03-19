@@ -5,12 +5,12 @@
 #define private public
 #include <GaitCommander.h>
 
-struct LegCommandParserMock: public LegCommandControllerInterface
+struct LegCommandParserMock: public MotorSpeedCommanderInterface
 {
     LegCommand lastCommand;
     bool commandReceived = false;
 
-    virtual void receiveLegCommand(LegCommand command) 
+    virtual void setGoal(LegCommand command) 
     {
         lastCommand = command;
         commandReceived = true;

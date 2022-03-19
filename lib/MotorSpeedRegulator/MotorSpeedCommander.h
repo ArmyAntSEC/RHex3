@@ -34,15 +34,16 @@ public:
         maxSpeedCPS = _maxSpeedCPS;
     }
 
-    virtual void setGoal( int16_t _clicks, int32_t _time )
+    virtual void setGoal( LegCommand goal )
     {                
-        int16_t thisClicks = currentRotPos->getClicks();
-        if ( thisClicks > _clicks ) {
-            goalPos = RotationalPosition(currentRotPos->getLaps()+1, _clicks);                
+        int16_t thisClicks = currentRotPos->getClicks();        
+        if ( thisClicks > goal.targetPositionClicks ) {
+            goalPos = RotationalPosition(currentRotPos->getLaps()+1, goal.targetPositionClicks );                
         } else {
-            goalPos = RotationalPosition(currentRotPos->getLaps(), _clicks);                
-        }
-        timeGoalMicros = _time;
+            goalPos = RotationalPosition(currentRotPos->getLaps(), goal.targetPositionClicks );                
+        }        
+
+        timeGoalMicros = goal.targetTimeMicros;
     }        
 
     void stop()

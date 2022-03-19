@@ -68,8 +68,8 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         commander.run(_nowMicros);        
     }
 
-    virtual void setGoal( int16_t _goal, int32_t _time )
+    virtual void setGoal( LegCommand goal )
     {
-        commander.setGoal( _goal, _time);
+        commander.setGoal( goal );
     }
 };

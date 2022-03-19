@@ -19,11 +19,11 @@ void testSetGoal()
     RotationalPosition currentPos ( 1234 );    
     SpeedRegulatorInterface* speedRegulator;
     MotorSpeedCommander commander( &currentPos, speedRegulator);        
-    int16_t goalPos = 3210;
+    MotorSpeedCommanderInterface::LegCommand goal ( 3210, 5432 );
 
-    commander.setGoal( goalPos, 5432 );
+    commander.setGoal( goal );
 
-    TEST_ASSERT_EQUAL( goalPos, commander.goalPos.getLinearPosition() );
+    TEST_ASSERT_EQUAL( goal.targetPositionClicks, commander.goalPos.getLinearPosition() );
     TEST_ASSERT_EQUAL( 5432, commander.timeGoalMicros );
 }
 
@@ -32,9 +32,9 @@ void testSetGoalBehindCurrentPosition()
     RotationalPosition currentPos ( 3210 );    
     SpeedRegulatorInterface* speedRegulator;
     MotorSpeedCommander commander( &currentPos, speedRegulator);        
-    int16_t goalPos = 1234;
+    MotorSpeedCommanderInterface::LegCommand goal ( 1234, 5432 );
 
-    commander.setGoal( goalPos, 5432 );
+    commander.setGoal( goal );
 
     int32_t forwardGoalPosLinear = 1234 + 10775776L / 3000;
 
@@ -116,11 +116,13 @@ void testRunAlreadyPassedGoal()
     int32_t timeNow = 4321;
     int32_t timeGoalMicros = 4321 + 200;
 
+    MotorSpeedCommanderInterface::LegCommand goal ( posGoal, timeGoalMicros );
+
     MotorSpeedCommander commander(&posNow, &speedRegulator);
     commander.config( maxSpeedCPS );    
     commander.start();
 
-    commander.setGoal( posGoal, timeGoalMicros );
+    commander.setGoal( goal );
     commander.goalPos.linPos = 100;
 
     commander.run(timeNow);
@@ -137,10 +139,12 @@ void testRunSimple()
     int16_t maxSpeedCPS = 5000;    
     int32_t timeNow = 4321;
     int32_t timeGoalMicros = 4321 + 250*1000L;
+    
+    MotorSpeedCommanderInterface::LegCommand goal ( posGoal, timeGoalMicros );
 
     MotorSpeedCommander commander( &posNow, &speedRegulator );
     commander.config( maxSpeedCPS );    
-    commander.setGoal( posGoal, timeGoalMicros );
+    commander.setGoal( goal );
     
     commander.stop();
     commander.run(timeNow);
@@ -161,11 +165,12 @@ void testRunOverTime()
     int16_t maxSpeedCPS = 5000;    
     int32_t timeNow = 4321;
     int32_t timeGoalMicros = 4321 - 250;    
- 
+    MotorSpeedCommanderInterface::LegCommand goal ( posGoal, timeGoalMicros );
+
     MotorSpeedCommander commander(&posNow, &speedRegulator);    
     commander.config( maxSpeedCPS );    
     commander.start();        
-    commander.setGoal( posGoal, timeGoalMicros );                
+    commander.setGoal( goal );                
     commander.run(timeNow);    
 
     TEST_ASSERT_EQUAL( maxSpeedCPS, speedRegulator.setPoint );

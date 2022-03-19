@@ -11,9 +11,9 @@ struct LegCommandSequence: public RunnableInterface
     int32_t periodMicros;
     bool firstCommandSent = false;
     bool inFastSegment = true;
-    LegCommandControllerInterface* parser;
+    MotorSpeedCommanderInterface* parser;
 
-    LegCommandSequence( LegCommandControllerInterface* _parser ): parser(_parser)
+    LegCommandSequence( MotorSpeedCommanderInterface* _parser ): parser(_parser)
     {}
 
     void config( int16_t _slowStartPos, int16_t _slowTimePercent, int16_t _slowLength, int32_t _period )
@@ -30,7 +30,7 @@ struct LegCommandSequence: public RunnableInterface
         int32_t timeInLoop = _nowMicros % periodMicros;
         int32_t loopNumber = _nowMicros / periodMicros;
 
-        LegCommandControllerInterface::LegCommand command;                
+        MotorSpeedCommanderInterface::LegCommand command;                
         
         bool inFastSegmentNow = timeInLoop >= fastStartTimeMicros;        
 
@@ -46,7 +46,7 @@ struct LegCommandSequence: public RunnableInterface
                 command.targetTimeMicros = fastStartTimeMicros + periodMicros*loopNumber;            
             }        
 
-            parser->receiveLegCommand( command );
+            parser->setGoal( command );
         }
     }
 };

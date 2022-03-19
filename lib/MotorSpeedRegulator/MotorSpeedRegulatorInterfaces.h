@@ -9,23 +9,20 @@ class MotorDriverInterface
         virtual int16_t getMotorPWM() = 0;
 };
 
-struct MotorSpeedCommanderInterface
-{
-    virtual void setGoal( int16_t _goal, int32_t _time ) = 0;
-};
-
 struct SpeedRegulatorInterface
 {
     virtual void setSetPoint( int16_t _setPoint16_t ) = 0;
 };
 
-struct LegCommandControllerInterface
+struct MotorSpeedCommanderInterface
 {
     struct LegCommand
     {
-        int16_t targetPositionClicks = 0;
-        int32_t targetTimeMicros = 0;
+        int16_t targetPositionClicks;
+        int32_t targetTimeMicros;
+        LegCommand( int16_t _clicks = 0, int32_t _timeMicros = 0 ): targetPositionClicks(_clicks), targetTimeMicros(_timeMicros)
+        {}
     };
 
-    virtual void receiveLegCommand(LegCommand) = 0;
+    virtual void setGoal(LegCommand) = 0;
 };
