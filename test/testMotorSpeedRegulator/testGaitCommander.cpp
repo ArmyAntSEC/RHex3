@@ -5,30 +5,31 @@
 #define private public
 #include <GaitCommander.h>
 
-struct LegCommandParserMock: public LegCommandParserInterface
+struct LegCommandParserMock: public LegCommandControllerInterface
 {
     LegCommand lastCommand;
+    bool commandReceived = false;
 
     virtual void receiveLegCommand(LegCommand command) 
     {
         lastCommand = command;
+        commandReceived = true;
     }
 };
 
 void testCreateLegCommandSequence()
-{
-    LegCommandSequenceCompact legSequence;
-    legSequence.slowStartPos = 0;    
-    legSequence.slowTimePercent = 50;
-    legSequence.slowLength = 1000;
-    long period = 2e6;
-
+{    
     LegCommandParserMock parser;
+    LegCommandSequence sut( &parser );
 
-    LegCommandSequence sut( &legSequence, &parser, period );
+    int slowStartPos = 100;    
+    int slowTimePercent = 50;
+    int slowLength = 1000;
+    long period = 2e6;
+    sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
-    TEST_ASSERT_EQUAL( 0, sut.slowStartPos );    
-    TEST_ASSERT_EQUAL( 1000, sut.fastStartPos );
+    TEST_ASSERT_EQUAL( 100, sut.slowStartPos );    
+    TEST_ASSERT_EQUAL( 1100, sut.fastStartPos );
     TEST_ASSERT_EQUAL( 1e6, sut.fastStartTimeMicros );
     TEST_ASSERT_EQUAL( period, sut.periodMicros );
     TEST_ASSERT_EQUAL( &parser, sut.parser );
@@ -36,15 +37,14 @@ void testCreateLegCommandSequence()
 
 void testRunLegCommandSequence()
 {    
-    LegCommandSequenceCompact legSequence;
-    legSequence.slowStartPos = 100;    
-    legSequence.slowTimePercent = 50;
-    legSequence.slowLength = 1000;
-    long period = 2e6;
-
     LegCommandParserMock parser;
+    LegCommandSequence sut( &parser );
 
-    LegCommandSequence sut( &legSequence, &parser, period );
+    int slowStartPos = 100;    
+    int slowTimePercent = 50;
+    int slowLength = 1000;
+    long period = 2e6;
+    sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
     sut.run( 0 );
     TEST_ASSERT_EQUAL( 1100, parser.lastCommand.targetPositionClicks );
@@ -61,15 +61,14 @@ void testRunLegCommandSequence()
 
 void testRunLegCommandSequenceThirdStep()
 {    
-    LegCommandSequenceCompact legSequence;
-    legSequence.slowStartPos = 100;    
-    legSequence.slowTimePercent = 50;
-    legSequence.slowLength = 1000;
-    long period = 2e6;
-
     LegCommandParserMock parser;
+    LegCommandSequence sut( &parser );
 
-    LegCommandSequence sut( &legSequence, &parser, period );
+    int slowStartPos = 100;    
+    int slowTimePercent = 50;
+    int slowLength = 1000;
+    long period = 2e6;
+    sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
     sut.run( 4e6 - 1 );
     TEST_ASSERT_EQUAL( 100, parser.lastCommand.targetPositionClicks );
@@ -80,31 +79,22 @@ void testRunLegCommandSequenceThirdStep()
     TEST_ASSERT_EQUAL( 5e6, parser.lastCommand.targetTimeMicros );
 }
 
-void testShallControllOneLegForOneRound()
-{
-    TEST_IGNORE();
-    LegCommandParserMock legCommandParser;
-    GaitCommander<2> sut(&legCommandParser);
-    sut.setPeriod( 2*1e6L );
-    LegCommandSequenceCompact legSequence;
-    legSequence.slowStartPos = 0;    
-    legSequence.slowTimePercent = 50;
-    legSequence.slowLength = 1000;
+void testGaitCommanderWithOneLeg()
+{    
+    LegCommandParserMock parser;
+    LegCommandSequence leg( &parser );
+    int slowStartPos = 100;    
+    int slowTimePercent = 50;
+    int slowLength = 1000;
+    long period = 2e6;
+    leg.config( slowStartPos, slowTimePercent, slowLength, period );
 
-    sut.setLegSchedule<0>( legSequence );
+    GaitCommander<2> sut;
 
-    sut.run( 0 );    
-    TEST_ASSERT_EQUAL( 1000, legCommandParser.lastCommand.targetPositionClicks );
-    TEST_ASSERT_EQUAL( 1e6, legCommandParser.lastCommand.targetTimeMicros );
-
-    legCommandParser.lastCommand = LegCommandParserInterface::LegCommand();
-
-    sut.run( 999 );    
-
-    TEST_ASSERT_EQUAL( 0, legCommandParser.lastCommand.targetPositionClicks );
-    TEST_ASSERT_EQUAL( 0, legCommandParser.lastCommand.targetTimeMicros );
-
-
+    sut.addLegSchedule(&leg);
+    sut.run( 4e6 );
+    
+    TEST_ASSERT_TRUE( parser.commandReceived );        
 }
 
 void runAllTestGaitCommander()
@@ -113,7 +103,7 @@ void runAllTestGaitCommander()
     RUN_TEST( testCreateLegCommandSequence );
     RUN_TEST( testRunLegCommandSequence );
     RUN_TEST( testRunLegCommandSequenceThirdStep );
-    RUN_TEST( testShallControllOneLegForOneRound );
+    RUN_TEST( testGaitCommanderWithOneLeg );
     UNITY_END_INT();
 
 }

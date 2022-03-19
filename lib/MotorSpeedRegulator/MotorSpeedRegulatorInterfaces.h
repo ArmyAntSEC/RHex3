@@ -19,7 +19,7 @@ struct SpeedRegulatorInterface
     virtual void setSetPoint( int _setPoint ) = 0;
 };
 
-struct LegCommandParserInterface
+struct LegCommandControllerInterface
 {
     struct LegCommand
     {

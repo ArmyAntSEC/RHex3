@@ -3,28 +3,23 @@
 #include <MotorSpeedRegulatorInterfaces.h>
 #include <RunnableInterface.h>
 
-struct LegCommandSequenceCompact
-{    
-    int slowStartPos;
-    int slowTimePercent;
-    int slowLength;
-};
-
 struct LegCommandSequence: public RunnableInterface
 {    
     int slowStartPos;    
     int fastStartPos;
     int fastStartTimeMicros;    
     int periodMicros;
-    LegCommandParserInterface* parser;
+    LegCommandControllerInterface* parser;
 
-    LegCommandSequence( LegCommandSequenceCompact* sequence, LegCommandParserInterface* _parser, int _period )
+    LegCommandSequence( LegCommandControllerInterface* _parser ): parser(_parser)
+    {}
+
+    void config( int _slowStartPos, int _slowTimePercent, int _slowLength, int _period )
     {
-        slowStartPos = sequence->slowStartPos;        
-        fastStartPos = sequence->slowStartPos + sequence->slowLength;
-        fastStartTimeMicros = sequence->slowTimePercent * _period / 100;
-        periodMicros = _period;
-        parser = _parser;
+        slowStartPos = _slowStartPos;        
+        fastStartPos = _slowStartPos + _slowLength;
+        fastStartTimeMicros = _slowTimePercent * _period / 100;
+        periodMicros = _period;        
     }
 
     void run ( unsigned long _nowMicros )
@@ -33,7 +28,7 @@ struct LegCommandSequence: public RunnableInterface
         int timeInLoop = _nowMicros % periodMicros;
         long loopNumber = _nowMicros / periodMicros;
 
-        LegCommandParserInterface::LegCommand command;                
+        LegCommandControllerInterface::LegCommand command;                
         
         if ( timeInLoop >= fastStartTimeMicros ) {
             command.targetPositionClicks = slowStartPos;
@@ -51,34 +46,22 @@ struct LegCommandSequence: public RunnableInterface
 template <int MaxLegs>
 class GaitCommander: public RunnableInterface
 {
-private:    
-    long period; 
-    LegCommandSequenceCompact legSequenceList[MaxLegs];
+private:        
+    LegCommandSequence* legSequenceList[MaxLegs];    
+    int legCount = 0;
 
-    LegCommandParserInterface* legCommander;
-
-public:
-    GaitCommander( LegCommandParserInterface* _legCommander ): legCommander(_legCommander)
+public:        
+    void addLegSchedule( LegCommandSequence* _sequence )
     {
+        legSequenceList[legCount++] = _sequence;
     }
 
-    void setPeriod( long _period )
+    void run( unsigned long _nowMicros )
     {
-        period = _period;
-    }
-
-    template <int LegNum>
-    void setLegSchedule( LegCommandSequenceCompact _sequence)
-    {
-        legSequenceList[LegNum] = _sequence;
-    }
-
-    void run( unsigned long _now )
-    {
-        LegCommandParserInterface::LegCommand command;
-        command.targetPositionClicks = legSequenceList[0].slowLength;
-        command.targetTimeMicros = legSequenceList[0].slowTimePercent * period / 100;
-        legCommander->receiveLegCommand( command );
+        for ( int i = 0; i < legCount; i++ )
+        {
+            legSequenceList[i]->run( _nowMicros );
+        }
     }
 };
 
