@@ -28,8 +28,8 @@ public:
 class HardwareInterruptsMock: public HardwareInterruptsInterface
 {
 public:
-    int interruptsEnabledCount = 0;
-    int interruptsDisabledCount = 0;
+    int16_t interruptsEnabledCount = 0;
+    int16_t interruptsDisabledCount = 0;
 
     void enableInterrupts()
     {

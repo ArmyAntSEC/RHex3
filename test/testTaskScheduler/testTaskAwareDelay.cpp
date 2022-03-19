@@ -7,9 +7,9 @@
 
 struct RunnableMock: public RunnableInterface
 {
-    int runCount = 0;
+    int16_t runCount = 0;
     unsigned long lastRunTime = 0;
-    virtual void run(unsigned long nowMillis)
+    virtual void run(uint32_t nowMillis)
     {
         runCount++;
         lastRunTime = nowMillis;

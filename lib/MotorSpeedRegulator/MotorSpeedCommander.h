@@ -11,7 +11,7 @@ private:
     SpeedRegulatorInterface* speedRegulator;
     RotationalPosition goalPos;
     unsigned long timeGoalMicros;
-    int maxSpeedCPS = 5000;
+    int16_t maxSpeedCPS = 5000;
     bool arrived = false;
     bool isRunning = false;
 
@@ -29,14 +29,14 @@ public:
         currentRotPos(_rotPos), speedRegulator(_speedRegulator)
     {}
     
-    void config( int _maxSpeedCPS )
+    void config( int16_t _maxSpeedCPS )
     {        
         maxSpeedCPS = _maxSpeedCPS;
     }
 
-    virtual void setGoal( int _clicks, unsigned long _time )
+    virtual void setGoal( int16_t _clicks, unsigned long _time )
     {                
-        int thisClicks = currentRotPos->getClicks();
+        int16_t thisClicks = currentRotPos->getClicks();
         if ( thisClicks > _clicks ) {
             goalPos = RotationalPosition(currentRotPos->getLaps()+1, _clicks);                
         } else {
@@ -70,7 +70,7 @@ public:
         return targetSpeedCPSCapped;
     }
 
-    virtual void run(unsigned long int nowMicros)
+    virtual void run(uint32_t nowMicros)
     {                                        
         if ( isRunning ) {                          
             long clicksLeft = goalPos.getLinearPosition() - currentRotPos->getLinearPosition();                        

@@ -36,7 +36,7 @@ public:
     RotationalPosition( long _linPos = 0 ): linPos(_linPos)
     {}
 
-    RotationalPosition( long laps, int clicks )
+    RotationalPosition( long laps, int16_t clicks )
     {
         linPos = (laps * clicksPerLapNum) / clicksPerLapDen + clicks;
     }
@@ -55,9 +55,9 @@ public:
         return !this->operator==( pos );        
     }
 
-    void moveToLapBeforeRounded( int _clicks )
+    void moveToLapBeforeRounded( int16_t _clicks )
     {                        
-        int thisClicks = getClicks();
+        int16_t thisClicks = getClicks();
         long clicksDiff = thisClicks - _clicks;                
         if ( clicksDiff < 0 )
         {            

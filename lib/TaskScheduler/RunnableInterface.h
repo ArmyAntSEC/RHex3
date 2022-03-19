@@ -2,11 +2,11 @@
 
 struct RunnableInterface
 {
-    virtual void run(unsigned long int nowMicros) = 0;
+    virtual void run(uint32_t nowMicros) = 0;
 };
 
 struct RunnableAtTimeInterface: public RunnableInterface
 {    
-    virtual bool canRun( unsigned long now) = 0;
+    virtual bool canRun( uint32_t now) = 0;
 };
 

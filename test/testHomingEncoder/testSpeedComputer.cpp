@@ -20,7 +20,7 @@ void testShouldNotComputeSpeedAfterNineClicks()
     SpeedComputer sut( &hwClock, &hwInterrupts );
     hwClock.resetMicrosecondsSinceBoot();
     
-    for ( int i = 0; i < 9; i++ ) {
+    for ( int16_t i = 0; i < 9; i++ ) {
         hwClock.stepMicrosecondsSinceBoot( 1000 );
         sut.signalStepForwardISR();
     }
@@ -35,7 +35,7 @@ void testShouldComputeSpeedAfterTenClicks()
     SpeedComputer sut( &hwClock, &hwInterrupts );
     hwClock.resetMicrosecondsSinceBoot();
     
-    for ( int i = 0; i < 10; i++ ) {
+    for ( int16_t i = 0; i < 10; i++ ) {
         hwClock.stepMicrosecondsSinceBoot( 1000 );
         sut.signalStepForwardISR();
     }

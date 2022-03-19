@@ -13,7 +13,7 @@ void testConvertIndexToFirstAddress()
 {
     EEPROMStorage eeprom( &HWEeprom );
 
-    int address = eeprom.convertIndexToFirstAddress( 3 );
+    int16_t address = eeprom.convertIndexToFirstAddress( 3 );
 
     TEST_ASSERT_EQUAL( 6, address );
 }
@@ -22,7 +22,7 @@ void testConvertIndexToSecondAddress()
 {
     EEPROMStorage eeprom( &HWEeprom );
 
-    int address = eeprom.convertIndexToSecondAddress( 3 );
+    int16_t address = eeprom.convertIndexToSecondAddress( 3 );
 
     TEST_ASSERT_EQUAL( 7, address );
 }
@@ -42,7 +42,7 @@ void testReadFromIndex()
     EEPROMStorage eeprom( &HWEeprom );
     eeprom.writeIntToIndex( 5, 1234 );
 
-    int rValue = eeprom.readIntFromIndex( 5 );
+    int16_t rValue = eeprom.readIntFromIndex( 5 );
 
     TEST_ASSERT_EQUAL( 1234, rValue );
 }
@@ -50,7 +50,7 @@ void testReadFromIndex()
 void testWriteArrayToIndex()
 {
     EEPROMStorage eeprom( &HWEeprom );    
-    int values[] = {1234, 7658};
+    int16_t values[] = {1234, 7658};
     
     eeprom.writeIntArrayToAddress( 5, values, 2 );
 
@@ -63,10 +63,10 @@ void testWriteArrayToIndex()
 void testReadArrayFromIndex()
 {
     EEPROMStorage eeprom( &HWEeprom );    
-    int values[] = {1234, 7658};    
+    int16_t values[] = {1234, 7658};    
     eeprom.writeIntArrayToAddress( 5, values, 2 );
 
-    int rValues[2];
+    int16_t rValues[2];
     eeprom.readIntArrayFromAddress( 5, rValues, 2 );
 
     TEST_ASSERT_EQUAL( 1234, rValues[0] );    

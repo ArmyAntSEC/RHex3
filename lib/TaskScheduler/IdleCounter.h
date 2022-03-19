@@ -24,7 +24,7 @@ public:
         return idleCounter;
     }
 
-    int getCPUFactorPercent()
+    int16_t getCPUFactorPercent()
     {
         return idleCounter * 100 / maxIdleCountsPerSecond;
     }
@@ -61,7 +61,7 @@ public:
     void Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond()
     {            
         getIdleCountsPerSecondAndResetCounter();
-        for ( int i = 0; i < 1000; i++ ) {            
+        for ( int16_t i = 0; i < 1000; i++ ) {            
             unsigned long thisTime = hwClock->getMicrosecondsSinceBoot();
             taskScheduler->run(thisTime);            
         }

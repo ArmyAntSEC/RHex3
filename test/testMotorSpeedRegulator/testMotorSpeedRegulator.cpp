@@ -6,7 +6,7 @@
 
 struct MockSpeedometer: public CanProvideSpeed
 {    
-    int speed;
+    int16_t speed;
     MockSpeedometer()
     {
         init();
@@ -16,12 +16,12 @@ struct MockSpeedometer: public CanProvideSpeed
         speed = 3;
     }
 
-    virtual  int getSpeedCPS() { return speed; }
+    virtual  int16_t getSpeedCPS() { return speed; }
 };
 
 struct MockDriver: public MotorDriverInterface
 {
-    int driveSignal; 
+    int16_t driveSignal; 
 
     MockDriver()
     {
@@ -33,12 +33,12 @@ struct MockDriver: public MotorDriverInterface
         driveSignal = 5;
     }
 
-    virtual void setMotorPWM( int _driveSignal )
+    virtual void setMotorPWM( int16_t _driveSignal )
     {
         driveSignal = _driveSignal;
     }
 
-    virtual int getMotorPWM()
+    virtual int16_t getMotorPWM()
     {
         return driveSignal;
     }
@@ -137,7 +137,7 @@ void testStepWithSimpleProportionalTermAndLargeDiff()
     regulator.derivativeTerm = 0;
     regulator.proportionalTerm = 100;
     //P = 100
-    //SetPoint = 10;
+    //SetPoint16_t = 10;
     //Input = 3;
     // => Output = (10-3)*100 = 700;    
     regulator.start();    

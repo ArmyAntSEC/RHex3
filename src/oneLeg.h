@@ -14,15 +14,15 @@
 
 struct LegPinList
 {
-    int motorEnable1;
-    int motorEnable2;
-    int motorPWM;
-    int encoder1;
-    int encoder2;
-    int homing;
+    int16_t motorEnable1;
+    int16_t motorEnable2;
+    int16_t motorPWM;
+    int16_t encoder1;
+    int16_t encoder2;
+    int16_t homing;
 };
 
-template <int EncoderChannel>
+template <int16_t EncoderChannel>
 struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
 {
     HardwareInterrupts* hwInterrupts;
@@ -57,7 +57,7 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         linPos.forceHomed();
     }
 
-    void setSpeedSetpoint( int speed )
+    void setSpeedSetpoint( int16_t speed )
     {
         regulator.setSetPoint( speed );
     }
@@ -68,7 +68,7 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         commander.run(_nowMicros);        
     }
 
-    virtual void setGoal( int _goal, unsigned long _time )
+    virtual void setGoal( int16_t _goal, unsigned long _time )
     {
         commander.setGoal( _goal, _time);
     }

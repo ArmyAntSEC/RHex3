@@ -5,8 +5,8 @@
 
 struct LegCommandSequence: public RunnableInterface
 {    
-    int slowStartPos;    
-    int fastStartPos;
+    int16_t slowStartPos;    
+    int16_t fastStartPos;
     long fastStartTimeMicros;    
     long periodMicros;
     bool firstCommandSent = false;
@@ -16,7 +16,7 @@ struct LegCommandSequence: public RunnableInterface
     LegCommandSequence( LegCommandControllerInterface* _parser ): parser(_parser)
     {}
 
-    void config( int _slowStartPos, int _slowTimePercent, int _slowLength, long _period )
+    void config( int16_t _slowStartPos, int16_t _slowTimePercent, int16_t _slowLength, long _period )
     {
         slowStartPos = _slowStartPos;        
         fastStartPos = _slowStartPos + _slowLength;
@@ -24,15 +24,16 @@ struct LegCommandSequence: public RunnableInterface
         periodMicros = _period;        
     }
 
-    void run ( unsigned long _nowMicros )
+    void run ( uint32_t _nowMicros )
     {
         //Find out where we are in our loop
-        int timeInLoop = _nowMicros % periodMicros;
-        long loopNumber = _nowMicros / periodMicros;
+        int32_t timeInLoop = _nowMicros % periodMicros;
+        int32_t loopNumber = _nowMicros / periodMicros;
 
         LegCommandControllerInterface::LegCommand command;                
         
-        bool inFastSegmentNow = timeInLoop >= fastStartTimeMicros;
+        bool inFastSegmentNow = timeInLoop >= fastStartTimeMicros;        
+
         if ( inFastSegmentNow != inFastSegment || !firstCommandSent ) {
             firstCommandSent = true;
             inFastSegment = inFastSegmentNow;
@@ -51,12 +52,12 @@ struct LegCommandSequence: public RunnableInterface
 };
 
 
-template <int MaxLegs>
+template <int16_t MaxLegs>
 class GaitCommander: public RunnableInterface
 {
 private:        
     LegCommandSequence* legSequenceList[MaxLegs];    
-    int legCount = 0;
+    int16_t legCount = 0;
 
 public:        
     void addLegSchedule( LegCommandSequence* _sequence )
@@ -64,9 +65,9 @@ public:
         legSequenceList[legCount++] = _sequence;
     }
 
-    void run( unsigned long _nowMicros )
+    void run( uint32_t _nowMicros )
     {
-        for ( int i = 0; i < legCount; i++ )
+        for ( int16_t i = 0; i < legCount; i++ )
         {
             legSequenceList[i]->run( _nowMicros );
         }

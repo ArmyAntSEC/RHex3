@@ -5,9 +5,9 @@
 
 struct SpeedRegulatorMock: public SpeedRegulatorInterface
 {
-    int setPoint = 1234;
+    int16_t setPoint = 1234;
 
-    virtual void setSetPoint( int _setPoint ) 
+    virtual void setSetPoint( int16_t _setPoint ) 
     {
         setPoint = _setPoint;
     }
@@ -19,7 +19,7 @@ void testSetGoal()
     RotationalPosition currentPos ( 1234 );    
     SpeedRegulatorInterface* speedRegulator;
     MotorSpeedCommander commander( &currentPos, speedRegulator);        
-    int goalPos = 3210;
+    int16_t goalPos = 3210;
 
     commander.setGoal( goalPos, 5432 );
 
@@ -32,7 +32,7 @@ void testSetGoalBehindCurrentPosition()
     RotationalPosition currentPos ( 3210 );    
     SpeedRegulatorInterface* speedRegulator;
     MotorSpeedCommander commander( &currentPos, speedRegulator);        
-    int goalPos = 1234;
+    int16_t goalPos = 1234;
 
     commander.setGoal( goalPos, 5432 );
 
@@ -46,7 +46,7 @@ void testConfigure()
 {
     RotationalPositionProvider* posProvider = (RotationalPositionProvider*)1234;
     SpeedRegulatorInterface* speedRegulator = (SpeedRegulatorInterface*)4321;
-    int maxSpeedCPS = 1234;
+    int16_t maxSpeedCPS = 1234;
     
     MotorSpeedCommander commander( posProvider, speedRegulator);
     commander.config( maxSpeedCPS );
@@ -71,7 +71,7 @@ void testComputeTargetSpeedAtTimeZero()
     RotationalPositionProvider* posProvider = (RotationalPositionProvider*)1234;
     SpeedRegulatorInterface* speedRegulator = (SpeedRegulatorInterface*)4321;
     MotorSpeedCommander commander(posProvider, speedRegulator);   
-    int maxSpeedCPS = 1234;
+    int16_t maxSpeedCPS = 1234;
     commander.config( maxSpeedCPS );
 
     long timeLeftMicros = 0;    
@@ -83,7 +83,7 @@ void testComputeTargetSpeedNegativeTimeLeft()
 {
     RotationalPositionProvider* posProvider = (RotationalPositionProvider*)1234;
     SpeedRegulatorInterface* speedRegulator = (SpeedRegulatorInterface*)4321;    
-    int maxSpeedCPS = 1234;
+    int16_t maxSpeedCPS = 1234;
     
     MotorSpeedCommander commander ( posProvider, speedRegulator );
     commander.config( maxSpeedCPS );
@@ -97,7 +97,7 @@ void testComputeTargetSpeedCapSpeed()
 {
     RotationalPositionProvider* posProvider = (RotationalPositionProvider*)1234;
     SpeedRegulatorInterface* speedRegulator = (SpeedRegulatorInterface*)4321;    
-    int maxSpeedCPS = 123;
+    int16_t maxSpeedCPS = 123;
     
     MotorSpeedCommander commander(posProvider, speedRegulator);
     commander.config( maxSpeedCPS );
@@ -110,9 +110,9 @@ void testComputeTargetSpeedCapSpeed()
 void testRunAlreadyPassedGoal()
 {    
     RotationalPosition posNow( 1234 );
-    int posGoal = 1234 + 500;
+    int16_t posGoal = 1234 + 500;
     SpeedRegulatorMock speedRegulator;
-    int maxSpeedCPS = 5000;    
+    int16_t maxSpeedCPS = 5000;    
     long timeNow = 4321;
     long timeGoalMicros = 4321 + 200;
 
@@ -132,9 +132,9 @@ void testRunAlreadyPassedGoal()
 void testRunSimple()
 {
     RotationalPosition posNow(1234);
-    int posGoal = 1234 + 500;
+    int16_t posGoal = 1234 + 500;
     SpeedRegulatorMock speedRegulator;
-    int maxSpeedCPS = 5000;    
+    int16_t maxSpeedCPS = 5000;    
     long timeNow = 4321;
     long timeGoalMicros = 4321 + 250*1000L;
 
@@ -156,9 +156,9 @@ void testRunOverTime()
 {    
     
     RotationalPosition posNow(1234);
-    int posGoal = 1234+100;
+    int16_t posGoal = 1234+100;
     SpeedRegulatorMock speedRegulator;
-    int maxSpeedCPS = 5000;    
+    int16_t maxSpeedCPS = 5000;    
     long timeNow = 4321;
     long timeGoalMicros = 4321 - 250;    
 

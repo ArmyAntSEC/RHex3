@@ -7,26 +7,26 @@
 class SpeedRegulator: public SpeedRegulatorInterface, public RunnableInterface
 {
 private:
-    const int maxOutput = 255;
+    const int16_t maxOutput = 255;
 
     bool isOn = false;
 
     float proportionalTerm;
     float integratorTerm;
     float derivativeTerm;
-    int filterLength;
+    int16_t filterLength;
 
     float input;
     float lastInput;
 
     float integratorCumulativeValue;
 
-    int setPoint;
+    int16_t setPoint;
 
     CanProvideSpeed* speedSource;
     MotorDriverInterface* target;
 
-    int clampOutput( int output )
+    int16_t clampOutput( int16_t output )
     {
         if (output > maxOutput )
             return maxOutput;        
@@ -39,7 +39,7 @@ private:
 public:
     void config( CanProvideSpeed* _speedSource, 
         MotorDriverInterface* _target, 
-        float _P, float _I, float _D, int _filterLength )
+        float _P, float _I, float _D, int16_t _filterLength )
     {
         proportionalTerm = _P;
         integratorTerm = _I;
@@ -64,20 +64,20 @@ public:
         isOn = false;
     }
 
-    virtual void setSetPoint( int _setPoint )
+    virtual void setSetPoint( int16_t _setPoint )
     {
         setPoint = _setPoint;
     }
 
-    void run( unsigned long nowMicros ) 
+    void run( uint32_t nowMicros ) 
     {     
         if ( this->isOn ) {            
-            int input = speedSource->getSpeedCPS();
-            int error = (setPoint - input);
+            int16_t input = speedSource->getSpeedCPS();
+            int16_t error = (setPoint - input);
             float proportionalOutput = proportionalTerm * error;
             float derivateiveOutput = derivativeTerm * (input - lastInput); 
             integratorCumulativeValue += integratorTerm * error;            
-            int clampedOutput = clampOutput( proportionalOutput + derivateiveOutput + integratorCumulativeValue );
+            int16_t clampedOutput = clampOutput( proportionalOutput + derivateiveOutput + integratorCumulativeValue );
             target->setMotorPWM( clampedOutput );             
         }
     }

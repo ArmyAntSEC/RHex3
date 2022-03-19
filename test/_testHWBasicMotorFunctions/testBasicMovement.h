@@ -12,7 +12,7 @@
 
 void testSimpleMove() {        
     
-    unsigned long int timeToMove = 1000;  
+    unsigned long int16_t timeToMove = 1000;  
     
     //First spin up the motor
     driver.setMotorPWM(128);     
@@ -23,15 +23,15 @@ void testSimpleMove() {
     encoder->forceHomed();  
     sched.delayWithScheduler(timeToMove);
     
-    long int endPos = encoder->getPosition().getSerialPosition();                        
-    long int endPosTarget = 3000; //Aproximately how far it should move in 1 second        
+    long int16_t endPos = encoder->getPosition().getSerialPosition();                        
+    long int16_t endPosTarget = 3000; //Aproximately how far it should move in 1 second        
     TEST_ASSERT_INT_WITHIN( 1000, endPosTarget, endPos ); //rather generous tolerances as we are just testing basic functionality here.
     
 }
 
 void testSimpleHoming() {    
-    unsigned long int maxTimeToMove = 5000;  
-    unsigned long int endTime = millis() + maxTimeToMove;    
+    unsigned long int16_t maxTimeToMove = 5000;  
+    unsigned long int16_t endTime = millis() + maxTimeToMove;    
 
     driver.setMotorPWM(128);    
     encoder->unHome(); //And reset the homing flag.    
@@ -40,13 +40,13 @@ void testSimpleHoming() {
     while ( millis() < endTime ) {   
         if ( encoder->isHomed() ) {
             if ( firstRound ) {
-                unsigned long int endPos = encoder->getPosAtLastHome().getClickPosition();
+                unsigned long int16_t endPos = encoder->getPosAtLastHome().getClickPosition();
                 TEST_ASSERT_LESS_THAN( 1796, endPos ); //Make sure we home within one rotation            
                 encoder->unHome(); //Then we unhome the encoder to keep moving
                 firstRound = false;                    
             } else {
                 driver.setMotorPWM(0);
-                unsigned long int endPos = encoder->getPosAtLastHome().getClickPosition();                
+                unsigned long int16_t endPos = encoder->getPosAtLastHome().getClickPosition();                
                 TEST_ASSERT_INT_WITHIN( 10, 1796, endPos ); //Make sure we have gone exactly 1 round                                            
                 return;
             }
@@ -57,7 +57,7 @@ void testSimpleHoming() {
 }
 
 void testWrapAroundAndOffset() {
-    unsigned long int timeToMove = 1500;  
+    unsigned long int16_t timeToMove = 1500;  
 
     driver.setMotorPWM(128);    
         
@@ -70,29 +70,29 @@ void testWrapAroundAndOffset() {
 
 void testEncoderForStandingStill()
 {
-    unsigned long int timeToMove = 1500;  
+    unsigned long int16_t timeToMove = 1500;  
     driver.setMotorPWM(0);            
     sched.delayWithScheduler( timeToMove );    
     
     sched.delayWithScheduler( 10 );    
 
-    int speed = encoder->getSpeedCPS();    
+    int16_t speed = encoder->getSpeedCPS();    
     
-    int speedFiltered = encoder->getSpeedCPSFiltered();    
+    int16_t speedFiltered = encoder->getSpeedCPSFiltered();    
     TEST_ASSERT_INT_WITHIN( 10, 0, speedFiltered );                    
 }
 
 void testSimpleMoveWithSpeed() {        
     TEST_IGNORE();
 
-    unsigned long int timeToMove = 1000;  
+    unsigned long int16_t timeToMove = 1000;  
 
     //First spin up the motor    
     driver.setMotorPWM(128);     
     sched.delayWithScheduler( timeToMove );
 
     //Measure the speed
-    int speed = encoder->getSpeedCPSFiltered();    
+    int16_t speed = encoder->getSpeedCPSFiltered();    
     TEST_ASSERT_INT_WITHIN( 600, 3252, speed ); //very loose tolerances as we are just sanity checking the system here.
 
     //Compute the distance to move
@@ -100,12 +100,12 @@ void testSimpleMoveWithSpeed() {
     encoder->forceHomed();        
     sched.delayWithScheduler( timeToMove );
 
-    long int endPosTarget = (timeToMove*speed)/1000;    
-    long int endPos = encoder->getPosition().getSerialPosition();                
+    long int16_t endPosTarget = (timeToMove*speed)/1000;    
+    long int16_t endPos = encoder->getPosition().getSerialPosition();                
     TEST_ASSERT_INT_WITHIN( 200, endPosTarget, endPos );
 }
 
-void doTestMoveWithPredictedSpeed( unsigned int power );
+void doTestMoveWithPredictedSpeed( unsigned int16_t power );
 
 void testMoveWithPredictedSpeedPower32()
 {
@@ -131,15 +131,15 @@ void testMoveWithPredictedSpeedPower255()
 }
 
 
-void doTestMoveWithPredictedSpeed( unsigned int power ) {        
+void doTestMoveWithPredictedSpeed( unsigned int16_t power ) {        
 
-    unsigned long int motorSettlingTime = 1000;      
+    unsigned long int16_t motorSettlingTime = 1000;      
     
     SpeedToPowerConverterProduction converter;
     
     converter.initFromEEPROM();    
     
-    unsigned int predictedSpeed = converter.GetFreeSpeedForPower( power );    
+    unsigned int16_t predictedSpeed = converter.GetFreeSpeedForPower( power );    
 
     //Spin up the motor
     driver.setMotorPWM(255);     
@@ -148,7 +148,7 @@ void doTestMoveWithPredictedSpeed( unsigned int power ) {
     //Set the speed, settle and measure
     driver.setMotorPWM(power);     
     sched.delayWithScheduler( motorSettlingTime );        
-    int measuredSpeed = encoder->getSpeedCPSFiltered();      
+    int16_t measuredSpeed = encoder->getSpeedCPSFiltered();      
     TEST_ASSERT_INT_WITHIN( 150, predictedSpeed, measuredSpeed );                    
 }
 #endif

@@ -21,14 +21,14 @@
 class MotorDriver: public MotorDriverInterface
 {
 private:
-  int driverPinOne;
-  int driverPinTwo;	  
-  int driverPinPWM;
-  int lastMotorPWM = 0;
+  int16_t driverPinOne;
+  int16_t driverPinTwo;	  
+  int16_t driverPinPWM;
+  int16_t lastMotorPWM = 0;
   HardwarePinsInterface* pins;
   
 public:	
-  void config( int _driverPinOne, int _driverPinTwo, int _driverPinPWM, HardwarePinsInterface* _pins ) {
+  void config( int16_t _driverPinOne, int16_t _driverPinTwo, int16_t _driverPinPWM, HardwarePinsInterface* _pins ) {
       driverPinOne = _driverPinOne;
       driverPinTwo = _driverPinTwo;
       driverPinPWM = _driverPinPWM;      
@@ -42,7 +42,7 @@ public:
       this->setMotorPWM(0); 
   }
   
-  virtual void setMotorPWM( int motorPWM ) {			  
+  virtual void setMotorPWM( int16_t motorPWM ) {			  
     if ( motorPWM < 0 || 
       (motorPWM == 0 && lastMotorPWM > 0) ) //Actively break when setting the speed to 0
     {
@@ -60,7 +60,7 @@ public:
     this->lastMotorPWM = motorPWM;
   }
 
-  virtual int getMotorPWM()
+  virtual int16_t getMotorPWM()
   {
     return this->lastMotorPWM;
   }

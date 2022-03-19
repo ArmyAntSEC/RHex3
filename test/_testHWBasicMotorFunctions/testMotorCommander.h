@@ -11,53 +11,53 @@
 
 void testComputeTargetSpeedWithinRange(void)
 {
-    int timeLeft = 100;
-    int clicksLeft = 200;
+    int16_t timeLeft = 100;
+    int16_t clicksLeft = 200;
     MotorSpeedCommander commander;
 
-    int speedComputed = commander.computeTargetSpeed(timeLeft, clicksLeft);
+    int16_t speedComputed = commander.computeTargetSpeed(timeLeft, clicksLeft);
     TEST_ASSERT_INT_WITHIN(2, 2000, speedComputed);
 }
 
 void testComputeTargetSpeedNegativeTime(void)
 {
-    int timeLeft = -100;
-    int clicksLeft = 200;
+    int16_t timeLeft = -100;
+    int16_t clicksLeft = 200;
     MotorSpeedCommander commander;
 
-    int speedComputed = commander.computeTargetSpeed(timeLeft, clicksLeft);
+    int16_t speedComputed = commander.computeTargetSpeed(timeLeft, clicksLeft);
     TEST_ASSERT_INT_WITHIN(2, commander.getMaxSpeed(), speedComputed);
 }
 
 void testComputeTargetSpeedTooFast(void)
 {
-    int timeLeft = 100;
-    int clicksLeft = 5000;
+    int16_t timeLeft = 100;
+    int16_t clicksLeft = 5000;
     MotorSpeedCommander commander;
 
-    int speedComputed = commander.computeTargetSpeed(timeLeft, clicksLeft);
+    int16_t speedComputed = commander.computeTargetSpeed(timeLeft, clicksLeft);
     TEST_ASSERT_INT_WITHIN(2, commander.getMaxSpeed(), speedComputed);
 }
 
 void testComputeTargetSpeedPastPoint(void)
 {
-    int timeLeft = 100;
-    int clicksLeft = -200;
+    int16_t timeLeft = 100;
+    int16_t clicksLeft = -200;
     MotorSpeedCommander commander;
 
-    int speedComputed = commander.computeTargetSpeed(timeLeft, clicksLeft);
+    int16_t speedComputed = commander.computeTargetSpeed(timeLeft, clicksLeft);
     TEST_ASSERT_INT_WITHIN(2, 1, speedComputed);
 }
 
 void testSimpleMoveToAPositionAtTime()
 {
-    unsigned long int timeToMove = 500;
-    unsigned long int posToMoveTo = 1500;
+    unsigned long int16_t timeToMove = 500;
+    unsigned long int16_t posToMoveTo = 1500;
 
     regulator.init();
     encoder->forceHomed();
 
-    unsigned long int endTime = millis() + timeToMove;
+    unsigned long int16_t endTime = millis() + timeToMove;
     commander.init(endTime, posToMoveTo);
     
     boolean hasArrived = false;
@@ -70,7 +70,7 @@ void testSimpleMoveToAPositionAtTime()
         }
         else if (commander.hasArrived())
         {
-            unsigned long int pos = encoder->getPosition().getClickPosition();
+            unsigned long int16_t pos = encoder->getPosition().getClickPosition();
             TEST_ASSERT_INT_WITHIN(100, posToMoveTo, pos);
             TEST_ASSERT_INT_WITHIN(100, endTime, millis());
             hasArrived = true;
@@ -95,7 +95,7 @@ void testSimpleMoveToAPositionAtTime()
         }
         if (commander.hasArrived())
         {
-            unsigned long int pos = encoder->getPosition().getClickPosition();
+            unsigned long int16_t pos = encoder->getPosition().getClickPosition();
             TEST_ASSERT_INT_WITHIN(100, posToMoveTo, pos);
             TEST_ASSERT_INT_WITHIN(100, endTime, millis());
             hasArrived = true;

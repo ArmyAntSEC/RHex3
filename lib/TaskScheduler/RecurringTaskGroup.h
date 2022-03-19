@@ -3,11 +3,11 @@
 #include <RunnableInterface.h>
 #include <SerialStream.h>
 
-template<int MaxTasks> class RecurringTaskGroup: public RunnableAtTimeInterface
+template<int16_t MaxTasks> class RecurringTaskGroup: public RunnableAtTimeInterface
 {
 private:
     RunnableInterface* taskList[MaxTasks];
-    int numTasks = 0;
+    int16_t numTasks = 0;
     unsigned long periodMicros;
     unsigned long nextRunTimeMicros = 0;
 
@@ -23,17 +23,17 @@ public:
         taskList[numTasks++] = task;
     }
 
-    int getNumberOfTasks()
+    int16_t getNumberOfTasks()
     {
         return numTasks;
     }
 
-    RunnableInterface* getTask( int n )
+    RunnableInterface* getTask( int16_t n )
     {
         return taskList[n];
     }
     
-    virtual bool canRun( unsigned long nowMicros )
+    virtual bool canRun( uint32_t nowMicros )
     {        
         if ( nowMicros > nextRunTimeMicros ) {                        
             return true;
@@ -42,10 +42,10 @@ public:
         }
     }
 
-    virtual void run( unsigned long nowMicros )
+    virtual void run( uint32_t nowMicros )
     {                                
         nextRunTimeMicros += periodMicros;
-        for ( int i = 0; i < numTasks; i++ )
+        for ( int16_t i = 0; i < numTasks; i++ )
         {
             taskList[i]->run(nowMicros);
         }        

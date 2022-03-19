@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <RunnableInterface.h>
 #include <SerialStream.h>
 #include <IdleCounter.h>
@@ -7,9 +8,9 @@
 class TaskScheduler: public RunnableInterface
 {
     private:
-        static const int MaxTasks = 6;
+        static const int16_t MaxTasks = 6;
         RunnableAtTimeInterface* taskList[MaxTasks];
-        int numTasks = 0;
+        int16_t numTasks = 0;
         IdleCounter idleCounter;
         HardwareClockInterface* hwClock;
         
@@ -27,19 +28,19 @@ class TaskScheduler: public RunnableInterface
             return &idleCounter;
         }
 
-        int getNumberOfTasks( )
+        int16_t getNumberOfTasks( )
         {
             return numTasks;
         }
 
-        RunnableAtTimeInterface* getTask( int n )
+        RunnableAtTimeInterface* getTask( int16_t n )
         {            
             return taskList[n];
         }
 
-        void run( unsigned long nowMicros )
+        void run( uint32_t nowMicros )
         {                               
-            for ( int i = 0; i < numTasks; i++ ) 
+            for ( int16_t i = 0; i < numTasks; i++ ) 
             {                
                 if ( taskList[i]->canRun( nowMicros ) ) {
                     taskList[i]->run( nowMicros );                

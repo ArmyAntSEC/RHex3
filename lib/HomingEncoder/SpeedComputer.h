@@ -10,7 +10,7 @@ class SpeedComputer: public CanProvideSpeed, public BasicEncoderListener
 private:
     volatile long timeAtLastUpdateMicros = 0;
     volatile long timeAtThisUpdateMicros = 0;
-    volatile int clicksSinceLastUpdate = 0;    
+    volatile int16_t clicksSinceLastUpdate = 0;    
 
     HardwareClockInterface* hwClock;
     HardwareInterruptsInterface* hwInterrupts;
@@ -34,7 +34,7 @@ public:
         
     }
     
-    virtual int getSpeedCPS ( )
+    virtual int16_t getSpeedCPS ( )
     {
         
         hwInterrupts->disableInterrupts();

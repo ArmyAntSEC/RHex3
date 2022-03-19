@@ -5,9 +5,9 @@
 
 void testBasicEncoderFactoryConfig()
 {
-    int encoderPin1 = 0;
-    int encoderPin2 = 1;
-    int homingPin = 2;
+    int16_t encoderPin1 = 0;
+    int16_t encoderPin2 = 1;
+    int16_t homingPin = 2;
     BasicEncoderListenerMock listener;
     HardwarePinsMock pins;    
     BasicEncoder* sut = BasicEncoderFactory::config<0>( encoderPin1, encoderPin2, homingPin, &pins );

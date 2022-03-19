@@ -62,8 +62,8 @@ void setup()
   leftLeg.driver.setMotorPWM( 0 );
   rightLeg.driver.setMotorPWM( 0 );
 
-  int startSlow = 0;
-  int endSlow = 800;
+  int16_t startSlow = 0;
+  int16_t endSlow = 800;
   
   leftLeg.commander.start();
   
@@ -94,7 +94,7 @@ void loop()
 
 #else
 
-int main()
+int16_t main()
 { 
     
 }

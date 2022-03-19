@@ -1,18 +1,18 @@
 #pragma once
-
+#include <cstdint>
 #include <string.h>
 
 struct HardwareEEPROMInterface
 {
     virtual void UpdateEEPROM(unsigned address, unsigned value) = 0;
-    virtual unsigned int ReadEEPROM(unsigned address) = 0;
+    virtual uint16_t ReadEEPROM(unsigned address) = 0;
 };
 
 
 struct HardwareEEPROMMock: public HardwareEEPROMInterface
 {
-    static const int EEPROMSize = 256;
-    int EEPROMData[EEPROMSize];
+    static const int16_t EEPROMSize = 256;
+    int16_t EEPROMData[EEPROMSize];
 
     HardwareEEPROMMock()
     {
@@ -28,12 +28,12 @@ struct HardwareEEPROMMock: public HardwareEEPROMInterface
     {
         if (address < EEPROMSize)
         {
-            int valueCapped = value & 0xFF;
+            int16_t valueCapped = value & 0xFF;
             EEPROMData[address] = valueCapped;
         }
     }
 
-    virtual unsigned int ReadEEPROM(unsigned address)
+    virtual uint16_t ReadEEPROM(unsigned address)
     {
         if (address < EEPROMSize)
         {
@@ -55,7 +55,7 @@ struct HardwareEEPROM: public HardwareEEPROMInterface
         EEPROM.update(address, value);
     }
 
-    virtual unsigned int ReadEEPROM(unsigned address) 
+    virtual unsigned int16_t ReadEEPROM(unsigned address) 
     {
         return EEPROM.read(address);
     }

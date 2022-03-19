@@ -28,9 +28,9 @@ void testCreateLegCommandSequence()
     LegCommandParserMock parser;
     LegCommandSequence sut( &parser );
 
-    int slowStartPos = 100;    
-    int slowTimePercent = 50;
-    int slowLength = 1000;
+    int16_t slowStartPos = 100;    
+    int16_t slowTimePercent = 50;
+    int16_t slowLength = 1000;
     long period = 2e6L;
     sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
@@ -46,9 +46,9 @@ void testRunLegCommandSequence()
     LegCommandParserMock parser;
     LegCommandSequence sut( &parser );
 
-    int slowStartPos = 100;    
-    int slowTimePercent = 50;
-    int slowLength = 1000;
+    int16_t slowStartPos = 100;    
+    int16_t slowTimePercent = 50;
+    int16_t slowLength = 1000;
     long period = 2e6L;
     sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
@@ -72,9 +72,9 @@ void testRunLegCommandSequenceThirdStep()
     LegCommandParserMock parser;
     LegCommandSequence sut( &parser );
 
-    int slowStartPos = 100;    
-    int slowTimePercent = 50;
-    int slowLength = 1000;
+    int16_t slowStartPos = 100;    
+    int16_t slowTimePercent = 50;
+    int16_t slowLength = 1000;
     long period = 2e6;
     sut.config( slowStartPos, slowTimePercent, slowLength, period );
 
@@ -91,9 +91,9 @@ void testGaitCommanderWithOneLeg()
 {    
     LegCommandParserMock parser;
     LegCommandSequence leg( &parser );
-    int slowStartPos = 100;    
-    int slowTimePercent = 50;
-    int slowLength = 1000;
+    int16_t slowStartPos = 100;    
+    int16_t slowTimePercent = 50;
+    int16_t slowLength = 1000;
     long period = 2e6;
     leg.config( slowStartPos, slowTimePercent, slowLength, period );
 

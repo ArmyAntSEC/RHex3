@@ -22,7 +22,7 @@ void setup() {
 void loop() {
 }
 #else
-int main(void)
+int16_t main(void)
 {
     process();
 }

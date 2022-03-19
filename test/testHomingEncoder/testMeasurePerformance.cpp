@@ -17,7 +17,7 @@ void testRotationalPositionGetClicksPerformance()
 
     unsigned long startTimeMicros = hwClock.getMicrosecondsSinceBoot();    
     volatile long value = 0;
-    for ( int i = 0; i < 100; i++ )
+    for ( int16_t i = 0; i < 100; i++ )
     {
         value = sut.getClicks();
     }
@@ -43,7 +43,7 @@ void testBasicEncoderWithMockListenersPerformance()
     //hwInterrupts.enableInterrupts();
 
     unsigned long startTimeMicros = hwClock.getMicrosecondsSinceBoot();
-    for ( int i = 0; i < 10000; i++ ) //Max number of clicks per second
+    for ( int16_t i = 0; i < 10000; i++ ) //Max number of clicks per second
     {
         BasicEncoderFactory::isr_encoder<0>();        
     }
@@ -72,7 +72,7 @@ void testBasicEncoderWithLinearAndSpeedMeasurementPerformance()
     encoder->addListener ( &speed );    
     
     unsigned long startTimeMicros = hwClock.getMicrosecondsSinceBoot();
-    for ( int i = 0; i < 10000; i++ ) //Max clicks per second
+    for ( int16_t i = 0; i < 10000; i++ ) //Max clicks per second
     {
         BasicEncoderFactory::isr_encoder<0>();        
     }    

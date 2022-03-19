@@ -6,8 +6,8 @@
 
 struct MockRunnable: public RunnableInterface
 {
-    int runCount = 0;
-    virtual void run(unsigned long int now)
+    int16_t runCount = 0;
+    virtual void run( uint32_t now)
     {
         runCount++;
     }

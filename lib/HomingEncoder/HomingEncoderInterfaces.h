@@ -15,5 +15,5 @@ struct LinearPositionProvider
 class CanProvideSpeed
 {
     public:
-        virtual int getSpeedCPS() = 0;
+        virtual int16_t getSpeedCPS() = 0;
 };
