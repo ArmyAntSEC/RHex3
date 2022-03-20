@@ -19,11 +19,13 @@ public:
         if ( isRunning && linPos->isHomed() ) {
             driver->setMotorPWM(0);    
             isRunning = false;
+            Log << "Homing done" << PRINTVAR(linPos->getLinearPosition()) << endl;
         }
     }
 
     void start()
     {
+        Log << "Homing started" << endl;
         isRunning = true;
         driver->setMotorPWM(64);        
     }

@@ -43,10 +43,13 @@ LegCommandSequence rightLegSequence(&rightLeg);
 void warmUpLegs()
 {
   //Warm things up a bit.
-  leftLeg.config(&leftLegPins);
+  leftLeg.config(&leftLegPins);  
   leftLeg.setSpeedSetpoint( 3500 );
-  rightLeg.config(&rightLegPins);
+  leftLeg.regulator.start();
+  
+  rightLeg.config(&rightLegPins);  
   rightLeg.setSpeedSetpoint( 3500 );
+  rightLeg.regulator.start();
   
   sched.addTask( &recurringGroup );
   recurringGroup.addTask( &leftLeg );
@@ -67,7 +70,8 @@ void warmUpLegs()
 void doHoming()
 {
   leftLeg.legHomer.start();  
-  awareDelay.delayMicros( 2e6L ); 
+  awareDelay.delayMicros( 2e6L );
+  leftLeg.stop();
 }
 
 void configLegGait()
@@ -86,7 +90,8 @@ void startWalking()
   gaitCommander.addLegSchedule( &leftLegSequence );    
   recurringGroup.addTask( &gaitCommander );
   
-  leftLeg.start();
+  leftLeg.commander.start();
+  leftLeg.regulator.start();
 
   awareDelay.delayMicros( 6e6L );   
   

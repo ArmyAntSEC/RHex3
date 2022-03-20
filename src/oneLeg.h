@@ -51,13 +51,11 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         encoder->addListener(&speed);
 
         driver.config(pinList->motorEnable1, pinList->motorEnable2, pinList->motorPWM, hwPins);
-        
-        //Wait with the integrating term for now until fully trimmed.
+                
+        //Wait with integator term for now.
         regulator.config(&speed, &driver, 0.1, 0*0.015, 0, 10); 
-        
-        regulator.start();
-
-        linPos.forceHomed();
+            
+        linPos.forceHomed();                
     }
 
     void setSpeedSetpoint( int16_t speed )
@@ -69,6 +67,7 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
     {
         regulator.run(_nowMicros);
         commander.run(_nowMicros);        
+        legHomer.run(_nowMicros);
     }
 
     virtual void setGoal( LegCommand goal )
@@ -77,16 +76,10 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         commander.setGoal( goal );
     }
 
-    void start()
-    {
-        regulator.start();
-        commander.start();        
-    }
-
     void stop()
     {
         commander.stop();
-        regulator.stop();
+        regulator.stop();        
         driver.setMotorPWM(0);
     }
 };

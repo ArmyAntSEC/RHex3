@@ -6,3 +6,5 @@
 #include <cmath>
 #include <iostream>
 #endif
+
+#include <SerialStream.h>
