@@ -53,13 +53,31 @@ void testDoSimpleHoming()
     
     linPos.encoderIsHomed = true;
     sut.run( 2345 );
-
     TEST_ASSERT_EQUAL( 0, driver.getMotorPWM() );
+    
+    //Now verify that once homed, Homer will not issue more orders.
+    driver.setMotorPWM(128);
+    sut.run( 3456 );
+    TEST_ASSERT_EQUAL( 128, driver.getMotorPWM() );
+}
+
+void testEnsureHomingDoesNotHappenBeforeBeingStarted()
+{
+    MotorDriverMock driver;
+    LinPosMock linPos;
+    Homer sut( &driver, &linPos );
+
+    driver.setMotorPWM(128);
+
+    linPos.encoderIsHomed = true;
+    sut.run( 2345 );
+    TEST_ASSERT_EQUAL( 128, driver.getMotorPWM() );
 }
 
 void runAllTestsHomer()
 {
     UNITY_BEGIN_INT();
     RUN_TEST(testDoSimpleHoming);
+    RUN_TEST( testEnsureHomingDoesNotHappenBeforeBeingStarted );
     UNITY_BEGIN_INT();
 }

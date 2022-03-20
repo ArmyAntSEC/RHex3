@@ -7,6 +7,8 @@ class Homer : public RunnableInterface
 private:
     MotorDriverInterface* driver;
     LinearPositionProvider* linPos;
+    bool isRunning = false;
+
 public:
     Homer( MotorDriverInterface* _driver, LinearPositionProvider* _linPos ):
         driver(_driver), linPos(_linPos)
@@ -14,13 +16,15 @@ public:
 
     void run (int32_t _nowMicros)
     {
-        if ( linPos->isHomed() ) {
+        if ( isRunning && linPos->isHomed() ) {
             driver->setMotorPWM(0);    
+            isRunning = false;
         }
     }
 
     void start()
     {
-        driver->setMotorPWM(64);
+        isRunning = true;
+        driver->setMotorPWM(64);        
     }
 };

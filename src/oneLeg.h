@@ -10,7 +10,7 @@
 #include <RunnableInterface.h>
 #include <RotationalPosition.h>
 #include <MotorSpeedCommander.h>
-
+#include <Homer.h>
 
 struct LegPinList
 {
@@ -36,10 +36,12 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
     SpeedComputer speed;
     SpeedRegulator regulator;    
     MotorSpeedCommander commander;
+    Homer legHomer;
 
     OneLeg( HardwareInterrupts* _hwInterrupts, HardwarePins* _hwPins, HardwareClock* _hwClock ):
         hwInterrupts(_hwInterrupts), hwPins(_hwPins), hwClock(_hwClock),
-        linPos(_hwInterrupts), speed(_hwClock, _hwInterrupts), rotPos(&linPos), commander(&rotPos, &regulator)
+        linPos(_hwInterrupts), speed(_hwClock, _hwInterrupts), rotPos(&linPos), 
+        commander(&rotPos, &regulator), legHomer(&driver,&linPos)
     {}
     
     void config( LegPinList* pinList )

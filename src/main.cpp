@@ -63,6 +63,13 @@ void warmUpLegs()
   //End warmup
 }
 
+
+void doHoming()
+{
+  leftLeg.legHomer.start();  
+  awareDelay.delayMicros( 2e6L ); 
+}
+
 void configLegGait()
 {
   int16_t slowStartPos = 0;
