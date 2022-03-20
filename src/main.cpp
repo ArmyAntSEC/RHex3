@@ -94,6 +94,9 @@ void setup()
   rightLeg.warmUpLegs(&awareDelay);   
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
 
+  leftLeg.linPos.setOffset(850);
+  rightLeg.linPos.setOffset(0);
+
   leftLeg.doHoming(&awareDelay);
   rightLeg.doHoming(&awareDelay);
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   

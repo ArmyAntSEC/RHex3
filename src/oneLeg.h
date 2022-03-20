@@ -94,8 +94,7 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
 
     void doHoming(TaskAwareDelay *awareDelay)
     {
-        Log << "Left leg homing started:" << PRINTVAR(linPos.isHomed()) << endl;
-        linPos.setOffset(850);
+        Log << "Left leg homing started:" << PRINTVAR(linPos.isHomed()) << endl;        
         legHomer.start();
         awareDelay->delayMicros(2e6L);
         stop();
