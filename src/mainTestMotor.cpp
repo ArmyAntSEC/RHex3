@@ -28,23 +28,25 @@ MotorDriver driver;
 HardwareInterrupts hwInterrupts;
 HardwarePins hwPins;
 
-class BasicEncoderStore: public BasicEncoderListener
-{
-private:
+struct BasicEncoderStore: public BasicEncoderListener
+{    
     volatile int32_t clickPosition = 0;
     volatile int16_t lapCount = 0;
+    volatile int16_t positionAtHoming;
+    volatile int32_t timeAtHoming;
+    volatile bool newLap = false;
 
-public:
     void signalStepForwardISR()
-    {        
-        hwInterrupts.disableInterrupts();
-        clickPosition++;
-        hwInterrupts.enableInterrupts();
+    {                
+        clickPosition++;        
     }
 
     void signalHomingISR()
-    {
-        lapCount++;
+    {        
+        positionAtHoming = clickPosition;
+        timeAtHoming = millis();
+        newLap = true;
+        lapCount++;     
     }
 
     int32_t getClickPosition()
@@ -54,16 +56,37 @@ public:
         rValue = this->clickPosition;
         hwInterrupts.enableInterrupts();
         return rValue;
-    }
+    }   
 
-    int32_t getLapCount()
+    void PrintIfNewLap()
     {
-        int32_t rValue = 0;
+        bool newLapExists = false;
+        int32_t newLapTime;
+        static int32_t oldLapTime;
+        int32_t newLapPos;
+        static int32_t oldLapPos;
+
         hwInterrupts.disableInterrupts();
-        rValue = this->lapCount;
+        if ( newLap && lapCount > 0 ) {
+            newLapExists = true;
+            newLapTime = timeAtHoming;            
+            newLapPos = positionAtHoming;            
+            newLap = false;
+        }          
         hwInterrupts.enableInterrupts();
-        return rValue;
+        
+        if ( newLapExists )
+        {
+            Log << "Position at lap " << lapCount << ": " << newLapPos;
+            SerialLog << " Lap length: " << newLapPos - oldLapPos;
+            SerialLog << " Lap time: " << newLapTime - oldLapTime;
+            SerialLog << endl;
+
+            oldLapPos = newLapPos;
+            oldLapTime = newLapTime;
+        }
     }
+     
 };
 
 BasicEncoderStore listener;
@@ -83,13 +106,16 @@ void setup()
     encoder = encoderFactory.config<0>( ENCODER_1, ENCODER_2, OPTO, &hwPins );
     encoder->addListener( &listener );
 
-    driver.setMotorPWM( 64 );
+    driver.setMotorPWM( 128 );
 
-    delay(5000);
+    int32_t endTime = millis() + 10000;
+    while ( millis() < endTime ) {
+        listener.PrintIfNewLap();
+    }
 
     driver.setMotorPWM( 0 );
 
-    Log << PRINTVAR(listener.getClickPosition()) << PRINTVAR(listener.getLapCount()) << endl;    
+    
 }
 
 void loop()
