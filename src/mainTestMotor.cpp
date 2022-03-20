@@ -5,6 +5,8 @@
 #include <MotorDriver.h>
 #include <BasicEncoder.h>
 
+
+#if 1
 #define MOTOR_EN1 3
 #define MOTOR_EN2 4
 #define MOTOR_PWM 5
@@ -12,6 +14,15 @@
 #define OPTO      16
 #define ENCODER_2 15
 #define ENCODER_1 14
+#else
+#define MOTOR_EN1 8
+#define MOTOR_EN2 7
+#define MOTOR_PWM 9
+
+#define ENCODER_2 10
+#define ENCODER_1 11
+#define OPTO 12
+#endif
 
 MotorDriver driver;
 HardwareInterrupts hwInterrupts;
@@ -21,6 +32,7 @@ class BasicEncoderStore: public BasicEncoderListener
 {
 private:
     volatile int32_t clickPosition = 0;
+    volatile int16_t lapCount = 0;
 
 public:
     void signalStepForwardISR()
@@ -32,7 +44,7 @@ public:
 
     void signalHomingISR()
     {
-
+        lapCount++;
     }
 
     int32_t getClickPosition()
@@ -40,6 +52,15 @@ public:
         int32_t rValue = 0;
         hwInterrupts.disableInterrupts();
         rValue = this->clickPosition;
+        hwInterrupts.enableInterrupts();
+        return rValue;
+    }
+
+    int32_t getLapCount()
+    {
+        int32_t rValue = 0;
+        hwInterrupts.disableInterrupts();
+        rValue = this->lapCount;
         hwInterrupts.enableInterrupts();
         return rValue;
     }
@@ -64,12 +85,11 @@ void setup()
 
     driver.setMotorPWM( 64 );
 
-    delay(10000);
+    delay(5000);
 
     driver.setMotorPWM( 0 );
 
-    Serial.print( "Position: " );
-    Serial.println( listener.getClickPosition() );
+    Log << PRINTVAR(listener.getClickPosition()) << PRINTVAR(listener.getLapCount()) << endl;    
 }
 
 void loop()

@@ -13,7 +13,7 @@
 #define MOTOR1_ENCODER2 14
 #define MOTOR1_ENCODER1 15
 #define MOTOR1_OPTO 16
-LegPinList leftLegPins = { MOTOR1_EN1, MOTOR1_EN2, MOTOR1_PWM, MOTOR1_ENCODER1, MOTOR1_ENCODER2, MOTOR1_OPTO };
+LegPinList rightLegPins = { MOTOR1_EN1, MOTOR1_EN2, MOTOR1_PWM, MOTOR1_ENCODER1, MOTOR1_ENCODER2, MOTOR1_OPTO };
 
 #define MOTOR2_EN1 8
 #define MOTOR2_EN2 7
@@ -21,7 +21,7 @@ LegPinList leftLegPins = { MOTOR1_EN1, MOTOR1_EN2, MOTOR1_PWM, MOTOR1_ENCODER1, 
 #define MOTOR2_ENCODER2 10
 #define MOTOR2_ENCODER1 11
 #define MOTOR2_OPTO 12
-LegPinList rightLegPins = { MOTOR2_EN1, MOTOR2_EN2, MOTOR2_PWM, MOTOR2_ENCODER1, MOTOR2_ENCODER2, MOTOR2_OPTO };
+LegPinList leftLegPins = { MOTOR2_EN1, MOTOR2_EN2, MOTOR2_PWM, MOTOR2_ENCODER1, MOTOR2_ENCODER2, MOTOR2_OPTO };
 
 HardwareClock hwClock;
 HardwareInterrupts hwInterrupts;
@@ -94,14 +94,14 @@ void setup()
   rightLeg.warmUpLegs(&awareDelay);   
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
 
-  leftLeg.linPos.setOffset(850);
-  rightLeg.linPos.setOffset(0);
+  leftLeg.linPos.setOffset(0);
+  rightLeg.linPos.setOffset(1500);
 
   leftLeg.doHoming(&awareDelay);
   rightLeg.doHoming(&awareDelay);
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
 
-  for ( int i = 0; i < 2; i++ ) {
+  for ( int i = 0; i < 4; i++ ) {
     leftLeg.goToZero(&awareDelay);
     rightLeg.goToZero(&awareDelay);
     Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
@@ -109,8 +109,8 @@ void setup()
     Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
   }
   
-  configLegGait();
-  startWalking();
+  //configLegGait();
+  //startWalking();
 
   Log << "Exit" << endl;
 }
