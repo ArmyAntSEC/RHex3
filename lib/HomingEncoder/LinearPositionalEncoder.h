@@ -9,6 +9,8 @@ private:
     volatile int32_t linearPosition = 0;
     volatile bool encoderIsHomed = false;
     HardwareInterruptsInterface* hwInterrupts;
+    int16_t offset = 0;
+
 public:
     LinearPositionEncoder( HardwareInterruptsInterface* _interrupts ): hwInterrupts(_interrupts)    
     { }
@@ -21,7 +23,7 @@ public:
     virtual void signalHomingISR()
     {
         if ( !encoderIsHomed )
-            linearPosition = 0;
+            linearPosition = -offset;
         encoderIsHomed = true;
     }
 
@@ -47,6 +49,12 @@ public:
     void forceHomed()
     {
         encoderIsHomed = true;
+    }
+
+    void setOffset( int16_t _offset )
+    {
+        Log << "OFFSET FEATURE NOT UNIT TESTED" << endl;
+        offset = _offset;
     }
 
 };

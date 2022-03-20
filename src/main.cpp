@@ -66,10 +66,11 @@ void warmUpLegs()
 void doHoming()
 {
   Log << "Left leg homing started:" << PRINTVAR(leftLeg.linPos.isHomed()) << endl;  
+  leftLeg.linPos.setOffset(850);
   leftLeg.legHomer.start();  
   awareDelay.delayMicros( 2e6L );
-  leftLeg.stop();
-  Log << "Left leg homing ended" << endl;
+  leftLeg.stop();  
+  Log << "Left leg homing ended" << PRINTVAR(leftLeg.linPos.getLinearPosition() ) << endl;
 }
 
 void goToZero()
@@ -91,9 +92,9 @@ void goToZero()
 void configLegGait()
 {
   int16_t slowStartPos = 0;
-  int16_t slowTimePercent = 50;
-  int16_t slowLength = 1000;
-  int32_t period = 15e5;
+  int16_t slowTimePercent = 70;
+  int16_t slowLength = 700;
+  int32_t period = 1e6;
 
   leftLegSequence.config( slowStartPos, slowTimePercent, slowLength, period );
 }
@@ -134,11 +135,16 @@ void setup()
   doHoming();
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
 
-  for ( int i = 0; i < 5; i++ ) {
+  for ( int i = 0; i < 2; i++ ) {
     goToZero();
+    Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
+    awareDelay.delayMicros(1e6);
     Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
   }
   
+  configLegGait();
+  startWalking();
+
   Log << "Exit" << endl;
 }
 
