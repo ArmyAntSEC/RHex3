@@ -1,22 +1,10 @@
-/*
- * MotorDriver.h
- *
- *  Created on: 24 okt. 2019
- *      Author: Daniel
- */
-
-#ifndef MOTORDRIVER_H_
-#define MOTORDRIVER_H_
+#pragma once
+#include <base.h>
 
 #include <HardwarePins.h>
 #include <MotorSpeedRegulatorInterfaces.h>
 #include <SerialStream.h>
 
-#ifdef ARDUINO
-#include <Arduino.h>
-#else
-#include <cmath>
-#endif
 
 class MotorDriver: public MotorDriverInterface
 {
@@ -66,5 +54,3 @@ public:
   }
 
 };
-
-#endif /* MOTORDRIVER_H_ */

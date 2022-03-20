@@ -4,6 +4,7 @@
 void processMotorSpeedRegulator();
 void runAllTestsMotorSpeedCommander();
 void runAllTestGaitCommander();
+void runAllTestsHomer();
 
 void process()
 {
@@ -11,12 +12,11 @@ void process()
     processMotorSpeedRegulator();              
     runAllTestsMotorSpeedCommander();    
     runAllTestGaitCommander();
+    runAllTestsHomer();
     UNITY_END_EXT();  
 }
 
 #ifdef ARDUINO
-#include <Arduino.h>
-
 void setup() {
     process();
 }

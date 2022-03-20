@@ -24,7 +24,7 @@ void testShouldHomeIfNotHomed()
     sut.signalHomingISR();
 
     TEST_ASSERT_EQUAL( 0, sut.getLinearPosition() );
-    TEST_ASSERT_TRUE( sut.isHomed );
+    TEST_ASSERT_TRUE( sut.isHomed() );
 }
 
 void testShouldNotHomeIfHomed()
@@ -33,7 +33,7 @@ void testShouldNotHomeIfHomed()
     LinearPositionEncoder sut(&hwInterrupts);    
 
     sut.linearPosition = 100;
-    sut.isHomed = true;
+    sut.encoderIsHomed = true;
 
     sut.signalHomingISR();
 

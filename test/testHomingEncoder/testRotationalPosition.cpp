@@ -14,6 +14,12 @@ struct LinearPositionProviderMock: public LinearPositionProvider
     {
         return linearPos;
     }
+
+    virtual bool isHomed()
+    {
+        Log << "Not meant to be called" << endl;
+        return false;
+    }
 };
 
 void testShouldGiveZeroForZero()

@@ -1,5 +1,5 @@
 #pragma once
-
+#include <base.h>
 #include <HardwareInterrupts.h>
 #include "HomingEncoderInterfaces.h"
 
@@ -7,7 +7,7 @@ class LinearPositionEncoder: public BasicEncoderListener, public LinearPositionP
 {
 private:
     volatile int32_t linearPosition = 0;
-    volatile bool isHomed = false;
+    volatile bool encoderIsHomed = false;
     HardwareInterruptsInterface* hwInterrupts;
 public:
     LinearPositionEncoder( HardwareInterruptsInterface* _interrupts ): hwInterrupts(_interrupts)    
@@ -20,9 +20,9 @@ public:
     
     virtual void signalHomingISR()
     {
-        if ( !isHomed )
+        if ( !encoderIsHomed )
             linearPosition = 0;
-        isHomed = true;
+        encoderIsHomed = true;
     }
 
     virtual int32_t getLinearPosition()
@@ -34,9 +34,14 @@ public:
         return rValue;
     }
 
+    virtual bool isHomed()
+    {
+        return encoderIsHomed;
+    }
+
     void forceHomed()
     {
-        isHomed = true;
+        encoderIsHomed = true;
     }
 
 };

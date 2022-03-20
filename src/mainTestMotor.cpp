@@ -1,7 +1,6 @@
 #ifdef ARDUINO
 #include <HardwareInterrupts.h>
 #include <HardwarePins.h>
-#include <Arduino.h>
 #include <SerialStream.h>
 #include <MotorDriver.h>
 #include <BasicEncoder.h>

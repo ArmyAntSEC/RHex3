@@ -1,11 +1,5 @@
-#ifndef _SERIALSTREAM_H_
-#define _SERIALSTREAM_H_
-
-#ifdef ARDUINO
-#include <Arduino.h>
-#else
-#include <iostream>
-#endif
+#pragma once
+#include <base.h>
 
 #define PRINTVAR(var) " " << #var << ": " << var
 
@@ -41,6 +35,3 @@ public:
 };
   
 extern SerialStream Log;
-
-
-#endif

@@ -1,10 +1,5 @@
 #pragma once
-#ifdef ARDUINO
-#include <Arduino.h>
-#else
-#include <string.h> //For memset();
-#include <cstdint>
-#endif
+#include <base.h>
 
 struct HardwarePinsInterface
 {

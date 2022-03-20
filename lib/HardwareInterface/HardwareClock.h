@@ -1,5 +1,5 @@
 #pragma once
-
+#include <base.h>
 #include <SerialStream.h>
 
 struct HardwareClockInterface
@@ -10,7 +10,6 @@ struct HardwareClockInterface
 };
 
 #ifdef ARDUINO
-#include <Arduino.h>
 #include <HardwareInterrupts.h>
 
 class HardwareClock: public HardwareClockInterface

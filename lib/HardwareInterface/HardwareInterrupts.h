@@ -1,4 +1,5 @@
 #pragma once
+#include <base.h>
 
 struct HardwareInterruptsInterface
 {
@@ -7,8 +8,6 @@ struct HardwareInterruptsInterface
 };
 
 #ifdef ARDUINO
-
-#include <Arduino.h>
 
 class HardwareInterrupts: public HardwareInterruptsInterface
 {
