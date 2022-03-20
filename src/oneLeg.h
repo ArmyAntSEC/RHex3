@@ -80,6 +80,7 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
     {
         commander.stop();
         regulator.stop();        
+        legHomer.stop();
         driver.setMotorPWM(0);
     }
 };

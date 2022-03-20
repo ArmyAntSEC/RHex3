@@ -79,7 +79,7 @@ public:
             integratorCumulativeValue += integratorTerm * error;            
             int16_t clampedOutput = clampOutput( proportionalOutput + derivateiveOutput + integratorCumulativeValue );            
             target->setMotorPWM( clampedOutput );             
-            Log << PRINTVAR( input ) << PRINTVAR(setPoint) << PRINTVAR(clampedOutput) << endl;
+            //Log << PRINTVAR( input ) << PRINTVAR(setPoint) << PRINTVAR(clampedOutput) << endl;
         }
     }
 };

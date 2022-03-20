@@ -15,18 +15,26 @@ public:
     {}
 
     void run (int32_t _nowMicros)
-    {
-        if ( isRunning && linPos->isHomed() ) {
-            driver->setMotorPWM(0);    
-            isRunning = false;
-            Log << "Homing done" << PRINTVAR(linPos->getLinearPosition()) << endl;
+    {        
+        if ( isRunning ) {
+            if ( linPos->isHomed() ) {            
+                driver->setMotorPWM(0);    
+                isRunning = false;            
+                Log << "Homing complete" << PRINTVAR(linPos->getLinearPosition()) << endl;
+            }
         }
     }
 
     void start()
     {
-        Log << "Homing started" << endl;
+        Log << "Homing started" << endl;        
         isRunning = true;
+        linPos->unHome();
         driver->setMotorPWM(64);        
+    }
+
+    void stop()
+    {
+        isRunning = false;    
     }
 };

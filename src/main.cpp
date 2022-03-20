@@ -51,9 +51,6 @@ void warmUpLegs()
   rightLeg.setSpeedSetpoint( 3500 );
   rightLeg.regulator.start();
   
-  sched.addTask( &recurringGroup );
-  recurringGroup.addTask( &leftLeg );
-  recurringGroup.addTask( &rightLeg );
   
   Log << "Starting" << endl;
   
@@ -69,9 +66,11 @@ void warmUpLegs()
 
 void doHoming()
 {
+  Log << "Left leg homing started:" << PRINTVAR(leftLeg.linPos.isHomed()) << endl;  
   leftLeg.legHomer.start();  
   awareDelay.delayMicros( 2e6L );
   leftLeg.stop();
+  Log << "Left leg homing ended" << endl;
 }
 
 void configLegGait()
@@ -104,19 +103,29 @@ void setup()
 {
   Serial.begin(115200);
   while (!Serial) {}    
-  Log << "Hello World!" << endl;  
+  Log << "*************************" << endl << "Hello World!" << endl;  
   
   IdleCounter* idleCounter = sched.getIdleCounterObject();    
   idleCounter->Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond();  
   Log << "Max idle counts per second: " << idleCounter->getMaxIdleCountsPerSecond() << endl;
   
-  warmUpLegs();
-  Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;  
+  sched.addTask( &recurringGroup );
+  recurringGroup.addTask( &leftLeg );
+  recurringGroup.addTask( &rightLeg );
   
+  for ( int i = 0; i < 5; i++ ) {
+    warmUpLegs();   
+    Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
+    doHoming();
+    Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
+  }
+
+  
+
   awareDelay.delayMicros( 1e6L );  
   
-  configLegGait();  
-  startWalking();
+  //configLegGait();  
+  //startWalking();
   
   Log << "Exit" << endl;
 }

@@ -20,6 +20,11 @@ struct LinPosMock: public LinearPositionProvider
     {
         return encoderIsHomed;
     }
+
+    virtual void unHome()
+    {
+        encoderIsHomed = false;        
+    }
 };
 
 struct MotorDriverMock: public MotorDriverInterface

@@ -11,6 +11,7 @@ struct LinearPositionProvider
 {
     virtual int32_t getLinearPosition() = 0;    
     virtual bool isHomed() = 0;
+    virtual void unHome() = 0;
 };
 
 class CanProvideSpeed

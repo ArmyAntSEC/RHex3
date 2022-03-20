@@ -39,6 +39,11 @@ public:
         return encoderIsHomed;
     }
 
+    virtual void unHome()
+    {
+        encoderIsHomed = false;
+    }
+
     void forceHomed()
     {
         encoderIsHomed = true;

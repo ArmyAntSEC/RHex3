@@ -79,6 +79,7 @@ void testShallComputeCPULoad()
     IdleCounter* sut = scheduler.getIdleCounterObject();
 
     sut->maxIdleCountsPerSecond = 20;    
+    hwClock.microsSinceStart = 1e6; //One click per second.
     sut->SignalOneCycleRunAndResetTaskRunStatus();
     TEST_ASSERT_EQUAL( 5, sut->getCPUFactorPercent() );    
 }

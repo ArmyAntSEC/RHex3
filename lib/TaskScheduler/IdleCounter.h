@@ -26,7 +26,7 @@ public:
 
     int16_t getCPUFactorPercent()
     {
-        return idleCounter * 100 / maxIdleCountsPerSecond;
+        return getIdleCountsPerSecondAndResetCounter() * 100 / maxIdleCountsPerSecond;
     }
     
     int32_t getIdleCountsPerSecondAndResetCounter()
@@ -35,7 +35,7 @@ public:
         int32_t timeDelta = thisTime - lastMeasurementTimeMicros;
         lastMeasurementTimeMicros = thisTime;
         int32_t thisIdleCounter = idleCounter;
-        idleCounter = 0;
+        idleCounter = 0;        
         return thisIdleCounter * 1e6 / timeDelta;
     }
 

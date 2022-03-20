@@ -17,8 +17,13 @@ struct LinearPositionProviderMock: public LinearPositionProvider
 
     virtual bool isHomed()
     {
-        Log << "Not meant to be called" << endl;
+        TEST_FAIL_MESSAGE( "Not meant to be called." );
         return false;
+    }
+    
+    virtual void unHome()
+    {
+        TEST_FAIL_MESSAGE( "Not meant to be called." );
     }
 };
 
