@@ -40,54 +40,7 @@ GaitCommander<2> gaitCommander;
 LegCommandSequence leftLegSequence(&leftLeg);
 LegCommandSequence rightLegSequence(&rightLeg);
 
-void warmUpLegs()
-{
-  //Warm things up a bit.
-  leftLeg.config(&leftLegPins);  
-  leftLeg.setSpeedSetpoint( 3500 );
-  leftLeg.regulator.start();
-  
-  rightLeg.config(&rightLegPins);  
-  rightLeg.setSpeedSetpoint( 3500 );
-  rightLeg.regulator.start();
-  
-  
-  Log << "Starting" << endl;
-  
-  awareDelay.delayMicros( 1000*1000L );
-  Log << "Left Leg: " << leftLeg.linPos.getLinearPosition() << endl;  
-  Log << "Right Leg: " << rightLeg.linPos.getLinearPosition() << endl;    
-  
-  leftLeg.stop();
-  rightLeg.stop();
-  //End warmup
-}
 
-void doHoming()
-{
-  Log << "Left leg homing started:" << PRINTVAR(leftLeg.linPos.isHomed()) << endl;  
-  leftLeg.linPos.setOffset(850);
-  leftLeg.legHomer.start();  
-  awareDelay.delayMicros( 2e6L );
-  leftLeg.stop();  
-  Log << "Left leg homing ended" << PRINTVAR(leftLeg.linPos.getLinearPosition() ) << endl;
-}
-
-void goToZero()
-{
-  Log << "Going to zero" << endl;
-  MotorSpeedCommanderInterface::LegCommand goal;
-  goal.targetPositionClicks = 0;
-  goal.targetTimeMicros = micros() + 2e6L;
-  leftLeg.commander.setGoal(goal);
-  leftLeg.commander.start();
-  leftLeg.regulator.start();
-  awareDelay.delayMicros( 2e6L );
-  leftLeg.stop();
-  RotationalPosition rotPos(leftLeg.linPos.getLinearPosition());
-  Log << "Arrived at zero" << PRINTVAR(rotPos.getClicks()) << endl;
-
-}
 
 void configLegGait()
 {
@@ -97,20 +50,25 @@ void configLegGait()
   int32_t period = 1e6;
 
   leftLegSequence.config( slowStartPos, slowTimePercent, slowLength, period );
+  rightLegSequence.config( slowStartPos, slowTimePercent, slowLength, period );
 }
 
 void startWalking()
 {
   Log << "Start walking" << endl;  
   gaitCommander.addLegSchedule( &leftLegSequence );    
+  gaitCommander.addLegSchedule( &rightLegSequence );    
   recurringGroup.addTask( &gaitCommander );
   
   leftLeg.commander.start();
   leftLeg.regulator.start();
+  rightLeg.commander.start();
+  rightLeg.regulator.start();
 
   awareDelay.delayMicros( 6e6L );   
   
   leftLeg.stop();  
+  rightLeg.stop();  
   
   Log << "Done walking" << endl;
 }
@@ -128,15 +86,21 @@ void setup()
   sched.addTask( &recurringGroup );
   recurringGroup.addTask( &leftLeg );
   recurringGroup.addTask( &rightLeg );
-    
-  warmUpLegs();   
+  
+  leftLeg.config(&leftLegPins);  
+  rightLeg.config(&rightLegPins);  
+
+  leftLeg.warmUpLegs(&awareDelay);   
+  rightLeg.warmUpLegs(&awareDelay);   
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
 
-  doHoming();
+  leftLeg.doHoming(&awareDelay);
+  rightLeg.doHoming(&awareDelay);
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
 
   for ( int i = 0; i < 2; i++ ) {
-    goToZero();
+    leftLeg.goToZero(&awareDelay);
+    rightLeg.goToZero(&awareDelay);
     Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
     awareDelay.delayMicros(1e6);
     Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
