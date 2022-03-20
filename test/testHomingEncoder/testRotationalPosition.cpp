@@ -45,17 +45,17 @@ void testShouldGiveSameForSmallValues()
 
 void testShouldHandleWrapAround()
 {    
-    RotationalPosition sut ( 4000 );
+    RotationalPosition sut ( 2000 );
 
     TEST_ASSERT_EQUAL( 1, sut.getLaps() );
-    TEST_ASSERT_EQUAL( 409, sut.getClicks() );  //Algorithm rounds up.
+    TEST_ASSERT_EQUAL( 205, sut.getClicks() );  //Algorithm rounds up.
 }
 
 void testShouldHandleLargeWrapAround()
 {    
     RotationalPosition sut ( 40000000 );
 
-    TEST_ASSERT_EQUAL( 11136, sut.getLaps() );
+    TEST_ASSERT_EQUAL( 22272, sut.getLaps() );
     TEST_ASSERT_EQUAL( 320, sut.getClicks() ); //Algorithm rounds up.      
 }
 
@@ -81,7 +81,7 @@ void testRotationalPositionEncoder()
 
 void testShouldBeAbleToJumpToTheLapBeforeAnother()
 { 
-    RotationalPosition pos( 1000 + 2*10775776L/3000 ); //Two laps + 1000 clicks
+    RotationalPosition pos( 1000 + 2*673486L/375 ); //Two laps + 1000 clicks
     
     pos.moveToLapBeforeRounded( 2000 );
     TEST_ASSERT_EQUAL( 3, pos.getLaps() );
@@ -90,19 +90,19 @@ void testShouldBeAbleToJumpToTheLapBeforeAnother()
 
 void testShouldBeAbleToJumpToTheLapBeforeAnotherReverse()
 { 
-    RotationalPosition pos( 2000 + 2*10775776L/3000 ); //Two laps + 2000 clicks
+    RotationalPosition pos( 1000 + 2*673486L/375 ); //Two laps + 1000 clicks
     
-    pos.moveToLapBeforeRounded( 1000 );
+    pos.moveToLapBeforeRounded( 500 );    
     TEST_ASSERT_EQUAL( 2, pos.getLaps() );
-    TEST_ASSERT_EQUAL( 2000, pos.getClicks() );
+    TEST_ASSERT_EQUAL( 1000, pos.getClicks() );
 }
 
 void shouldBeConstructableFromLapsAndClicks()
 {
-    RotationalPosition pos( 2, 2000 ); //Two laps + 2000 clicks
+    RotationalPosition pos( 2, 1000 ); //Two laps + 1000 clicks
     
     TEST_ASSERT_EQUAL( 2, pos.getLaps() );
-    TEST_ASSERT_EQUAL( 2000, pos.getClicks() );
+    TEST_ASSERT_EQUAL( 1000, pos.getClicks() );
 }
 
 void runAllTestRotationalPosition()

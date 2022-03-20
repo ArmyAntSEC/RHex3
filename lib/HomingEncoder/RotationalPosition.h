@@ -6,8 +6,10 @@
 class RotationalPositionProvider
 {
 protected:
-    static const int32_t clicksPerLapNum = 10775776;
-    static const int32_t clicksPerLapDen = 3000;
+    //673486 / 375 = 1795,962667 = Clicks per channel for a rotation.
+    static const int32_t clicksPerLapNum = 673486; 
+    static const int32_t clicksPerLapDen = 375;
+    
 
 public:
     virtual int32_t getLinearPosition() const = 0;          
@@ -61,7 +63,7 @@ public:
         int32_t clicksDiff = thisClicks - _clicks;                
         if ( clicksDiff < 0 )
         {            
-            linPos = (getLaps()+1)*10775776/3000 + thisClicks;
+            linPos = (getLaps()+1)*clicksPerLapNum/clicksPerLapDen + thisClicks;
         }       
     }
 };
