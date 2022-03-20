@@ -34,4 +34,10 @@ public:
   
 };
   
-extern SerialStream Log;
+extern SerialStream SerialLog;
+
+#ifdef ARDUINO
+#define Log SerialLog << "[" << millis() << "]: "
+#else
+#define Log SerialLog
+#endif  

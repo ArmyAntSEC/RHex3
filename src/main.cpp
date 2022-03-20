@@ -63,7 +63,6 @@ void warmUpLegs()
   //End warmup
 }
 
-
 void doHoming()
 {
   Log << "Left leg homing started:" << PRINTVAR(leftLeg.linPos.isHomed()) << endl;  
@@ -71,6 +70,22 @@ void doHoming()
   awareDelay.delayMicros( 2e6L );
   leftLeg.stop();
   Log << "Left leg homing ended" << endl;
+}
+
+void goToZero()
+{
+  Log << "Going to zero" << endl;
+  MotorSpeedCommanderInterface::LegCommand goal;
+  goal.targetPositionClicks = 0;
+  goal.targetTimeMicros = micros() + 2e6L;
+  leftLeg.commander.setGoal(goal);
+  leftLeg.commander.start();
+  leftLeg.regulator.start();
+  awareDelay.delayMicros( 2e6L );
+  leftLeg.stop();
+  RotationalPosition rotPos(leftLeg.linPos.getLinearPosition());
+  Log << "Arrived at zero" << PRINTVAR(rotPos.getClicks()) << endl;
+
 }
 
 void configLegGait()
@@ -112,20 +127,17 @@ void setup()
   sched.addTask( &recurringGroup );
   recurringGroup.addTask( &leftLeg );
   recurringGroup.addTask( &rightLeg );
-  
+    
+  warmUpLegs();   
+  Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
+
+  doHoming();
+  Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
+
   for ( int i = 0; i < 5; i++ ) {
-    warmUpLegs();   
-    Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
-    doHoming();
+    goToZero();
     Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
   }
-
-  
-
-  awareDelay.delayMicros( 1e6L );  
-  
-  //configLegGait();  
-  //startWalking();
   
   Log << "Exit" << endl;
 }

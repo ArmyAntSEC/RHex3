@@ -53,7 +53,7 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         driver.config(pinList->motorEnable1, pinList->motorEnable2, pinList->motorPWM, hwPins);
                 
         //Wait with integator term for now.
-        regulator.config(&speed, &driver, 0.1, 0*0.015, 0, 10); 
+        regulator.config(&speed, &driver, 0.1, 0.015, 0, 10); 
             
         linPos.forceHomed();                
     }

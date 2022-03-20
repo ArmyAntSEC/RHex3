@@ -36,6 +36,7 @@ public:
 
     virtual void setGoal( LegCommand goal )
     {                
+        Log << "Set Goal" << PRINTVAR(goal.targetPositionClicks) << PRINTVAR(goal.targetTimeMicros) << endl;
         int16_t thisClicks = currentRotPos->getClicks();        
         if ( thisClicks > goal.targetPositionClicks ) {
             goalPos = RotationalPosition(currentRotPos->getLaps()+1, goal.targetPositionClicks );                

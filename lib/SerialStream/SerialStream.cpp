@@ -1,3 +1,3 @@
 #include "SerialStream.h"
 
-SerialStream Log;
+SerialStream SerialLog;
