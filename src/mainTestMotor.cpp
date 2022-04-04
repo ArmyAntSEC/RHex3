@@ -6,7 +6,7 @@
 #include <BasicEncoder.h>
 
 
-#if 1
+#if 0
 #define MOTOR_EN1 3
 #define MOTOR_EN2 4
 #define MOTOR_PWM 5
