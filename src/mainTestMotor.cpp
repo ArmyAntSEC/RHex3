@@ -12,16 +12,18 @@
 #define MOTOR1_PWM 5
 
 #define OPTO1      16
-#define ENCODER1_2 14
 #define ENCODER1_1 15
+#define ENCODER1_2 14
+
 
 #define MOTOR2_EN1 8
 #define MOTOR2_EN2 7
 #define MOTOR2_PWM 9
 
-#define ENCODER2_2 12
-#define ENCODER2_1 11
 #define OPTO2 10
+#define ENCODER2_1 11
+#define ENCODER2_2 12
+
 
 MotorDriver driver1;
 MotorDriver driver2;
