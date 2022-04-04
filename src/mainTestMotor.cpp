@@ -19,9 +19,9 @@
 #define MOTOR_EN2 7
 #define MOTOR_PWM 9
 
-#define ENCODER_2 10
+#define ENCODER_2 12
 #define ENCODER_1 11
-#define OPTO 12
+#define OPTO 10
 #endif
 
 MotorDriver driver;
