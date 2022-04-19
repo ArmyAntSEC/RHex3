@@ -38,7 +38,7 @@ struct BasicEncoderStore: public BasicEncoderListener
 {    
     volatile int32_t clickPosition = 0;
     volatile int16_t lapCount = 0;
-    volatile int16_t positionAtHoming;
+    volatile int32_t positionAtHoming;
     volatile int32_t timeAtHoming;
     volatile bool newLap = false;
     int32_t oldLapTime;
@@ -105,7 +105,7 @@ void setup()
     while (!Serial) {}
 
     Serial.println("Hello World!");    
-
+    
     driver1.config( MOTOR1_EN1, MOTOR1_EN2, MOTOR1_PWM, &hwPins );
     driver2.config( MOTOR2_EN1, MOTOR2_EN2, MOTOR2_PWM, &hwPins );
     
@@ -125,8 +125,7 @@ void setup()
     }
 
     driver1.setMotorPWM( 0 );
-    driver2.setMotorPWM( 0 );
-    
+    driver2.setMotorPWM( 0 );    
 }
 
 void loop()

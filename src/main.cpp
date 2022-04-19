@@ -96,18 +96,18 @@ void setup()
   leftLeg.config(&leftLegPins);  
   rightLeg.config(&rightLegPins);  
 
-  leftLeg.warmUpLegs(&awareDelay);   
-  rightLeg.warmUpLegs(&awareDelay);   
-  Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
+  //leftLeg.warmUpLegs(&awareDelay);   
+  //rightLeg.warmUpLegs(&awareDelay);   
+  //Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
 
-  leftLeg.linPos.setOffset(0);
-  rightLeg.linPos.setOffset(1500);
+  leftLeg.linPos.setOffset(1400);
+  rightLeg.linPos.setOffset(800);
 
   leftLeg.doHoming(&awareDelay);
   rightLeg.doHoming(&awareDelay);
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
 
-  for ( int i = 0; i < 4; i++ ) {
+  for ( int i = 0; i < 3; i++ ) {
     leftLeg.goToZero(&awareDelay);
     rightLeg.goToZero(&awareDelay);
     Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
@@ -115,8 +115,16 @@ void setup()
     Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
   }
   
-  //configLegGait();
-  //startWalking();
+  Log << "Starting in 3...." << endl;
+  awareDelay.delayMicros(1e6);
+  Log << "Starting in 2...." << endl;
+  awareDelay.delayMicros(1e6);
+  Log << "Starting in 1...." << endl;
+  awareDelay.delayMicros(1e6);
+  Log << "NOW!!!" << endl;
+  
+  configLegGait();
+  startWalking();
 
   Log << "Exit" << endl;
 }
