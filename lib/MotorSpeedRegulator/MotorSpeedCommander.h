@@ -34,9 +34,8 @@ public:
         maxSpeedCPS = _maxSpeedCPS;
     }
 
-    virtual void setGoal( LegCommand goal )
-    {                
-        Log << "Set Goal" << PRINTVAR(goal.targetPositionClicks) << PRINTVAR(goal.targetTimeMicros) << endl;
+    virtual void setGoal( LegCommand goal, int32_t nowMicros )
+    {                        
         int16_t thisClicks = currentRotPos->getClicks();        
         if ( thisClicks > goal.targetPositionClicks ) {
             goalPos = RotationalPosition(currentRotPos->getLaps()+1, goal.targetPositionClicks );                
@@ -44,7 +43,7 @@ public:
             goalPos = RotationalPosition(currentRotPos->getLaps(), goal.targetPositionClicks );                
         }        
 
-        timeGoalMicros = goal.targetTimeMicros;
+        timeGoalMicros = nowMicros + goal.targetTimeMicros;
     }        
 
     void stop()

@@ -46,7 +46,7 @@ struct LegCommandSequence: public RunnableInterface
                 command.targetTimeMicros = stepTimeStartMicros + fastRelativeStartTimeMicros;
             }        
 
-            parser->setGoal( command );            
+            parser->setGoal( command, _nowMicros );            
         }
     }
 };

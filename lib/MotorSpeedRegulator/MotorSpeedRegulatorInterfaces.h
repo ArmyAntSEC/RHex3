@@ -24,5 +24,5 @@ struct MotorSpeedCommanderInterface
         {}
     };
 
-    virtual void setGoal(LegCommand) = 0;
+    virtual void setGoal(LegCommand command, int32_t nowMicros ) = 0;
 };

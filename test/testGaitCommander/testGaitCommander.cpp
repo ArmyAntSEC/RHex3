@@ -8,11 +8,13 @@
 struct LegCommandParserMock: public MotorSpeedCommanderInterface
 {
     LegCommand lastCommand;
+    int32_t timeNow;
     bool commandReceived = false;
 
-    virtual void setGoal(LegCommand command) 
+    virtual void setGoal(LegCommand command, int32_t _timeNow ) 
     {
         lastCommand = command;
+        timeNow = _timeNow;
         commandReceived = true;
     }
 
