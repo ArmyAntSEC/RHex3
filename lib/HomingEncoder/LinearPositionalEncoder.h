@@ -23,7 +23,7 @@ public:
     virtual void signalHomingISR()
     {
         if ( !encoderIsHomed )
-            linearPosition = -offset;
+            linearPosition = 0;
         encoderIsHomed = true;
     }
 
@@ -33,7 +33,7 @@ public:
         hwInterrupts->disableInterrupts();
         rValue = linearPosition;
         hwInterrupts->enableInterrupts();
-        return rValue;
+        return rValue - offset;
     }
 
     virtual bool isHomed()
@@ -52,8 +52,7 @@ public:
     }
 
     void setOffset( int16_t _offset )
-    {
-        Log << "OFFSET FEATURE NOT UNIT TESTED" << endl;
+    {        
         offset = _offset;
     }
 

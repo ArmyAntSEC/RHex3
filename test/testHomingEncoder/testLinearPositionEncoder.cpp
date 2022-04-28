@@ -51,6 +51,18 @@ void testShouldRestoreInterruptFlags()
     TEST_ASSERT_EQUAL( 1, hwInterrupts.interruptsDisabledCount );     
 }
 
+void testShouldUseOffset()
+{
+    HardwareInterruptsMock hwInterrupts;    
+    LinearPositionEncoder sut(&hwInterrupts);    
+   
+   TEST_ASSERT_EQUAL( 0, sut.getLinearPosition() );
+
+   sut.setOffset( 100 );
+
+   TEST_ASSERT_EQUAL( -100, sut.getLinearPosition() );
+}
+
 void runAllTestsLinearPositionEncoder()
 {
     UNITY_BEGIN_INT();
@@ -58,5 +70,6 @@ void runAllTestsLinearPositionEncoder()
     RUN_TEST( testShouldHomeIfNotHomed ); 
     RUN_TEST( testShouldNotHomeIfHomed ); 
     RUN_TEST( testShouldRestoreInterruptFlags );
+    RUN_TEST ( testShouldUseOffset );
     UNITY_END_INT();
 }
