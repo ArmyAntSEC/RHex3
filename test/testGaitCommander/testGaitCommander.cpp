@@ -28,74 +28,64 @@ void testCreateLegCommandSequence()
     LegCommandParserMock parser;
     LegCommandSequence sut( &parser );
 
+    int32_t stepTimeStart = 2e6;
     int16_t slowStartPos = 100;    
-    int16_t slowTimePercent = 50;
+    int16_t slowTimePercent = 75;
     int16_t slowLength = 1000;
-    int32_t period = 2e6L;
-    sut.config( slowStartPos, slowTimePercent, slowLength, period );
+    int32_t period = 1e6L;
+    sut.config( stepTimeStart, slowStartPos, slowTimePercent, slowLength, period );
 
     TEST_ASSERT_EQUAL( 100, sut.slowStartPos );    
     TEST_ASSERT_EQUAL( 1100, sut.fastStartPos );
-    TEST_ASSERT_EQUAL( 1e6, sut.fastStartTimeMicros );
-    TEST_ASSERT_EQUAL( period, sut.periodMicros );
+    TEST_ASSERT_EQUAL( 0.75e6, sut.fastRelativeStartTimeMicros );
+    TEST_ASSERT_EQUAL( period, sut.stepTimeTotalMicros );
     TEST_ASSERT_EQUAL( &parser, sut.parser );
 }
 
 void testRunLegCommandSequence()
-{    
+{        
     LegCommandParserMock parser;
     LegCommandSequence sut( &parser );
 
+    int32_t stepTimeStart = 2e6;
     int16_t slowStartPos = 100;    
-    int16_t slowTimePercent = 50;
+    int16_t slowTimePercent = 75;
     int16_t slowLength = 1000;
-    int32_t period = 2e6L;
-    sut.config( slowStartPos, slowTimePercent, slowLength, period );
+    int32_t stepTimeTotal = 1e6L;
+    
+    sut.config( stepTimeStart, slowStartPos, slowTimePercent, slowLength, stepTimeTotal );
 
-    sut.run( 0 );
+    sut.run( 2e6 );
     TEST_ASSERT_TRUE( parser.commandReceived );    
     TEST_ASSERT_EQUAL( 1100, parser.lastCommand.targetPositionClicks );
-    TEST_ASSERT_EQUAL( 1e6L, parser.lastCommand.targetTimeMicros );
+    TEST_ASSERT_EQUAL( 2.75e6L, parser.lastCommand.targetTimeMicros );
     
     parser.reset(); 
-    sut.run( 1e6 - 1 ); //Should not issue a new command as there is no change.
+    sut.run( 2.75e6 - 1 ); //Should not issue a new command as there is no change.
     TEST_ASSERT_FALSE( parser.commandReceived );    
 
-    sut.run( 1e6 ); //Should issue a new command.
+    parser.reset(); 
+    sut.run( 2.75e6 ); //Should issue a new command.
     TEST_ASSERT_TRUE( parser.commandReceived );    
     TEST_ASSERT_EQUAL( 100, parser.lastCommand.targetPositionClicks );
-    TEST_ASSERT_EQUAL( 2e6, parser.lastCommand.targetTimeMicros );    
+    TEST_ASSERT_EQUAL( 3e6, parser.lastCommand.targetTimeMicros );    
+
+    parser.reset(); 
+    sut.run( 3e6+1 ); //Should not issue a new command as we only do one period.
+    TEST_ASSERT_FALSE( parser.commandReceived );        
 }
 
-void testRunLegCommandSequenceThirdStep()
-{    
-    LegCommandParserMock parser;
-    LegCommandSequence sut( &parser );
-
-    int16_t slowStartPos = 100;    
-    int16_t slowTimePercent = 50;
-    int16_t slowLength = 1000;
-    int32_t period = 2e6;
-    sut.config( slowStartPos, slowTimePercent, slowLength, period );
-
-    sut.run( 4e6 - 1 );
-    TEST_ASSERT_EQUAL( 100, parser.lastCommand.targetPositionClicks );
-    TEST_ASSERT_EQUAL( 4e6, parser.lastCommand.targetTimeMicros );
-
-    sut.run( 4e6 );
-    TEST_ASSERT_EQUAL( 1100, parser.lastCommand.targetPositionClicks );
-    TEST_ASSERT_EQUAL( 5e6, parser.lastCommand.targetTimeMicros );
-}
 
 void testGaitCommanderWithOneLeg()
 {    
     LegCommandParserMock parser;
     LegCommandSequence leg( &parser );
+    int32_t stepTimeStart = 0;
     int16_t slowStartPos = 100;    
     int16_t slowTimePercent = 50;
     int16_t slowLength = 1000;
-    int32_t period = 2e6;
-    leg.config( slowStartPos, slowTimePercent, slowLength, period );
+    int32_t stepTimeTotal = 2e6;
+    leg.config( stepTimeStart, slowStartPos, slowTimePercent, slowLength, stepTimeTotal );
 
     GaitCommander<2> sut;
 
@@ -109,8 +99,7 @@ void runAllTestGaitCommander()
 {    
     UNITY_BEGIN_INT();    
     RUN_TEST( testCreateLegCommandSequence );
-    RUN_TEST( testRunLegCommandSequence );
-    RUN_TEST( testRunLegCommandSequenceThirdStep );
+    RUN_TEST( testRunLegCommandSequence );    
     RUN_TEST( testGaitCommanderWithOneLeg );
     UNITY_END_INT();
 

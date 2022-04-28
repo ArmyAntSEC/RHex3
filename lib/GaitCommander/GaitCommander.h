@@ -5,10 +5,11 @@
 
 struct LegCommandSequence: public RunnableInterface
 {    
+    int32_t stepTimeStartMicros;
     int16_t slowStartPos;    
     int16_t fastStartPos;
-    int32_t fastStartTimeMicros;    
-    int32_t periodMicros;
+    int32_t fastRelativeStartTimeMicros;    
+    int32_t stepTimeTotalMicros;
     bool firstCommandSent = false;
     bool inFastSegment = true;
     MotorSpeedCommanderInterface* parser;
@@ -16,25 +17,22 @@ struct LegCommandSequence: public RunnableInterface
     LegCommandSequence( MotorSpeedCommanderInterface* _parser ): parser(_parser)
     {}
 
-    void config( int16_t _slowStartPos, int16_t _slowTimePercent, int16_t _slowLength, int32_t _period )
+    void config( int32_t _stepTimeStart, int16_t _slowStartPos, int16_t _slowTimePercent, int16_t _slowLength, int32_t _stepTimeTotal )
     {
+        stepTimeStartMicros = _stepTimeStart;
         slowStartPos = _slowStartPos;        
         fastStartPos = _slowStartPos + _slowLength;
-        fastStartTimeMicros = _slowTimePercent * _period / 100L;
-        periodMicros = _period;        
+        fastRelativeStartTimeMicros =  _slowTimePercent * _stepTimeTotal / 100L;
+        stepTimeTotalMicros = _stepTimeTotal;                
     }
 
     void run ( int32_t _nowMicros )
-    {        
-        //Find out where we are in our loop
-        int32_t timeInLoop = _nowMicros % periodMicros;
-        int32_t loopNumber = _nowMicros / periodMicros;
-        
-        //Log << "Gait commander running: " << PRINTVAR( _nowMicros ) << PRINTVAR( timeInLoop ) << PRINTVAR(loopNumber) << PRINTVAR( periodMicros ) << endl;
+    {                
+        int32_t timeInLoop = _nowMicros - stepTimeStartMicros;        
         
         MotorSpeedCommanderInterface::LegCommand command;                
         
-        bool inFastSegmentNow = timeInLoop >= fastStartTimeMicros;        
+        bool inFastSegmentNow = timeInLoop >= fastRelativeStartTimeMicros;        
 
         if ( inFastSegmentNow != inFastSegment || !firstCommandSent ) {
             firstCommandSent = true;
@@ -42,14 +40,13 @@ struct LegCommandSequence: public RunnableInterface
 
             if ( inFastSegmentNow ) {
                 command.targetPositionClicks = slowStartPos;
-                command.targetTimeMicros = periodMicros*(loopNumber+1);
+                command.targetTimeMicros = stepTimeStartMicros + stepTimeTotalMicros;
             } else {
                 command.targetPositionClicks = fastStartPos;
-                command.targetTimeMicros = fastStartTimeMicros + periodMicros*loopNumber;            
+                command.targetTimeMicros = stepTimeStartMicros + fastRelativeStartTimeMicros;
             }        
 
-            parser->setGoal( command );
-            //Log << "Goal sent: " << PRINTVAR( command.targetPositionClicks ) << PRINTVAR( command.targetTimeMicros ) << endl;
+            parser->setGoal( command );            
         }
     }
 };
