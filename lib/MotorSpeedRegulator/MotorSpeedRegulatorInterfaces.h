@@ -14,15 +14,17 @@ struct SpeedRegulatorInterface
     virtual void setSetPoint( int16_t _setPoint16_t ) = 0;
 };
 
-struct MotorSpeedCommanderInterface
+struct MotorCommanderGoal
 {
-    struct LegCommand
-    {
-        int16_t targetPositionClicks;
-        int32_t targetTimeMicros;
-        LegCommand( int16_t _clicks = 0, int32_t _timeMicros = 0 ): targetPositionClicks(_clicks), targetTimeMicros(_timeMicros)
-        {}
-    };
-
-    virtual void setGoal(LegCommand command, int32_t nowMicros ) = 0;
+    int16_t targetPositionClicks;
+    int32_t targetTimeMicros;
+    MotorCommanderGoal( int16_t _targetPositionClicks = 0, int32_t _targetTimeMicros = 0 ):
+        targetPositionClicks(_targetPositionClicks), targetTimeMicros(_targetTimeMicros)
+    {}
 };
+
+struct MotorSpeedCommanderInterface
+{    
+    virtual void setGoal(MotorCommanderGoal command, int32_t nowMicros ) = 0;
+};
+

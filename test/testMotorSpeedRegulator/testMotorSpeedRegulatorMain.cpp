@@ -4,6 +4,7 @@
 void processMotorSpeedRegulator();
 void runAllTestsMotorSpeedCommander();
 void runAllTestsHomer();
+void runAllMotorGoalTests();
 
 void process()
 {
@@ -11,6 +12,7 @@ void process()
     processMotorSpeedRegulator();              
     runAllTestsMotorSpeedCommander();        
     runAllTestsHomer();
+    runAllMotorGoalTests();
     UNITY_END_EXT();  
 }
 

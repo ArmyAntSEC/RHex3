@@ -34,7 +34,7 @@ public:
         maxSpeedCPS = _maxSpeedCPS;
     }
 
-    virtual void setGoal( LegCommand goal, int32_t nowMicros )
+    virtual void setGoal( MotorCommanderGoal goal, int32_t nowMicros )
     {                        
         int16_t thisClicks = currentRotPos->getClicks();        
         if ( thisClicks > goal.targetPositionClicks ) {

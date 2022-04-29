@@ -7,11 +7,11 @@
 
 struct LegCommandParserMock: public MotorSpeedCommanderInterface
 {
-    LegCommand lastCommand;
+    MotorCommanderGoal lastCommand;
     int32_t timeNow;
     bool commandReceived = false;
 
-    virtual void setGoal(LegCommand command, int32_t _timeNow ) 
+    virtual void setGoal(MotorCommanderGoal command, int32_t _timeNow ) 
     {
         lastCommand = command;
         timeNow = _timeNow;
@@ -20,7 +20,7 @@ struct LegCommandParserMock: public MotorSpeedCommanderInterface
 
     void reset()
     {
-        lastCommand = LegCommand();
+        lastCommand = MotorCommanderGoal();
         commandReceived = false;
     }
 };
@@ -45,7 +45,7 @@ void testCreateLegCommandSequence()
 }
 
 void testRunLegCommandSequence()
-{        
+{            
     LegCommandParserMock parser;
     LegCommandSequence sut( &parser );
 
@@ -70,7 +70,7 @@ void testRunLegCommandSequence()
     sut.run( 2.75e6 ); //Should issue a new command.
     TEST_ASSERT_TRUE( parser.commandReceived );    
     TEST_ASSERT_EQUAL( 100, parser.lastCommand.targetPositionClicks );
-    TEST_ASSERT_EQUAL( 3e6, parser.lastCommand.targetTimeMicros );    
+    TEST_ASSERT_EQUAL( 3e6, parser.lastCommand.targetTimeMicros );
 
     parser.reset(); 
     sut.run( 3e6+1 ); //Should not issue a new command as we only do one period.

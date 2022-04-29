@@ -30,7 +30,7 @@ struct LegCommandSequence: public RunnableInterface
     {                
         int32_t timeInLoop = _nowMicros - stepTimeStartMicros;        
         
-        MotorSpeedCommanderInterface::LegCommand command;                
+        MotorCommanderGoal command;                
         
         bool inFastSegmentNow = timeInLoop >= fastRelativeStartTimeMicros;        
 
@@ -39,11 +39,9 @@ struct LegCommandSequence: public RunnableInterface
             inFastSegment = inFastSegmentNow;
 
             if ( inFastSegmentNow ) {
-                command.targetPositionClicks = slowStartPos;
-                command.targetTimeMicros = stepTimeStartMicros + stepTimeTotalMicros;
+                command = MotorCommanderGoal( slowStartPos,  stepTimeStartMicros + stepTimeTotalMicros );
             } else {
-                command.targetPositionClicks = fastStartPos;
-                command.targetTimeMicros = stepTimeStartMicros + fastRelativeStartTimeMicros;
+                command = MotorCommanderGoal( fastStartPos, stepTimeStartMicros + fastRelativeStartTimeMicros );
             }        
 
             parser->setGoal( command, _nowMicros );            
