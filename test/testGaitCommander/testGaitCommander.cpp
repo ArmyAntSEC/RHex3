@@ -60,7 +60,7 @@ void testRunLegCommandSequence()
     sut.run( 2e6 );
     TEST_ASSERT_TRUE( parser.commandReceived );    
     TEST_ASSERT_EQUAL( 1100, parser.lastCommand.targetPositionClicks );
-    TEST_ASSERT_EQUAL( 2.75e6L, parser.lastCommand.targetTimeMicros );
+    TEST_ASSERT_EQUAL( 2.75e6L, parser.lastCommand.targetRelativeTimeMicros );
     
     parser.reset(); 
     sut.run( 2.75e6 - 1 ); //Should not issue a new command as there is no change.
@@ -70,7 +70,7 @@ void testRunLegCommandSequence()
     sut.run( 2.75e6 ); //Should issue a new command.
     TEST_ASSERT_TRUE( parser.commandReceived );    
     TEST_ASSERT_EQUAL( 100, parser.lastCommand.targetPositionClicks );
-    TEST_ASSERT_EQUAL( 3e6, parser.lastCommand.targetTimeMicros );
+    TEST_ASSERT_EQUAL( 3e6, parser.lastCommand.targetRelativeTimeMicros );
 
     parser.reset(); 
     sut.run( 3e6+1 ); //Should not issue a new command as we only do one period.

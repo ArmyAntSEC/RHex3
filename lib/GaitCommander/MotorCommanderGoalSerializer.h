@@ -10,7 +10,7 @@ class MotorCommanderGoalSerializer
     {
         StaticJsonDocument<200> doc;
         doc["targetPositionClicks"] = goal.targetPositionClicks;
-        doc["targetTimeMicros"] = goal.targetTimeMicros;
+        doc["targetRelativeTimeMicros"] = goal.targetRelativeTimeMicros;
 
         serializeJson( doc, buffer, bufferLength );
     }
@@ -23,7 +23,7 @@ class MotorCommanderGoalSerializer
         if ( error ) {
             return MotorCommanderGoal();
         } else {
-            return MotorCommanderGoal( doc["targetPositionClicks"], doc["targetTimeMicros"] );
+            return MotorCommanderGoal( doc["targetPositionClicks"], doc["targetRelativeTimeMicros"] );
         }
     }
 };

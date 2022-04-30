@@ -43,7 +43,7 @@ public:
             goalPos = RotationalPosition(currentRotPos->getLaps(), goal.targetPositionClicks );                
         }        
 
-        timeGoalMicros = nowMicros + goal.targetTimeMicros;
+        timeGoalMicros = nowMicros + goal.targetRelativeTimeMicros;
     }        
 
     void stop()

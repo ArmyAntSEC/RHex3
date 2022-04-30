@@ -3,6 +3,9 @@
 		{
 			"name": "RHex3",
 			"path": "."
+		},
+		{
+			"path": "../I2C_debug"
 		}
 	],
 	"settings": {

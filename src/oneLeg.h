@@ -68,7 +68,7 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
 
     virtual void setGoal(LegCommand goal)
     {
-        Log << "Setting goal: Clicks: " << goal.targetPositionClicks << " Time: " << goal.targetTimeMicros << endl;
+        Log << "Setting goal: Clicks: " << goal.targetPositionClicks << " Time: " << goal.targetRelativeTimeMicros << endl;
         commander.setGoal(goal);
     }
 
@@ -106,7 +106,7 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         Log << "Going to zero" << endl;
         MotorSpeedCommanderInterface::LegCommand goal;
         goal.targetPositionClicks = 0;
-        goal.targetTimeMicros = micros() + 2e6L;
+        goal.targetRelativeTimeMicros = micros() + 2e6L;
         commander.setGoal(goal);
         commander.start();
         regulator.start();

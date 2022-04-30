@@ -17,9 +17,9 @@ struct SpeedRegulatorInterface
 struct MotorCommanderGoal
 {
     int16_t targetPositionClicks;
-    int32_t targetTimeMicros;
-    MotorCommanderGoal( int16_t _targetPositionClicks = 0, int32_t _targetTimeMicros = 0 ):
-        targetPositionClicks(_targetPositionClicks), targetTimeMicros(_targetTimeMicros)
+    int32_t targetRelativeTimeMicros;
+    MotorCommanderGoal( int16_t _targetPositionClicks = 0, int32_t _targetRelativeTimeMicros = 0 ):
+        targetPositionClicks(_targetPositionClicks), targetRelativeTimeMicros(_targetRelativeTimeMicros)
     {}
 };
 
