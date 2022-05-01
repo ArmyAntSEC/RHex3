@@ -7,8 +7,8 @@
 
 struct I2CReceiverWrapperInterface
 {    
-    virtual void setOnReceive( void(onReceive)(int32_t numBytes) ) = 0;
-    virtual int8_t read() = 0;
+    virtual void setOnReceive( void(*onReceive)(int32_t numBytes) ) = 0;
+    virtual uint8_t read() = 0;
 };
 
 class LegCommandReceiver: public I2CBase
@@ -25,25 +25,49 @@ public:
 };
 
 
-class I2CTextReceiver: public I2CBase
+class I2CReceiver: public I2CBase
 {    
 private:
     
-    I2CTextReceiver() 
+    static int32_t messageBuffer[4];
+
+    static I2CReceiverWrapperInterface* i2cPort;
+    
+    static void onReceive( int numberOfBytes )
+    {
+        uint8_t* messageByteBuffer = (uint8_t*)messageBuffer;
+        
+        if ( numberOfBytes == 4*sizeof(int32_t) ) {
+            for ( int i = 0; i < sizeof(messageBuffer); i++ ) {
+                uint8_t byte = i2cPort->read();
+                messageByteBuffer[i] = byte;            
+            }        
+
+        } else {
+            memset( messageBuffer, 0, sizeof(messageBuffer) );
+        }
+    }
+
+    I2CReceiver() 
     {        
     }
-    
-    LegCommandReceiver* receiver;
+        
 
 public:
-    I2CTextReceiver(I2CTextReceiver const&) = delete; //To make singleton
-    void operator=(I2CTextReceiver const&) = delete; //To make singleton.
+    I2CReceiver(I2CReceiver const&) = delete; //To make singleton
+    void operator=(I2CReceiver const&) = delete; //To make singleton.
 
-    static I2CTextReceiver& getSingletonInstance() 
+    static I2CReceiver& getSingletonInstance() 
     {
-        static I2CTextReceiver instance; // Guaranteed to be destroyed. Instantiated on first use.
+        static I2CReceiver instance; // Guaranteed to be destroyed. Instantiated on first use.
         return instance;
     }        
+
+    static void configI2CPort( I2CReceiverWrapperInterface* _i2cPort )
+    {
+        I2CReceiver::i2cPort = _i2cPort;
+        i2cPort->setOnReceive( I2CReceiver::onReceive );
+    }    
     
 };
 
@@ -58,12 +82,12 @@ class I2CReceiverWrapper: public I2CReceiverWrapperInterface
         Wire.begin( address ); //Should only be called once.
     }
 
-    void setOnReceive( void(onReceive)(int32_t numBytes) )
+    void setOnReceive( void(*_onReceive)(int32_t numBytes) )
     {
-        Wire.onReceive(onReceive);
+        Wire.onReceive(_onReceive);
     }
 
-    int8_t read()
+    uint8_t read()
     {
         return Wire.read();
     }
