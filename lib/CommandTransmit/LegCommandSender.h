@@ -50,10 +50,10 @@ public:
         return instance;
     }
 
-    virtual void sendText( int8_t i2cAddress, char * str, int8_t len )
+    virtual void sendText( int8_t i2cAddress, int32_t const * buffer, int8_t len )
     {
         Wire.beginTransmission(i2cAddress);
-        Wire.write(str, len);
+        Wire.write((uint8_t*)buffer, len*sizeof(buffer));
         int8_t errorCode = Wire.endTransmission();
         if ( errorCode ) {
             Log << "I2C Error: " << errorCode << endl;
