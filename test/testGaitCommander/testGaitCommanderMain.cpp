@@ -2,14 +2,12 @@
 #include <SerialStream.h>
 
 void runAllTestGaitCommander();
-void runAllTestSpeedCommanderGoalSerializer();
 void runAllTestsLegCommandSender();
 
 void process()
 {
     UNITY_BEGIN_EXT();  
-    runAllTestGaitCommander();                  
-    runAllTestSpeedCommanderGoalSerializer();
+    runAllTestGaitCommander();                      
     runAllTestsLegCommandSender();
     UNITY_END_EXT();  
 }

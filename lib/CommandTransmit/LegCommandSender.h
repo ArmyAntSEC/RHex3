@@ -1,30 +1,11 @@
 #pragma once
 #include <base.h>
 #include <MotorSpeedRegulatorInterfaces.h>
-#include <ArduinoJson.h>
+#include <LegCommandBase.h>
 
 struct I2cTextSenderInterface
 {
-    virtual void sendText( int8_t i2cAddress, char * str, int8_t len ) = 0;
-};
-
-enum LegIdentifiers { FORWARD_LEFT = 0, FORWARD_RIGHT = 1, 
-    MIDDLE_LEFT = 2, MIDDLE_RIGHT = 3, 
-    BACK_LEFT = 4, BACK_RIGHT = 5 };
-
-struct I2CBase 
-{
-    static const int LegAddresses[6][2];
-
-    int8_t getControllerIDForLeg(LegIdentifiers leg )
-    {
-        return LegAddresses[leg][0];
-    }
-
-    int8_t getMotorIDForLeg(LegIdentifiers leg )
-    {
-        return LegAddresses[leg][1];
-    }
+    virtual void sendText( int8_t i2cAddress, int32_t const * buffer, int8_t len ) = 0;
 };
 
 class LegCommandSender: public I2CBase
@@ -38,18 +19,13 @@ public:
 
     void sendCommand ( LegIdentifiers leg, MotorCommanderGoal goal )
     {
-        const int8_t bufferLength = 120;
-        char buffer[bufferLength];
-
-        StaticJsonDocument<200> doc;        
-        doc["motorID"] = getMotorIDForLeg( leg );
-        doc["targetPositionClicks"] = goal.targetPositionClicks;
-        doc["targetRelativeTimeMicros"] = goal.targetRelativeTimeMicros;
-        
-        serializeJson( doc, buffer, bufferLength );
-        
         int8_t controllerID = getControllerIDForLeg( leg );
-        rawSender->sendText( controllerID, buffer, bufferLength );
+        int8_t motorID = getMotorIDForLeg( leg );
+
+        const int32_t buffer[] = 
+            {motorID, goal.targetPositionClicks, goal.targetRelativeTimeMicros };            
+        
+        rawSender->sendText( controllerID, buffer, 3 );
     }    
 };
 
