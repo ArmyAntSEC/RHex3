@@ -3,12 +3,14 @@
 
 void runAllTestGaitCommander();
 void runAllTestSpeedCommanderGoalSerializer();
+void runAllTestsLegCommandSender();
 
 void process()
 {
     UNITY_BEGIN_EXT();  
     runAllTestGaitCommander();                  
     runAllTestSpeedCommanderGoalSerializer();
+    runAllTestsLegCommandSender();
     UNITY_END_EXT();  
 }
 
