@@ -2,6 +2,14 @@
 #include <base.h>
 #include <MotorSpeedRegulatorInterfaces.h>
 #include <LegCommandBase.h>
+#include <HardwareInterrupts.h>
+#include <RunnableInterface.h>
+
+struct I2CReceiverWrapperInterface
+{    
+    virtual void setOnReceive( void(onReceive)(int32_t numBytes) ) = 0;
+    virtual int8_t read() = 0;
+};
 
 class LegCommandReceiver: public I2CBase
 {
@@ -16,22 +24,13 @@ public:
     {}
 };
 
-#ifdef ARDUINO
-
-#include <Wire.h>
-#include <HardwareInterrupts.h>
 
 class I2CTextReceiver: public I2CBase
 {    
 private:
-    static const int8_t PacketLength = 4*sizeof(int32_t);
-    static volatile int32_t PacketBuffer[PacketLength];
-    static volatile bool PacketArrived;
-
+    
     I2CTextReceiver() 
-    {
-        Wire.begin( 7 ); //Hard-coded ID for now. Should be stored in EEPROM
-        PacketArrived = false;
+    {        
     }
     
     LegCommandReceiver* receiver;
@@ -45,19 +44,29 @@ public:
         static I2CTextReceiver instance; // Guaranteed to be destroyed. Instantiated on first use.
         return instance;
     }        
+    
+};
 
-    static void receivePacket( int8_t lengthInBytes )
-    {        
-        if ( lengthInBytes == PacketLength )
-        {
-            for ( int8_t i = 0; i < PacketLength; i++ ) {
-                PacketBuffer[i] = Wire.read();
-            }
-            PacketArrived = true;
-        }
+#ifdef ARDUINO
+
+#include <Wire.h>
+
+class I2CReceiverWrapper: public I2CReceiverWrapperInterface
+{
+    I2CReceiverWrapper( int8_t address )
+    {
+        Wire.begin( address ); //Should only be called once.
     }
 
+    void setOnReceive( void(onReceive)(int32_t numBytes) )
+    {
+        Wire.onReceive(onReceive);
+    }
 
+    int8_t read()
+    {
+        return Wire.read();
+    }
 };
 
 #endif

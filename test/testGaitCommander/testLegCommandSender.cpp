@@ -13,7 +13,7 @@ struct I2cTextSenderMock: public I2cTextSenderInterface
     }
 };
 
-void createLegCommandSender()
+void testCreateLegCommandSender()
 {
     I2cTextSenderMock rawSender;
     
@@ -41,7 +41,7 @@ void testSendLegCommand()
 void runAllTestsLegCommandSender()
 {
     UNITY_BEGIN_INT();
-    RUN_TEST( createLegCommandSender );
+    RUN_TEST( testCreateLegCommandSender );
     RUN_TEST( testSendLegCommand );
     UNITY_END_INT();
 }
