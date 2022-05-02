@@ -4,6 +4,7 @@
 #include <LegCommandBase.h>
 #include <HardwareInterrupts.h>
 #include <RunnableInterface.h>
+#include <HardwareClock.h>
 
 struct I2CReceiverWrapperInterface
 {    
@@ -12,63 +13,84 @@ struct I2CReceiverWrapperInterface
 };
 
 class LegCommandReceiver: public I2CBase
-{
-private:
+{    
+private:    
+    static const int8_t messageBufferLength = 3;
+    int32_t messageBuffer[messageBufferLength];
+
+    I2CReceiverWrapperInterface* i2cPort;
+    
     MotorSpeedCommanderInterface* commanderLeft;
     MotorSpeedCommanderInterface* commanderRight;
 
-public:
-    LegCommandReceiver( MotorSpeedCommanderInterface* _commanderLeft,  
-        MotorSpeedCommanderInterface* _commanderRight  ): 
-        commanderLeft(_commanderLeft), commanderRight(_commanderRight)
-    {}
-};
+    HardwareClockInterface* hwClock;
 
-
-class I2CReceiver: public I2CBase
-{    
-private:
-    
-    static int32_t messageBuffer[4];
-
-    static I2CReceiverWrapperInterface* i2cPort;
-    
-    static void onReceive( int numberOfBytes )
+    static void onReceive( int32_t numberOfBytes )
     {
-        uint8_t* messageByteBuffer = (uint8_t*)messageBuffer;
-        
-        if ( numberOfBytes == 4*sizeof(int32_t) ) {
-            for ( int i = 0; i < sizeof(messageBuffer); i++ ) {
-                uint8_t byte = i2cPort->read();
-                messageByteBuffer[i] = byte;            
-            }        
+        LegCommandReceiver& receiver = LegCommandReceiver::getSingletonInstance();        
+        receiver.handleIncomingData( numberOfBytes );
+    }
 
+    void handleIncomingData( int32_t numberOfBytes )
+    {                
+        if ( numberOfBytes == 3*sizeof(int32_t) ) {
+            int32_t nowMicros = hwClock->getMicrosecondsSinceBoot();
+            readMessageToBuffer ( messageBuffer, numberOfBytes );            
+            parseMessageAndSendToSpeedCommander( messageBuffer, nowMicros );            
         } else {
             memset( messageBuffer, 0, sizeof(messageBuffer) );
         }
     }
 
-    I2CReceiver() 
-    {        
+    void parseMessageAndSendToSpeedCommander( int32_t messageBuffer[3], int32_t nowMicros )
+    {                
+        MotorCommanderGoal goal( messageBuffer[1], messageBuffer[2] );
+        int32_t motorID = messageBuffer[0];
+        if ( motorID == 0 ) {
+            commanderLeft->setGoal( goal, nowMicros );
+        } else if ( motorID == 1 ) {
+            commanderRight->setGoal( goal, nowMicros );    
+        }
+
     }
+
+    void readMessageToBuffer( int32_t* messageBuffer, int8_t numberOfBytes )
+    {
+        uint8_t* messageByteBuffer = (uint8_t*)messageBuffer;
+        for ( int i = 0; i < numberOfBytes; i++ ) {
+            uint8_t byte = i2cPort->read();
+            messageByteBuffer[i] = byte;                        
+        }                            
+    }
+
+    LegCommandReceiver()  //Here to ensure it becomes private.
+    {}
         
 
 public:
-    I2CReceiver(I2CReceiver const&) = delete; //To make singleton
-    void operator=(I2CReceiver const&) = delete; //To make singleton.
+    LegCommandReceiver(LegCommandReceiver const&) = delete; //To make singleton
+    void operator=(LegCommandReceiver const&) = delete; //To make singleton.
 
-    static I2CReceiver& getSingletonInstance() 
+    static LegCommandReceiver& getSingletonInstance() 
     {
-        static I2CReceiver instance; // Guaranteed to be destroyed. Instantiated on first use.
+        static LegCommandReceiver instance; // Guaranteed to be destroyed. Instantiated on first use.
         return instance;
     }        
 
-    static void configI2CPort( I2CReceiverWrapperInterface* _i2cPort )
+    void config( 
+        I2CReceiverWrapperInterface* _i2cPort,
+        MotorSpeedCommanderInterface* _commanderLeft,
+        MotorSpeedCommanderInterface* _commanderRight,
+        HardwareClockInterface* _clock )
     {
-        I2CReceiver::i2cPort = _i2cPort;
-        i2cPort->setOnReceive( I2CReceiver::onReceive );
-    }    
-    
+        i2cPort = _i2cPort;
+        i2cPort->setOnReceive( LegCommandReceiver::onReceive );
+
+        commanderLeft = _commanderLeft;
+        commanderRight = _commanderRight;
+
+        hwClock = _clock;
+    }            
 };
 
 #ifdef ARDUINO
