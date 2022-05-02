@@ -110,9 +110,7 @@ public:
                 hwInterrupts->enableInterrupts();
             }
             parseMessageAndSendToSpeedCommander( myMessageBuffer, nowMicros );
-
-        }
-        
+        }        
     }
 };
 
@@ -122,6 +120,8 @@ public:
 
 class I2CReceiverWrapper: public I2CReceiverWrapperInterface
 {
+public:
+
     I2CReceiverWrapper( int8_t address )
     {
         Wire.begin( address ); //Should only be called once.

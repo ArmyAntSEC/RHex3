@@ -11,6 +11,7 @@
 #include <RotationalPosition.h>
 #include <MotorSpeedCommander.h>
 #include <Homer.h>
+#include <LegCommandReceiver.h>
 
 struct LegPinList
 {
@@ -36,7 +37,8 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
     SpeedComputer speed;
     SpeedRegulator regulator;
     MotorSpeedCommander commander;
-    Homer legHomer;
+    Homer legHomer;    
+
 
     OneLeg(HardwareInterrupts *_hwInterrupts, HardwarePins *_hwPins, HardwareClock *_hwClock)
         : hwInterrupts(_hwInterrupts), hwPins(_hwPins), hwClock(_hwClock),
@@ -64,6 +66,7 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         regulator.run(_nowMicros);
         commander.run(_nowMicros);
         legHomer.run(_nowMicros);
+        
     }
 
     virtual void setGoal(MotorCommanderGoal goal, int32_t nowMicros )

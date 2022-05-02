@@ -6,6 +6,7 @@
 #include <RecurringTaskGroup.h>
 #include <oneLeg.h>
 #include <GaitCommander.h>
+#include <LegCommandReceiver.h>
 
 #define MOTOR1_EN1 3
 #define MOTOR1_EN2 4
@@ -36,6 +37,9 @@ HardwarePins hwPins;
 OneLeg<0> leftLeg(&hwInterrupts, &hwPins, &hwClock);
 OneLeg<1> rightLeg(&hwInterrupts, &hwPins, &hwClock);
 
+I2CReceiverWrapper i2cWrapper(8);
+LegCommandReceiver& receiver = LegCommandReceiver::getSingletonInstance();
+
 TaskScheduler sched( &hwClock );
 RecurringTaskGroup<3> recurringGroup( 10*1000L );
 
@@ -54,6 +58,9 @@ void setup()
   sched.addTask( &recurringGroup );
   recurringGroup.addTask( &leftLeg );
   recurringGroup.addTask( &rightLeg );
+  
+  receiver.config( &i2cWrapper, &leftLeg.commander, &rightLeg.commander, &hwInterrupts );
+  recurringGroup.addTask( &receiver );
   
   leftLeg.config(&leftLegPins);  
   rightLeg.config(&rightLegPins);  
