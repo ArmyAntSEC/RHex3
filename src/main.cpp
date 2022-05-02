@@ -41,44 +41,6 @@ RecurringTaskGroup<3> recurringGroup( 10*1000L );
 
 TaskAwareDelay awareDelay(&hwClock, &sched);
 
-GaitCommander<2> gaitCommander;
-
-LegCommandSequence leftLegSequence(&leftLeg);
-LegCommandSequence rightLegSequence(&rightLeg);
-
-
-
-void configLegGait()
-{
-  int16_t slowStartPos = 0;
-  int16_t slowTimePercent = 70;
-  int16_t slowLength = 700;
-  int32_t period = 1e6;
-
-  leftLegSequence.config( slowStartPos, slowTimePercent, slowLength, period );
-  rightLegSequence.config( slowStartPos, slowTimePercent, slowLength, period );
-}
-
-void startWalking()
-{
-  Log << "Start walking" << endl;  
-  gaitCommander.addLegSchedule( &leftLegSequence );    
-  gaitCommander.addLegSchedule( &rightLegSequence );    
-  recurringGroup.addTask( &gaitCommander );
-  
-  leftLeg.commander.start();
-  leftLeg.regulator.start();
-  rightLeg.commander.start();
-  rightLeg.regulator.start();
-
-  awareDelay.delayMicros( 6e6L );   
-  
-  leftLeg.stop();  
-  rightLeg.stop();  
-  
-  Log << "Done walking" << endl;
-}
-
 void setup()
 {
   Serial.begin(115200);
@@ -96,42 +58,26 @@ void setup()
   leftLeg.config(&leftLegPins);  
   rightLeg.config(&rightLegPins);  
 
-  //leftLeg.warmUpLegs(&awareDelay);   
-  //rightLeg.warmUpLegs(&awareDelay);   
-  //Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
-
   leftLeg.linPos.setOffset(1400);
   rightLeg.linPos.setOffset(800);
 
+  Log << "Homing both legs" << endl;
   leftLeg.doHoming(&awareDelay);
   rightLeg.doHoming(&awareDelay);
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
 
-  for ( int i = 0; i < 3; i++ ) {
-    leftLeg.goToZero(&awareDelay);
-    rightLeg.goToZero(&awareDelay);
-    Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
-    awareDelay.delayMicros(1e6);
-    Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
-  }
-  
-  Log << "Starting in 3...." << endl;
-  awareDelay.delayMicros(1e6);
-  Log << "Starting in 2...." << endl;
-  awareDelay.delayMicros(1e6);
-  Log << "Starting in 1...." << endl;
-  awareDelay.delayMicros(1e6);
-  Log << "NOW!!!" << endl;
-  
-  configLegGait();
-  startWalking();
+  Log << "Looping a full round to reach zero" << endl;
+  leftLeg.goToZero(&awareDelay);
+  rightLeg.goToZero(&awareDelay);
+  Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;   
 
-  Log << "Exit" << endl;
+  Log << "Setup done!" << endl;
 }
 
 
 void loop()
 {  
+  sched.run(hwClock.getMicrosecondsSinceBoot());
 }
 
 #else

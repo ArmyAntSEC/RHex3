@@ -66,10 +66,10 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         legHomer.run(_nowMicros);
     }
 
-    virtual void setGoal(LegCommand goal)
+    virtual void setGoal(MotorCommanderGoal goal, int32_t nowMicros )
     {
         Log << "Setting goal: Clicks: " << goal.targetPositionClicks << " Time: " << goal.targetRelativeTimeMicros << endl;
-        commander.setGoal(goal);
+        commander.setGoal(goal, nowMicros);
     }
 
     void stop()
@@ -101,13 +101,14 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         Log << "Left leg homing ended" << PRINTVAR(linPos.getLinearPosition()) << endl;
     }
 
-    void goToZero(TaskAwareDelay *awareDelay)
+    void goToZero ( TaskAwareDelay *awareDelay )
     {
         Log << "Going to zero" << endl;
-        MotorSpeedCommanderInterface::LegCommand goal;
+        int32_t nowMicros = hwClock->getMicrosecondsSinceBoot();        
+        MotorCommanderGoal goal;
         goal.targetPositionClicks = 0;
         goal.targetRelativeTimeMicros = micros() + 2e6L;
-        commander.setGoal(goal);
+        commander.setGoal(goal, nowMicros );
         commander.start();
         regulator.start();
         awareDelay->delayMicros(2e6L);

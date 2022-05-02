@@ -4,7 +4,7 @@
 #include <LegCommandBase.h>
 #include <HardwareInterrupts.h>
 #include <RunnableInterface.h>
-#include <HardwareClock.h>
+#include <RunnableInterface.h>
 
 struct I2CReceiverWrapperInterface
 {    
@@ -12,18 +12,19 @@ struct I2CReceiverWrapperInterface
     virtual uint8_t read() = 0;
 };
 
-class LegCommandReceiver: public I2CBase
+class LegCommandReceiver: public I2CBase, public RunnableInterface
 {    
 private:    
     static const int8_t messageBufferLength = 3;
-    int32_t messageBuffer[messageBufferLength];
+    volatile int32_t messageBuffer[messageBufferLength];
+    volatile bool newMessageArrived = false;
 
     I2CReceiverWrapperInterface* i2cPort;
     
     MotorSpeedCommanderInterface* commanderLeft;
     MotorSpeedCommanderInterface* commanderRight;
-
-    HardwareClockInterface* hwClock;
+    
+    HardwareInterruptsInterface* hwInterrupts;
 
     static void onReceive( int32_t numberOfBytes )
     {
@@ -33,14 +34,24 @@ private:
 
     void handleIncomingData( int32_t numberOfBytes )
     {                
-        if ( numberOfBytes == 3*sizeof(int32_t) ) {
-            int32_t nowMicros = hwClock->getMicrosecondsSinceBoot();
-            readMessageToBuffer ( messageBuffer, numberOfBytes );            
-            parseMessageAndSendToSpeedCommander( messageBuffer, nowMicros );            
-        } else {
-            memset( messageBuffer, 0, sizeof(messageBuffer) );
+        if ( numberOfBytes == 3*sizeof(int32_t) ) {            
+            readMessageToBuffer ( messageBuffer, numberOfBytes );                    
+            newMessageArrived = true;
+        } else {            
+            newMessageArrived = false;
         }
     }
+
+    void readMessageToBuffer( volatile int32_t* messageBuffer, int8_t numberOfBytes )
+    {
+        uint8_t* messageByteBuffer = (uint8_t*)messageBuffer;
+        for ( int i = 0; i < numberOfBytes; i++ ) {
+            uint8_t byte = i2cPort->read();
+            messageByteBuffer[i] = byte;                        
+        }                            
+
+    }
+
 
     void parseMessageAndSendToSpeedCommander( int32_t messageBuffer[3], int32_t nowMicros )
     {                
@@ -51,16 +62,8 @@ private:
         } else if ( motorID == 1 ) {
             commanderRight->setGoal( goal, nowMicros );    
         }
+        Log << "Leg: " << motorID << " Goal: " << goal << endl;
 
-    }
-
-    void readMessageToBuffer( int32_t* messageBuffer, int8_t numberOfBytes )
-    {
-        uint8_t* messageByteBuffer = (uint8_t*)messageBuffer;
-        for ( int i = 0; i < numberOfBytes; i++ ) {
-            uint8_t byte = i2cPort->read();
-            messageByteBuffer[i] = byte;                        
-        }                            
     }
 
     LegCommandReceiver()  //Here to ensure it becomes private.
@@ -80,8 +83,8 @@ public:
     void config( 
         I2CReceiverWrapperInterface* _i2cPort,
         MotorSpeedCommanderInterface* _commanderLeft,
-        MotorSpeedCommanderInterface* _commanderRight,
-        HardwareClockInterface* _clock )
+        MotorSpeedCommanderInterface* _commanderRight,        
+        HardwareInterruptsInterface* _interrupts )
     {
         i2cPort = _i2cPort;
         i2cPort->setOnReceive( LegCommandReceiver::onReceive );
@@ -89,8 +92,28 @@ public:
         commanderLeft = _commanderLeft;
         commanderRight = _commanderRight;
 
-        hwClock = _clock;
+        hwInterrupts = _interrupts;
     }            
+
+    void run( int32_t nowMicros )
+    {
+        hwInterrupts->disableInterrupts();
+        bool newMessage = newMessageArrived;
+        newMessageArrived = false;
+        hwInterrupts->enableInterrupts();
+
+        if ( newMessage ) {
+            int32_t myMessageBuffer[messageBufferLength];
+            for ( int i = 0; i < messageBufferLength; i++ ) {
+                hwInterrupts->disableInterrupts();
+                myMessageBuffer[i] = messageBuffer[i];
+                hwInterrupts->enableInterrupts();
+            }
+            parseMessageAndSendToSpeedCommander( myMessageBuffer, nowMicros );
+
+        }
+        
+    }
 };
 
 #ifdef ARDUINO

@@ -20,8 +20,10 @@ struct MotorCommanderGoal
     int32_t targetRelativeTimeMicros;
     MotorCommanderGoal( int16_t _targetPositionClicks = 0, int32_t _targetRelativeTimeMicros = 0 ):
         targetPositionClicks(_targetPositionClicks), targetRelativeTimeMicros(_targetRelativeTimeMicros)
-    {}
+    {}    
 };
+
+SerialStream& operator<< ( SerialStream& stream, const MotorCommanderGoal& goal );
 
 struct MotorSpeedCommanderInterface
 {    
