@@ -59,7 +59,7 @@ void testLegCommandOnReceive()
     MotorSpeedCommanderMock commander1;
     MotorSpeedCommanderMock commander2;    
     HardwareInterruptsMock hwInterrupts;
-
+    
     int32_t myBuffer[] = {1, 4567, 5676};
     memcpy( i2cMock.buffer, myBuffer, sizeof(myBuffer) );
 
@@ -111,7 +111,7 @@ void testLegCommandOnReceiveOtherLeg()
     TEST_ASSERT_EQUAL_INT( 5676, commander1.lastGoal.targetRelativeTimeMicros );
     TEST_ASSERT_EQUAL_INT( 7891, commander1.lastTime );
 
-    assertLastGoalIsUnset( &commander1 );
+    assertLastGoalIsUnset( &commander2 );
 
     TEST_ASSERT_FALSE( sut.newMessageArrived );
 }

@@ -62,7 +62,7 @@ private:
         } else if ( motorID == 1 ) {
             commanderRight->setGoal( goal, nowMicros );    
         }
-        Log << "Leg: " << motorID << " Goal: " << goal << endl;
+        //Log << "Leg: " << motorID << " Goal: " << goal << endl;
 
     }
 
