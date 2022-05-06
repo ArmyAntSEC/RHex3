@@ -23,8 +23,8 @@ public:
         int8_t motorID = getMotorIDForLeg( leg );
 
         const int32_t buffer[] = 
-            {motorID, goal.targetPositionClicks, goal.targetRelativeTimeMicros };            
-        
+            {motorID, goal.targetPositionClicks, goal.targetRelativeTimeMicros };                    
+
         rawSender->sendText( controllerID, buffer, 3 );
     }    
 };

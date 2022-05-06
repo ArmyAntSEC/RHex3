@@ -9,7 +9,7 @@ struct I2cTextSenderMock: public I2cTextSenderInterface
     virtual void sendText( int8_t i2cAddress, int32_t const * data, int8_t len )
     {
         lastAddress = i2cAddress;        
-        memcpy( buffer, data, len*sizeof(data) );                        
+        memcpy( buffer, data, len*sizeof(*data) );                                
     }
 };
 
