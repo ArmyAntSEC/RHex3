@@ -110,7 +110,7 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         int32_t nowMicros = hwClock->getMicrosecondsSinceBoot();        
         MotorCommanderGoal goal;
         goal.targetPositionClicks = 0;
-        goal.targetRelativeTimeMicros = micros() + 2e6L;
+        goal.targetRelativeTimeMicros = 2e6L;
         commander.setGoal(goal, nowMicros );
         commander.start();
         regulator.start();
