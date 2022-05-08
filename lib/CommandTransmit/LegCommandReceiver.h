@@ -115,7 +115,7 @@ public:
 
             if (newMessage)
             {
-                Log << "New massage!" << endl;
+                // Log << "New message!" << endl;
                 int32_t myMessageBuffer[messageBufferLength];
                 for (int i = 0; i < messageBufferLength; i++)
                 {
