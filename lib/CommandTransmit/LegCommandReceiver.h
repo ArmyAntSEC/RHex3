@@ -7,110 +7,138 @@
 #include <RunnableInterface.h>
 
 struct I2CReceiverWrapperInterface
-{    
-    virtual void setOnReceive( void(*onReceive)(int32_t numBytes) ) = 0;
+{
+    virtual void setOnReceive(void (*onReceive)(int numBytes)) = 0;
     virtual uint8_t read() = 0;
+    virtual void emptyReceiveBuffer() = 0;
 };
 
-class LegCommandReceiver: public I2CBase, public RunnableInterface
-{    
-private:    
+class LegCommandReceiver : public I2CBase, public RunnableInterface
+{
+private:
     static const int8_t messageBufferLength = 3;
     volatile int32_t messageBuffer[messageBufferLength];
     volatile bool newMessageArrived = false;
 
-    I2CReceiverWrapperInterface* i2cPort;
-    
-    MotorSpeedCommanderInterface* commanderLeft;
-    MotorSpeedCommanderInterface* commanderRight;
-    
-    HardwareInterruptsInterface* hwInterrupts;
+    bool isRunning = false;
 
-    static void onReceive( int32_t numberOfBytes )
+    I2CReceiverWrapperInterface *i2cPort;
+
+    MotorSpeedCommanderInterface *commanderLeft;
+    MotorSpeedCommanderInterface *commanderRight;
+
+    HardwareInterruptsInterface *hwInterrupts;
+
+    static void onReceive(int numberOfBytes)
     {
-        LegCommandReceiver& receiver = LegCommandReceiver::getSingletonInstance();        
-        receiver.handleIncomingData( numberOfBytes );
+        LegCommandReceiver &receiver = LegCommandReceiver::getSingletonInstance();
+        receiver.handleIncomingData(numberOfBytes);
     }
 
-    void handleIncomingData( int32_t numberOfBytes )
-    {                
-        if ( numberOfBytes == 3*sizeof(int32_t) ) {            
-            readMessageToBuffer ( messageBuffer, numberOfBytes );                    
+    void handleIncomingData(int16_t numberOfBytes)
+    {
+        if (numberOfBytes == 3 * sizeof(int32_t))
+        {
+            readMessageToBuffer(messageBuffer, numberOfBytes);
             newMessageArrived = true;
-        } else {            
+        }
+        else
+        {
             newMessageArrived = false;
         }
+        i2cPort->emptyReceiveBuffer();
     }
 
-    void readMessageToBuffer( volatile int32_t* messageBuffer, int8_t numberOfBytes )
+    void readMessageToBuffer(volatile int32_t *messageBuffer, int8_t numberOfBytes)
     {
-        uint8_t* messageByteBuffer = (uint8_t*)messageBuffer;
-        for ( int i = 0; i < numberOfBytes; i++ ) {
+        uint8_t *messageByteBuffer = (uint8_t *)messageBuffer;
+        for (int i = 0; i < numberOfBytes; i++)
+        {
             uint8_t byte = i2cPort->read();
-            messageByteBuffer[i] = byte;                        
-        }                            
-
-    }
-
-
-    void parseMessageAndSendToSpeedCommander( int32_t messageBuffer[3], int32_t nowMicros )
-    {                
-        MotorCommanderGoal goal( messageBuffer[1], messageBuffer[2] );
-        int32_t motorID = messageBuffer[0];
-        if ( motorID == 0 ) {
-            commanderLeft->setGoal( goal, nowMicros );
-        } else if ( motorID == 1 ) {
-            commanderRight->setGoal( goal, nowMicros );    
+            messageByteBuffer[i] = byte;
         }
-        //Log << "Leg: " << motorID << " Goal: " << goal << endl;
-
     }
 
-    LegCommandReceiver()  //Here to ensure it becomes private.
-    {}
-        
+    void parseMessageAndSendToSpeedCommander(int32_t messageBuffer[3], int32_t nowMicros)
+    {
+        MotorCommanderGoal goal(messageBuffer[1], messageBuffer[2]);
+        int32_t motorID = messageBuffer[0];
+        if (motorID == 0)
+        {
+            commanderLeft->setGoal(goal, nowMicros);
+        }
+        else if (motorID == 1)
+        {
+            commanderRight->setGoal(goal, nowMicros);
+        }
+        // Log << "Leg: " << motorID << " Goal: " << goal << endl;
+    }
+
+    LegCommandReceiver() // Here to ensure it becomes private.
+    {
+    }
 
 public:
-    LegCommandReceiver(LegCommandReceiver const&) = delete; //To make singleton
-    void operator=(LegCommandReceiver const&) = delete; //To make singleton.
+    LegCommandReceiver(LegCommandReceiver const &) = delete; // To make singleton
+    void operator=(LegCommandReceiver const &) = delete;     // To make singleton.
 
-    static LegCommandReceiver& getSingletonInstance() 
+    // This object does not need to be a sigleton.
+    static LegCommandReceiver &getSingletonInstance()
     {
         static LegCommandReceiver instance; // Guaranteed to be destroyed. Instantiated on first use.
         return instance;
-    }        
+    }
 
-    void config( 
-        I2CReceiverWrapperInterface* _i2cPort,
-        MotorSpeedCommanderInterface* _commanderLeft,
-        MotorSpeedCommanderInterface* _commanderRight,        
-        HardwareInterruptsInterface* _interrupts )
+    void config(
+        I2CReceiverWrapperInterface *_i2cPort,
+        MotorSpeedCommanderInterface *_commanderLeft,
+        MotorSpeedCommanderInterface *_commanderRight,
+        HardwareInterruptsInterface *_interrupts)
     {
         i2cPort = _i2cPort;
-        i2cPort->setOnReceive( LegCommandReceiver::onReceive );
+        i2cPort->setOnReceive(LegCommandReceiver::onReceive);
 
         commanderLeft = _commanderLeft;
         commanderRight = _commanderRight;
 
         hwInterrupts = _interrupts;
-    }            
+    }
 
-    void run( int32_t nowMicros )
+    void run(int32_t nowMicros)
     {
+        if (isRunning)
+        {
+            hwInterrupts->disableInterrupts();
+            bool newMessage = newMessageArrived;
+            newMessageArrived = false;
+            hwInterrupts->enableInterrupts();
+
+            if (newMessage)
+            {
+                Log << "New massage!" << endl;
+                int32_t myMessageBuffer[messageBufferLength];
+                for (int i = 0; i < messageBufferLength; i++)
+                {
+                    hwInterrupts->disableInterrupts();
+                    myMessageBuffer[i] = messageBuffer[i];
+                    hwInterrupts->enableInterrupts();
+                }
+                parseMessageAndSendToSpeedCommander(myMessageBuffer, nowMicros);
+            }
+        }
+    }
+
+    void start()
+    {
+        isRunning = true;
         hwInterrupts->disableInterrupts();
-        bool newMessage = newMessageArrived;
         newMessageArrived = false;
         hwInterrupts->enableInterrupts();
+    }
 
-        if ( newMessage ) {
-            int32_t myMessageBuffer[messageBufferLength];
-            for ( int i = 0; i < messageBufferLength; i++ ) {
-                hwInterrupts->disableInterrupts();
-                myMessageBuffer[i] = messageBuffer[i];
-                hwInterrupts->enableInterrupts();
-            }
-            parseMessageAndSendToSpeedCommander( myMessageBuffer, nowMicros );
-        }        
+    void stop()
+    {
+        isRunning = false;
     }
 };
 
@@ -118,23 +146,49 @@ public:
 
 #include <Wire.h>
 
-class I2CReceiverWrapper: public I2CReceiverWrapperInterface
+void onReceive(int n)
 {
+    Log << "Received: " << n << endl;
+    while (Wire.available())
+    {
+        Wire.read();
+    }
+}
+
+void onRequest()
+{
+    Wire.write("OK");
+}
+
+// TODO: This should be the singleton.
+class I2CReceiverWrapper : public I2CReceiverWrapperInterface
+{
+private:
+    int8_t address;
+
 public:
-
-    I2CReceiverWrapper( int8_t address )
+    I2CReceiverWrapper(int8_t _address) : address(_address)
     {
-        Wire.begin( address ); //Should only be called once.
     }
 
-    void setOnReceive( void(*_onReceive)(int32_t numBytes) )
+    void setOnReceive(void (*_onReceive)(int numBytes))
     {
+        Wire.begin(9);
         Wire.onReceive(_onReceive);
+        Wire.onRequest(onRequest);
     }
 
-    uint8_t read()
+    virtual uint8_t read()
     {
         return Wire.read();
+    }
+
+    virtual void emptyReceiveBuffer()
+    {
+        while (Wire.available())
+        {
+            Wire.read();
+        }
     }
 };
 
