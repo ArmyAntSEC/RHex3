@@ -1,3 +1,5 @@
+#include <base.h>
+
 #ifdef ARDUINO
 #include <HardwareClock.h>
 #include <SerialStream.h>
