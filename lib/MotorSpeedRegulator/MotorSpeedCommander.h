@@ -42,6 +42,8 @@ public:
         goalPos = RotationalPosition(goal.targetPositionClicks);
         timeGoalMicros = nowMicros + goal.targetRelativeTimeMicros;
         start();
+        Log << PRINTVAR(currentRotPos->getLinearPosition()) << PRINTVAR(goal.targetPositionClicks) << endl;
+        Log << PRINTVAR(nowMicros) << PRINTVAR(goal.targetRelativeTimeMicros) << endl;
     }
 
     void stop()
@@ -85,7 +87,7 @@ public:
             {
                 arrived = true;
                 speedRegulator->setSetPoint(0);
-                Log << "Arrived!" << endl;
+                // Log << "Arrived!" << endl;
             }
             else
             {
