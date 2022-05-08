@@ -163,17 +163,14 @@ void onRequest()
 // TODO: This should be the singleton.
 class I2CReceiverWrapper : public I2CReceiverWrapperInterface
 {
-private:
-    int8_t address;
-
 public:
-    I2CReceiverWrapper(int8_t _address) : address(_address)
+    void config(int address)
     {
+        Wire.begin(address);
     }
 
     void setOnReceive(void (*_onReceive)(int numBytes))
     {
-        Wire.begin(9);
         Wire.onReceive(_onReceive);
         Wire.onRequest(onRequest);
     }

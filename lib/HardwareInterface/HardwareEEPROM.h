@@ -1,15 +1,13 @@
 #pragma once
-#include <cstdint>
-#include <string.h>
+#include <base.h>
 
 struct HardwareEEPROMInterface
 {
-    virtual void UpdateEEPROM(int16_t address, int16_t value) = 0;
-    virtual uint16_t ReadEEPROM(int16_t address) = 0;
+    virtual void UpdateEEPROM(uint8_t address, uint8_t value) = 0;
+    virtual uint8_t ReadEEPROM(uint8_t address) = 0;
 };
 
-
-struct HardwareEEPROMMock: public HardwareEEPROMInterface
+struct HardwareEEPROMMock : public HardwareEEPROMInterface
 {
     static const int16_t EEPROMSize = 256;
     int16_t EEPROMData[EEPROMSize];
@@ -48,14 +46,14 @@ struct HardwareEEPROMMock: public HardwareEEPROMInterface
 
 #ifdef ARDUINO
 #include <EEPROM.h>
-struct HardwareEEPROM: public HardwareEEPROMInterface
+struct HardwareEEPROM : public HardwareEEPROMInterface
 {
-    virtual void UpdateEEPROM(int16_t address, int16_t value)
+    virtual void UpdateEEPROM(uint8_t address, uint8_t value)
     {
         EEPROM.update(address, value);
     }
 
-    virtual int16_t int16_t ReadEEPROM(int16_t address) 
+    virtual uint8_t ReadEEPROM(uint8_t address)
     {
         return EEPROM.read(address);
     }

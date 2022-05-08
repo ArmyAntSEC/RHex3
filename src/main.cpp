@@ -9,6 +9,7 @@
 #include <oneLeg.h>
 #include <GaitCommander.h>
 #include <LegCommandReceiver.h>
+#include <EEPROMStorage.h>
 
 #define MOTOR1_EN1 3
 #define MOTOR1_EN2 4
@@ -37,13 +38,22 @@ HardwarePins hwPins;
 OneLeg<0> leftLeg(&hwInterrupts, &hwPins, &hwClock);
 OneLeg<1> rightLeg(&hwInterrupts, &hwPins, &hwClock);
 
-I2CReceiverWrapper i2cWrapper(9);
+I2CReceiverWrapper i2cWrapper;
 LegCommandReceiver &receiver = LegCommandReceiver::getSingletonInstance();
 
 TaskScheduler sched(&hwClock);
 RecurringTaskGroup<3> recurringGroup(10 * 1000L);
 
 TaskAwareDelay awareDelay(&hwClock, &sched);
+
+void initI2C(I2CReceiverWrapper *i2cWrapper)
+{
+  HardwareEEPROM rawEeprom;
+  EEPROMStorage storage(&rawEeprom);
+  int16_t i2cID = storage.readIntFromIndex(0);
+  i2cWrapper->config(i2cID);
+  Log << "I2C ID: " << i2cID << endl;
+}
 
 void setup()
 {
@@ -53,6 +63,8 @@ void setup()
   }
   Log << "*************************" << endl
       << "Hello World!" << endl;
+
+  initI2C(&i2cWrapper);
 
   IdleCounter *idleCounter = sched.getIdleCounterObject();
   idleCounter->Run1000IdleTaskToCalibrateAndGetMaxIdleCountsPerSecond();
