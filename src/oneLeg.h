@@ -12,6 +12,7 @@
 #include <MotorSpeedCommander.h>
 #include <Homer.h>
 #include <LegCommandReceiver.h>
+#include <EEPROMStorage.h>
 
 struct LegPinList
 {
@@ -37,14 +38,22 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
     SpeedComputer speed;
     SpeedRegulator regulator;
     MotorSpeedCommander commander;
-    Homer legHomer;    
-
+    Homer legHomer;
 
     OneLeg(HardwareInterrupts *_hwInterrupts, HardwarePins *_hwPins, HardwareClock *_hwClock)
         : hwInterrupts(_hwInterrupts), hwPins(_hwPins), hwClock(_hwClock),
           linPos(_hwInterrupts), speed(_hwClock, _hwInterrupts), rotPos(&linPos),
           commander(&rotPos, &regulator), legHomer(&driver, &linPos)
     {
+    }
+
+    void initLegOffsets(int legIndex)
+    {
+        HardwareEEPROM rawEeprom;
+        EEPROMStorage storage(&rawEeprom);
+        int16_t legOffset = storage.readIntFromIndex(legIndex + 1);
+        linPos.setOffset(legOffset);
+        Log << "Offset: " << legOffset << endl;
     }
 
     void config(LegPinList *pinList)
@@ -66,10 +75,9 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
         regulator.run(_nowMicros);
         commander.run(_nowMicros);
         legHomer.run(_nowMicros);
-        
     }
 
-    virtual void setGoal(MotorCommanderGoal goal, int32_t nowMicros )
+    virtual void setGoal(MotorCommanderGoal goal, int32_t nowMicros)
     {
         Log << "Setting goal: Clicks: " << goal.targetPositionClicks << " Time: " << goal.targetRelativeTimeMicros << endl;
         commander.setGoal(goal, nowMicros);
@@ -92,26 +100,26 @@ struct OneLeg : public RunnableInterface, public MotorSpeedCommanderInterface
 
         awareDelay->delayMicros(1000 * 1000L);
         stop();
-        Log << "Left Leg: " << linPos.getLinearPosition() << endl;        
+        Log << "Left Leg: " << linPos.getLinearPosition() << endl;
     }
 
     void doHoming(TaskAwareDelay *awareDelay)
     {
-        Log << "Left leg homing started:" << PRINTVAR(linPos.isHomed()) << endl;        
+        Log << "Left leg homing started:" << PRINTVAR(linPos.isHomed()) << endl;
         legHomer.start();
         awareDelay->delayMicros(2e6L);
         stop();
         Log << "Left leg homing ended" << PRINTVAR(linPos.getLinearPosition()) << endl;
     }
 
-    void goToZero ( TaskAwareDelay *awareDelay )
+    void goTo(TaskAwareDelay *awareDelay, int32_t pos)
     {
         Log << "Going to zero" << endl;
-        int32_t nowMicros = hwClock->getMicrosecondsSinceBoot();        
+        int32_t nowMicros = hwClock->getMicrosecondsSinceBoot();
         MotorCommanderGoal goal;
-        goal.targetPositionClicks = 0;
+        goal.targetPositionClicks = pos;
         goal.targetRelativeTimeMicros = 2e6L;
-        commander.setGoal(goal, nowMicros );
+        commander.setGoal(goal, nowMicros);
         commander.start();
         regulator.start();
         awareDelay->delayMicros(2e6L);

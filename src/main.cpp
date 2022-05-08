@@ -80,8 +80,8 @@ void setup()
   leftLeg.config(&leftLegPins);
   rightLeg.config(&rightLegPins);
 
-  leftLeg.linPos.setOffset(1400);
-  rightLeg.linPos.setOffset(800);
+  leftLeg.initLegOffsets(0);
+  rightLeg.initLegOffsets(1);
 
   Log << "Homing both legs" << endl;
   leftLeg.doHoming(&awareDelay);
@@ -89,8 +89,12 @@ void setup()
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;
 
   Log << "Looping a full round to reach zero" << endl;
-  leftLeg.goToZero(&awareDelay);
-  rightLeg.goToZero(&awareDelay);
+  for (int i = 0; i < 2; i++)
+  {
+    leftLeg.goTo(&awareDelay, i * 1792);
+    rightLeg.goTo(&awareDelay, i * 1792);
+  }
+
   Log << "CPU Idle fraction: " << idleCounter->getCPUFactorPercent() << "%" << endl;
 
   Log << "Setup done!" << endl;

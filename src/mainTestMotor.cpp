@@ -95,8 +95,6 @@ struct BasicEncoderStore : public BasicEncoderListener
 BasicEncoderStore listener1;
 BasicEncoderStore listener2;
 
-const int16_t I2CID = 10;
-
 void setup()
 {
     Serial.begin(115200);
@@ -106,14 +104,6 @@ void setup()
     }
 
     Serial.println("Hello World!");
-
-    // Store the I2C ID
-    HardwareEEPROM rawEeprom;
-    EEPROMStorage storage(&rawEeprom);
-    storage.writeIntToIndex(0, I2CID);
-
-    // Read back to verify
-    Log << "I2C ID: " << storage.readIntFromIndex(0);
 
     driver1.config(MOTOR1_EN1, MOTOR1_EN2, MOTOR1_PWM, &hwPins);
     driver2.config(MOTOR2_EN1, MOTOR2_EN2, MOTOR2_PWM, &hwPins);
