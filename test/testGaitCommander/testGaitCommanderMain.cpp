@@ -1,25 +1,25 @@
 #include <unityEx.h>
 #include <SerialStream.h>
 
-void runAllTestGaitCommander();
 void runAllTestsLegCommandSender();
 void runAllTestsLegCommandReceiver();
 
 void process()
 {
-    UNITY_BEGIN_EXT();  
-    runAllTestGaitCommander();                      
+    UNITY_BEGIN_EXT();
     runAllTestsLegCommandSender();
     runAllTestsLegCommandReceiver();
-    UNITY_END_EXT();  
+    UNITY_END_EXT();
 }
 
 #ifdef ARDUINO
-void setup() {
+void setup()
+{
     process();
 }
 
-void loop() {
+void loop()
+{
 }
 #else
 int main(void)

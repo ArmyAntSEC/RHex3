@@ -7,7 +7,6 @@
 #include <TaskAwareDelay.h>
 #include <RecurringTaskGroup.h>
 #include <oneLeg.h>
-#include <GaitCommander.h>
 #include <LegCommandReceiver.h>
 #include <EEPROMStorage.h>
 
