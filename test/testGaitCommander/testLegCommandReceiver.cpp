@@ -5,12 +5,12 @@
 
 struct I2CReceiverWrappeMock : public I2CReceiverWrapperInterface
 {
-    void (*onReceive)(int32_t numBytes);
+    void (*onReceive)(int numBytes);
 
     uint8_t buffer[16];
     int8_t bufferPointer = 0;
 
-    virtual void setOnReceive(void (*_onReceive)(int32_t numBytes))
+    virtual void setOnReceive(void (*_onReceive)(int numBytes))
     {
         onReceive = _onReceive;
     }
