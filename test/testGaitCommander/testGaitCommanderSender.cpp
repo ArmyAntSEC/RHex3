@@ -1,7 +1,7 @@
 #include <unityEx.h>
 #define private public
 #include <LegCommandSender.h>
-#include <RunnableInterface.h>
+#include <HardwareClock.h>
 
 struct I2CSenderWrapperMock : public I2CSenderWrapperInterface
 {
@@ -23,14 +23,14 @@ struct I2CSenderWrapperMock : public I2CSenderWrapperInterface
     }
 };
 
-struct TaskAwareDelayMock : public TaskAwareDelayInterface
+struct HardwareClockMockWitDelay : public HardwareClockMock
 {
     int32_t lastDelay[3];
     int8_t writePointer = 0;
 
-    virtual void delayMicros(int32_t micros)
+    virtual void delayMicroseconds(int32_t us)
     {
-        lastDelay[writePointer] = micros;
+        lastDelay[writePointer] = us;
         writePointer++;
     }
 };
@@ -94,7 +94,7 @@ void sendCommandToTripodOne()
     int8_t tripodOne[3][2] = {{8, 1}, {9, 0}, {10, 1}};
     sender.configureTripodOne(tripodOne);
 
-    TaskAwareDelayMock delayMock;
+    HardwareClockMockWitDelay delayMock;
 
     int32_t position = 4567;
     int32_t relativeTime = 1.5e6;
@@ -131,7 +131,7 @@ void sendCommandToTripodTwo()
     int32_t position = 4567;
     int32_t relativeTime = 1.5e6;
 
-    TaskAwareDelayMock delayMock;
+    HardwareClockMockWitDelay delayMock;
 
     sender.sendCommandToTripodTwo(position, relativeTime, &delayMock);
 

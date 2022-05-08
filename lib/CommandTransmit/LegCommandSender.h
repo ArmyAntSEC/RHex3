@@ -1,7 +1,7 @@
 #pragma once
 #include <base.h>
 #include "LegCommandBase.h"
-#include <RunnableInterface.h>
+#include <HardwareClock.h>
 
 struct I2CSenderWrapperInterface
 {
@@ -15,14 +15,14 @@ private:
     int8_t tripodOne[3][2];
     int8_t tripodTwo[3][2];
 
-    void sendCommandToTripod(int8_t tripod[3][2], int32_t position, int32_t relativeTimeMicros, TaskAwareDelayInterface *delay)
+    void sendCommandToTripod(int8_t tripod[3][2], int32_t position, int32_t relativeTimeMicros, HardwareClockInterface *delay)
     {
         for (int i = 0; i < 3; i++)
         {
             int8_t driverID = tripod[i][0];
             int8_t motorID = tripod[i][1];
             sendCommand(driverID, motorID, position, relativeTimeMicros);
-            delay->delayMicros(12e3);
+            delay->delayMicroseconds(12e3);
         }
     }
 
@@ -48,12 +48,12 @@ public:
         memcpy(tripodTwo, _tripodTwo, sizeof(tripodTwo));
     }
 
-    void sendCommandToTripodOne(int32_t position, int32_t relativeTimeMicros, TaskAwareDelayInterface *delay)
+    void sendCommandToTripodOne(int32_t position, int32_t relativeTimeMicros, HardwareClockInterface *delay)
     {
         sendCommandToTripod(tripodOne, position, relativeTimeMicros, delay);
     }
 
-    void sendCommandToTripodTwo(int32_t position, int32_t relativeTimeMicros, TaskAwareDelayInterface *delay)
+    void sendCommandToTripodTwo(int32_t position, int32_t relativeTimeMicros, HardwareClockInterface *delay)
     {
         sendCommandToTripod(tripodTwo, position, relativeTimeMicros, delay);
     }
